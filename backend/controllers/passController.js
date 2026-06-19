@@ -1215,19 +1215,13 @@ for (const approver of approversEmails) {
     });
 
   } catch (error) {
+  console.error(error);
 
-    console.log(error);
-
-    res.status(500).json({
-
-      success: false,
-
-      message:
-        "Server Error"
-
-    });
-
-  }
+  res.status(500).json({
+    success: false,
+    error: error.message
+  });
+}
 
 };
 
