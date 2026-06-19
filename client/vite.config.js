@@ -9,7 +9,7 @@ export default defineConfig({
       "/api": {
         target:
           process.env.VITE_API_PROXY_TARGET ||
-          "http://localhost:5000",
+          "https://dgpms-backend-h54g.onrender.com",
         changeOrigin: true,
       },
     },

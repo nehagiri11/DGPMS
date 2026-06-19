@@ -21,7 +21,7 @@ const pool =
 
        ssl: {
     rejectUnauthorized: false,
-  },
+     },
     waitForConnections: true,
 
     connectionLimit: 10,
