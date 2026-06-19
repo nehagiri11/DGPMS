@@ -1136,7 +1136,7 @@ async (req, res) => {
     }
 
    await writeAuditLog(
-  userId,
+   requesterId,
   "PASS_CREATED",
   `${passNo} created`
 );
@@ -1322,7 +1322,7 @@ async (req, res) => {
     );
 
     await writeAuditLog(
-  userId,
+  requesterId,
   "PASS_CREATED",
   `${passNo} created`
 );
@@ -1514,7 +1514,7 @@ async (req, res) => {
     );
 
     await writeAuditLog(
-  userId,
+  requesterId,
   "PASS_CREATED",
   `${passNo} created`
 );
