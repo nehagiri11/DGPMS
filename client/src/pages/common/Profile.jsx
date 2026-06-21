@@ -351,10 +351,7 @@ transition
                 </div>
 
               </div>
-
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-4 mb-6">
+              <div className="grid md:grid-cols-3 gap-4 mb-6">
 
               <div className="
 bg-white
@@ -414,6 +411,10 @@ transition
               </div>
 
             </div>
+
+            </div>
+
+            
 
             <div className="grid lg:grid-cols-2 gap-6 mb-6">
 
