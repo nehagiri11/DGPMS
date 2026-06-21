@@ -154,6 +154,15 @@
   page-break-inside: avoid;
 }
 
+.visitor-record-copy {
+  width: min(1100px, 100%);
+  margin: 0 auto 18px;
+  background: #ffffff;
+  padding: 20px;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
 @media print {
   @page {
     size: A4 portrait;
@@ -366,6 +375,30 @@
     margin-top: 8mm !important;
     break-before: page;
     page-break-before: always;
+  }
+
+  .visitor-card-sheet + .visitor-section-divider + .visitor-record-copy {
+    margin-top: 0 !important;
+    break-before: page;
+    page-break-before: always;
+  }
+
+  .visitor-record-copy {
+    font-size: 11px !important;
+    line-height: 1.25 !important;
+  }
+
+  .visitor-record-copy table {
+    font-size: 11px !important;
+  }
+
+  .visitor-record-copy th,
+  .visitor-record-copy td {
+    padding: 2.1mm !important;
+  }
+
+  .visitor-record-copy .print-person-name {
+    font-size: 11px !important;
   }
 
   .visitor-record-pass h1 {

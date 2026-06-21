@@ -7,7 +7,6 @@ import { useToast } from "../../components/ToastProvider";
 
 import axios from "axios";
 import {
-  formatValidationMessage,
   isValidPhoneNumber,
   requiredText,
   todayDateString,
@@ -55,6 +54,9 @@ const [isSubmitting, setIsSubmitting] =
 const [feedback, setFeedback] =
   useState(null);
 
+const [fieldErrors, setFieldErrors] =
+  useState({});
+
   const [visitors, setVisitors] = useState([
     {
       name: "",
@@ -83,7 +85,7 @@ const [feedback, setFeedback] =
       visitors.filter((_, i) => i !== index)
     );
   };
-  const updateVisitor = (
+ const updateVisitor = (
   index,
   field,
   value
@@ -93,11 +95,18 @@ const [feedback, setFeedback] =
     [...visitors];
 
     updatedVisitors[index][field] =
-    value;
+    field === "contact"
+      ? value.replace(/\D/g, "").slice(0, 10)
+      : value;
 
    setVisitors(
     updatedVisitors
    );
+
+   setFieldErrors((previous) => ({
+    ...previous,
+    [`visitor_${index}_${field}`]: ""
+   }));
  };
 
  const updateVisitorPhoto = (
@@ -155,27 +164,34 @@ const [feedback, setFeedback] =
     }
 
     setFeedback(null);
+    setFieldErrors({});
 
     const errors = [];
+    const nextFieldErrors = {};
 
     if (!requiredText(hostName)) {
       errors.push("Host employee name is required.");
+      nextFieldErrors.hostName = "Host employee name is required.";
     }
 
     if (!requiredText(hostDepartment)) {
       errors.push("Host department is required.");
+      nextFieldErrors.hostDepartment = "Host department is required.";
     }
 
     if (!requiredText(arrivalDate)) {
       errors.push("Arrival date is required.");
+      nextFieldErrors.arrivalDate = "Arrival date is required.";
     }
 
     if (!requiredText(departureDate)) {
       errors.push("Departure date is required.");
+      nextFieldErrors.departureDate = "Departure date is required.";
     }
 
     if (!requiredText(purpose)) {
       errors.push("Purpose of visit is required.");
+      nextFieldErrors.purpose = "Purpose of visit is required.";
     }
 
     visitors.forEach((visitor, index) => {
@@ -183,34 +199,41 @@ const [feedback, setFeedback] =
 
       if (!requiredText(visitor.name)) {
         errors.push(`Visitor ${rowNumber}: name is required.`);
+        nextFieldErrors[`visitor_${index}_name`] = "Visitor name is required.";
       }
 
       if (!requiredText(visitor.company)) {
         errors.push(`Visitor ${rowNumber}: company/organization is required.`);
+        nextFieldErrors[`visitor_${index}_company`] = "Company or organization is required.";
       }
 
       if (!requiredText(visitor.email)) {
         errors.push(`Visitor ${rowNumber}: email address is required.`);
+        nextFieldErrors[`visitor_${index}_email`] = "Email address is required.";
       } else if (
         !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
           visitor.email.trim()
         )
       ) {
         errors.push(`Visitor ${rowNumber}: enter a valid email address.`);
+        nextFieldErrors[`visitor_${index}_email`] = "Enter a valid email address.";
       }
 
       if (!requiredText(visitor.contact)) {
         errors.push(`Visitor ${rowNumber}: contact number is required.`);
+        nextFieldErrors[`visitor_${index}_contact`] = "Contact number is required.";
       } else if (
         !isValidPhoneNumber(
           visitor.contact
         )
       ) {
         errors.push(`Visitor ${rowNumber}: contact number must be 10 digits.`);
+        nextFieldErrors[`visitor_${index}_contact`] = "Contact number must be exactly 10 digits.";
       }
 
       if (!visitor.photo) {
         errors.push(`Visitor ${rowNumber}: photo is required for the badge.`);
+        nextFieldErrors[`visitor_${index}_photo`] = "Visitor photo is required for the badge.";
       }
     });
 
@@ -222,6 +245,7 @@ const [feedback, setFeedback] =
       arrivalDate < today
     ) {
       errors.push("Arrival date cannot be before today.");
+      nextFieldErrors.arrivalDate = "Arrival date cannot be before today.";
     }
 
     if (
@@ -230,14 +254,11 @@ const [feedback, setFeedback] =
       arrivalDate > departureDate
     ) {
       errors.push("Departure date must be the same as or after arrival date.");
+      nextFieldErrors.departureDate = "Departure date must be the same as or after arrival date.";
     }
 
     if (errors.length > 0) {
-      setFeedback({
-        type: "error",
-        message:
-          formatValidationMessage(errors)
-      });
+      setFieldErrors(nextFieldErrors);
       return;
     }
  
@@ -383,8 +404,9 @@ try {
 
                 <div className="grid md:grid-cols-2 gap-4">
 
-                  <input
-                    placeholder="Visitor Name"
+                  <div>
+                    <input
+                      placeholder="Visitor Name"
   value={visitor.name}
   onChange={(e) =>
   updateVisitor(
@@ -393,10 +415,17 @@ try {
     e.target.value
   )
 }
-  className="border rounded-lg p-3"
+  className="border rounded-lg p-3 w-full"
                   />
+                    {fieldErrors[`visitor_${index}_name`] && (
+                      <p className="text-red-600 text-sm mt-1">
+                        {fieldErrors[`visitor_${index}_name`]}
+                      </p>
+                    )}
+                  </div>
 
-                  <input
+                  <div>
+                    <input
                   
   placeholder="Company / Organization"
   value={visitor.company}
@@ -407,12 +436,19 @@ try {
       e.target.value
     )
   }
-  className="border rounded-lg p-3"
+  className="border rounded-lg p-3 w-full"
 />
+                    {fieldErrors[`visitor_${index}_company`] && (
+                      <p className="text-red-600 text-sm mt-1">
+                        {fieldErrors[`visitor_${index}_company`]}
+                      </p>
+                    )}
+                  </div>
   
                   
 
-                 <input
+                 <div>
+                   <input
   type="email"
   placeholder="Email Address"
   value={visitor.email}
@@ -423,10 +459,17 @@ try {
       e.target.value
     )
   }
-  className="border rounded-lg p-3"
+  className="border rounded-lg p-3 w-full"
 />
+                   {fieldErrors[`visitor_${index}_email`] && (
+                     <p className="text-red-600 text-sm mt-1">
+                       {fieldErrors[`visitor_${index}_email`]}
+                     </p>
+                   )}
+                 </div>
 
-                  <input
+                  <div>
+                    <input
   type="tel"
   placeholder="Contact Number"
   value={visitor.contact}
@@ -437,8 +480,15 @@ try {
       e.target.value
     )
   }
-  className="border rounded-lg p-3"
+  maxLength="10"
+  className="border rounded-lg p-3 w-full"
 />
+                    {fieldErrors[`visitor_${index}_contact`] && (
+                      <p className="text-red-600 text-sm mt-1">
+                        {fieldErrors[`visitor_${index}_contact`]}
+                      </p>
+                    )}
+                  </div>
 
                 </div>
 
@@ -475,6 +525,11 @@ try {
                     <p className="text-sm text-slate-500 mt-2">
                       Upload a clear front-facing photo. Maximum size: 1 MB.
                     </p>
+                    {fieldErrors[`visitor_${index}_photo`] && (
+                      <p className="text-red-600 text-sm mt-1">
+                        {fieldErrors[`visitor_${index}_photo`]}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -496,25 +551,47 @@ try {
 
             <div className="grid md:grid-cols-2 gap-4">
 
-              <input
+              <div>
+                <input
                placeholder="Host Employee Name"
                 value={hostName}
-                onChange={(e) =>
-                setHostName(e.target.value)
-                }
-                className="border rounded-lg p-3"
+                onChange={(e) => {
+                setHostName(e.target.value);
+                setFieldErrors((previous) => ({
+                  ...previous,
+                  hostName: ""
+                }));
+                }}
+                className="border rounded-lg p-3 w-full"
              />
+             {fieldErrors.hostName && (
+              <p className="text-red-600 text-sm mt-1">
+                {fieldErrors.hostName}
+              </p>
+             )}
+              </div>
 
+              <div>
               <input
   placeholder="Host Department"
   value={hostDepartment}
-  onChange={(e) =>
+  onChange={(e) => {
     setHostDepartment(
       e.target.value
-    )
-  }
-  className="border rounded-lg p-3"
+    );
+    setFieldErrors((previous) => ({
+      ...previous,
+      hostDepartment: ""
+    }));
+  }}
+  className="border rounded-lg p-3 w-full"
 />
+              {fieldErrors.hostDepartment && (
+                <p className="text-red-600 text-sm mt-1">
+                  {fieldErrors.hostDepartment}
+                </p>
+              )}
+              </div>
 
             </div>
 
@@ -532,13 +609,22 @@ try {
                <input
   type="date"
   value={arrivalDate}
-  onChange={(e) =>
+  onChange={(e) => {
     setArrivalDate(
       e.target.value
-    )
-  }
+    );
+    setFieldErrors((previous) => ({
+      ...previous,
+      arrivalDate: ""
+    }));
+  }}
   className="border rounded-lg p-3 w-full"
 />
+{fieldErrors.arrivalDate && (
+  <p className="text-red-600 text-sm mt-1">
+    {fieldErrors.arrivalDate}
+  </p>
+)}
 </div>
 
               <div>
@@ -549,13 +635,22 @@ try {
                 <input
   type="date"
   value={departureDate}
-  onChange={(e) =>
+  onChange={(e) => {
     setDepartureDate(
       e.target.value
-    )
-  }
+    );
+    setFieldErrors((previous) => ({
+      ...previous,
+      departureDate: ""
+    }));
+  }}
   className="border rounded-lg p-3 w-full"
 />
+{fieldErrors.departureDate && (
+  <p className="text-red-600 text-sm mt-1">
+    {fieldErrors.departureDate}
+  </p>
+)}
 </div>
 
             </div>
@@ -564,13 +659,17 @@ try {
               Purpose Of Visit
             </h2>
 
-            <select
+<select
   value={purpose}
-  onChange={(e) =>
+  onChange={(e) => {
     setPurpose(
       e.target.value
-    )
-  }
+    );
+    setFieldErrors((previous) => ({
+      ...previous,
+      purpose: ""
+    }));
+  }}
   className="w-full border rounded-lg p-3"
 >
 
@@ -597,6 +696,11 @@ try {
               <option>Other</option>
 
             </select>
+            {fieldErrors.purpose && (
+              <p className="text-red-600 text-sm mt-1">
+                {fieldErrors.purpose}
+              </p>
+            )}
 
             <h2 className="text-xl font-bold mt-10 mb-4">
               Additional Information

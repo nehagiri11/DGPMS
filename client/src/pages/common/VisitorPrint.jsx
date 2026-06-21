@@ -40,6 +40,17 @@ function VisitorPrint({ request }) {
       visitor: visitor.name,
     });
 
+  const detailRow = (label, value) => (
+    <div className="grid grid-cols-[95px_1fr] gap-2 py-1">
+      <span className="font-semibold">
+        {label}
+      </span>
+      <span>
+        : {value || "-"}
+      </span>
+    </div>
+  );
+
   const VisitorCard = ({ visitor }) => (
     <section className="visitor-pass-card">
       <header className="visitor-card-company">
@@ -108,89 +119,47 @@ function VisitorPrint({ request }) {
     </section>
   );
 
-  const renderVisitorGatePass = (copyTitle) => (
-    <section className="visitor-record-pass">
-      <div className="flex justify-between items-start mb-4">
-        <div className="text-center flex-1">
-          <h1 className="font-bold text-xl">
+  const renderVisitorGatePass = (copyTitle, showSecurityFields) => (
+    <section className="copy-section visitor-record-copy border-2 border-black flex flex-col min-h-[46vh]">
+      <div className="relative border-b border-black pb-8">
+        <div className="absolute right-2 -top-2 bg-white p-1">
+          <QRCodeCanvas
+            value={request.passNo}
+            size={76}
+          />
+        </div>
+
+        <div className="text-center px-32 -mt-2">
+          <h1 className="font-bold text-base leading-tight">
             LAXMI MOTOR CORPORATION PVT. LTD
           </h1>
-          <h2 className="font-bold">
+          <h2 className="font-semibold text-sm leading-tight mt-1">
             RAMGRAM-13, PARASI
           </h2>
-          <h3 className="font-bold text-lg mt-2">
+          <h3 className="font-bold text-base leading-tight mt-1">
             VISITOR GATE PASS
           </h3>
-          <p className="font-semibold">
+          <p className="font-semibold text-[10px] mt-1">
             {copyTitle}
           </p>
         </div>
-
-        <div className="relative -top-2 -left-2">
-  <QRCodeCanvas
-    value={request.passNo}
-    size={86}
-  />
-</div>
       </div>
 
-      <table className="w-full border-collapse border border-black">
-        <tbody>
-          <tr>
-            <td className="border border-black p-2 font-semibold">
-              Date
-            </td>
-            <td className="border border-black p-2">
-              {request.date}
-            </td>
-            <td className="border border-black p-2 font-semibold">
-              Pass No
-            </td>
-            <td className="border border-black p-2">
-              {request.passNo}
-            </td>
-          </tr>
-          <tr>
-            <td className="border border-black p-2 font-semibold">
-              Host Name
-            </td>
-            <td className="border border-black p-2">
-              {request.hostName}
-            </td>
-            <td className="border border-black p-2 font-semibold">
-              Department
-            </td>
-            <td className="border border-black p-2">
-              {request.hostDepartment}
-            </td>
-          </tr>
-          <tr>
-            <td className="border border-black p-2 font-semibold">
-              Valid From
-            </td>
-            <td className="border border-black p-2">
-              {request.arrivalDate}
-            </td>
-            <td className="border border-black p-2 font-semibold">
-              Valid To
-            </td>
-            <td className="border border-black p-2">
-              {request.departureDate}
-            </td>
-          </tr>
-          <tr>
-            <td className="border border-black p-2 font-semibold">
-              Purpose
-            </td>
-            <td
-              colSpan="3"
-              className="border border-black p-2"
-            >
-              {request.purpose || "N/A"}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div className="grid grid-cols-2 gap-10 border-b border-black py-4">
+        <div>
+          {detailRow("Host Name", request.hostName)}
+          {detailRow("Department", request.hostDepartment)}
+          {detailRow("Purpose", request.purpose)}
+          {detailRow("Vehicle No", request.vehicleNo)}
+        </div>
+
+        <div>
+          {detailRow("Gate Pass No", request.passNo)}
+          {detailRow("Date", request.date)}
+          {detailRow("Valid From", request.arrivalDate)}
+          {detailRow("Valid To", request.departureDate)}
+        </div>
+      </div>
 
       <table className="w-full border-collapse border border-black mt-4">
         <thead>
@@ -229,32 +198,69 @@ function VisitorPrint({ request }) {
         </tbody>
       </table>
 
-      <div className="grid grid-cols-2 gap-10 mt-16">
-        <div>
-          <p className="text-gray-500">
-            Prepared By
-          </p>
-          <p className="print-person-name font-bold">
-            {request.requester}
-          </p>
-        </div>
-
-        <div className="text-right">
-          <p className="text-gray-500">
-            Approved By
-          </p>
-          <p className="print-person-name font-bold">
-            {request.approvedBy || "Pending"}
-          </p>
-        </div>
-
+      <div className="border border-black p-2 mt-3 min-h-8">
+        <strong>Remarks:</strong> {request.remarks || "-"}
       </div>
 
-      <div className="text-center mt-12">
-  <p className="text-xs font-semibold">
-    This is a computer generated gate pass and does not require a signature.
-  </p>
-</div>
+      <div className="h-2"></div>
+
+      {showSecurityFields ? (
+        <div className="grid grid-cols-3 gap-8 mt-7 items-end">
+          <div>
+            <p className="text-gray-500">
+              Prepared By
+            </p>
+            <p className="print-person-name font-bold">
+              {request.requester}
+            </p>
+          </div>
+
+          <div className="ml-8">
+            <p className="text-gray-500">
+              Approved By
+            </p>
+            <p className="print-person-name font-bold">
+              {request.approvedBy || "Pending"}
+            </p>
+          </div>
+
+          <div className="ml-[90px]">
+            <p className="font-semibold">
+              Security Signature:
+            </p>
+            <p className="mt-3">
+              Date:
+            </p>
+            <p className="mt-3">
+              Time:
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-8 mt-10 items-end">
+          <div>
+            <p className="text-gray-500">
+              Prepared By
+            </p>
+            <p className="print-person-name font-bold">
+              {request.requester}
+            </p>
+          </div>
+
+          <div className="text-right">
+            <p className="text-gray-500">
+              Approved By
+            </p>
+            <p className="print-person-name font-bold">
+              {request.approvedBy || "Pending"}
+            </p>
+          </div>
+        </div>
+      )}
+
+      <p className="text-center text-[9px] font-medium text-slate-600 mt-3">
+        This is a computer generated gate pass and does not require a signature.
+      </p>
     </section>
   );
 
@@ -288,7 +294,7 @@ function VisitorPrint({ request }) {
         Visitor Gate Pass / Office Record
       </div>
 
-      {renderVisitorGatePass("SECURITY COPY - 1")}
+      {renderVisitorGatePass("SECURITY COPY - 1", true)}
 
       <div className="visitor-record-cut-line cut-line border-t-2 border-dotted border-black my-4 relative">
         <span className="absolute left-1/2 -translate-x-1/2 -top-3 bg-white px-3 text-xs font-semibold">
@@ -296,7 +302,7 @@ function VisitorPrint({ request }) {
         </span>
       </div>
 
-      {renderVisitorGatePass("OFFICE COPY - 2")}
+      {renderVisitorGatePass("OFFICE COPY - 2", false)}
     </div>
   );
 }
