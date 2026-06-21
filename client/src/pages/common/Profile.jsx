@@ -21,31 +21,35 @@ import {
 } from "recharts";
 
 import { FaUserCircle } from "react-icons/fa";
-const [mobileOpen, setMobileOpen] =
-  useState(false);
 
-const [profile, setProfile] =
-  useState(null);
+function Profile() {
 
-const [passes, setPasses] =
-  useState([]);
+  const [mobileOpen, setMobileOpen] =
+    useState(false);
 
-const [loading, setLoading] =
-  useState(true);
+  const [profile, setProfile] =
+    useState(null);
 
-const [calendarDate, setCalendarDate] =
-  useState(new Date());
+  const [passes, setPasses] =
+    useState([]);
 
-const loggedInUser =
-  JSON.parse(
-    localStorage.getItem("loggedInUser")
-  ) ||
-  JSON.parse(
-    localStorage.getItem("user")
-  );
+  const [loading, setLoading] =
+    useState(true);
 
-const role =
-  loggedInUser?.role;
+  const [calendarDate, setCalendarDate] =
+    useState(new Date());
+
+  const loggedInUser =
+    JSON.parse(
+      localStorage.getItem("loggedInUser")
+    ) ||
+    JSON.parse(
+      localStorage.getItem("user")
+    );
+
+  const role =
+    loggedInUser?.role;
+
   useEffect(() => {
 
   const loadData = async () => {
@@ -508,5 +512,9 @@ return (
     </div>
 
   </div>
+
+
 );
+}
+
 export default Profile;
