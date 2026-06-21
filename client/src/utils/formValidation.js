@@ -30,16 +30,12 @@ export const isValidPhoneNumber = (
   value
 ) => {
 
-  const text =
-    String(value || "").trim();
-
   const digits =
-    text.replace(/\D/g, "");
+    String(value || "")
+      .trim();
 
   return (
-    /^[0-9+\-\s()]+$/.test(text) &&
-    digits.length >= 10 &&
-    digits.length <= 15
+    /^\d{10}$/.test(digits)
   );
 
 };

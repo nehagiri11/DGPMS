@@ -372,16 +372,8 @@ function requiredText(value) {
 
 function isValidPhoneNumber(value) {
 
-  const text =
-    String(value || "").trim();
-
-  const digits =
-    text.replace(/\D/g, "");
-
-  return (
-    /^[0-9+\-\s()]+$/.test(text) &&
-    digits.length >= 10 &&
-    digits.length <= 15
+  return /^\d{10}$/.test(
+    String(value || "").trim()
   );
 
 }
@@ -747,7 +739,7 @@ function validateVisitorPass(body) {
             visitor.contact
           )
         ) {
-          errors.push(`Visitor ${rowNumber}: contact number must be 10 to 15 digits`);
+          errors.push(`Visitor ${rowNumber}: contact number must be exactly 10 digits`);
         }
 
         if (
@@ -787,7 +779,7 @@ function validateRegularPass(body) {
       body.driver_number
     )
   ) {
-    errors.push("Driver number must be 10 to 15 digits");
+    errors.push("Driver number must be exactly 10 digits");
   }
 
   if (!requiredText(body.vehicle_no)) {
@@ -826,7 +818,7 @@ function validateCKDPass(body) {
       body.driver_number
     )
   ) {
-    errors.push("Driver number must be 10 to 15 digits");
+    errors.push("Driver number must be exactly 10 digits");
   }
 
   if (!requiredText(body.truck_number)) {

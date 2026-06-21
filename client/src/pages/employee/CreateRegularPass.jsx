@@ -66,6 +66,8 @@ const [isSubmitting, setIsSubmitting] =
 
 const [feedback, setFeedback] =
   useState(null);
+const [fieldErrors, setFieldErrors] =
+  useState({});
 
   const [items, setItems] = useState([
     {
@@ -98,31 +100,38 @@ const [feedback, setFeedback] =
     setFeedback(null);
 
     const errors = [];
+    const nextFieldErrors = {};
 
     if (!requiredText(companyName)) {
-      errors.push("Company name is required.");
+      nextFieldErrors.companyName =
+        "Company name is required.";
     }
 
     if (!requiredText(driverName)) {
-      errors.push("Driver name is required.");
+      nextFieldErrors.driverName =
+        "Driver name is required.";
     }
 
     if (!requiredText(driverNumber)) {
-      errors.push("Driver number is required.");
+      nextFieldErrors.driverNumber =
+        "Driver number is required.";
     } else if (
       !isValidPhoneNumber(
         driverNumber
       )
     ) {
-      errors.push("Driver number must be 10 digits.");
+      nextFieldErrors.driverNumber =
+        "Driver number must be exactly 10 digits.";
     }
 
     if (!requiredText(vehicleNumber)) {
-      errors.push("Vehicle number is required.");
+      nextFieldErrors.vehicleNumber =
+        "Vehicle number is required.";
     }
 
     if (!requiredText(category)) {
-      errors.push("Pass category is required.");
+      nextFieldErrors.category =
+        "Pass category is required.";
     }
 
     errors.push(
@@ -139,12 +148,23 @@ const [feedback, setFeedback] =
       errors.push("Exit time must be after entry time.");
     }
 
-    if (errors.length > 0) {
-      setFeedback({
-        type: "error",
-        message:
-          formatValidationMessage(errors)
-      });
+    setFieldErrors(
+      nextFieldErrors
+    );
+
+    if (
+      errors.length > 0 ||
+      Object.keys(nextFieldErrors).length > 0
+    ) {
+      setFeedback(
+        errors.length > 0
+          ? {
+              type: "error",
+              message:
+                formatValidationMessage(errors)
+            }
+          : null
+      );
       return;
     }
 
@@ -272,29 +292,40 @@ const [feedback, setFeedback] =
             <div className="grid md:grid-cols-3 gap-4">
 
               <input
-  type="date"
-  value={passDate}
-  readOnly
-  className="border rounded-lg p-3 bg-slate-100"
-/>
-
-<input
-  type="text"
-  value={passTime}
-  readOnly
-  className="border rounded-lg p-3 bg-slate-100"
-/>
+                type="date"
+                value={passDate}
+                readOnly
+                className="border rounded-lg p-3 bg-slate-100"
+              />
 
               <input
-  placeholder="Company Name"
-  value={companyName}
-  onChange={(e) =>
-    setCompanyName(
-      e.target.value
-    )
-  }
-  className="border rounded-lg p-3"
-/>
+                type="text"
+                value={passTime}
+                readOnly
+                className="border rounded-lg p-3 bg-slate-100"
+              />
+
+              <div>
+                <input
+                  placeholder="Company Name"
+                  value={companyName}
+                  onChange={(e) =>
+                    setCompanyName(
+                      e.target.value
+                    )
+                  }
+                  className={`border rounded-lg p-3 w-full ${
+                    fieldErrors.companyName
+                      ? "border-red-500"
+                      : ""
+                  }`}
+                />
+                {fieldErrors.companyName && (
+                  <p className="text-red-600 text-sm mt-1">
+                    {fieldErrors.companyName}
+                  </p>
+                )}
+              </div>
 
             </div>
 
@@ -306,39 +337,76 @@ const [feedback, setFeedback] =
 
             <div className="grid md:grid-cols-3 gap-4">
 
-              <input
-  placeholder="Driver Name"
-  value={driverName}
-  onChange={(e) =>
-    setDriverName(
-      e.target.value
-    )
-  }
-  className="border rounded-lg p-3"
-/>
+              <div>
+                <input
+                  placeholder="Driver Name"
+                  value={driverName}
+                  onChange={(e) =>
+                    setDriverName(
+                      e.target.value
+                    )
+                  }
+                  className={`border rounded-lg p-3 w-full ${
+                    fieldErrors.driverName
+                      ? "border-red-500"
+                      : ""
+                  }`}
+                />
+                {fieldErrors.driverName && (
+                  <p className="text-red-600 text-sm mt-1">
+                    {fieldErrors.driverName}
+                  </p>
+                )}
+              </div>
 
-              <input
-  type="tel"
-  placeholder="Driver Number"
-  value={driverNumber}
-  onChange={(e) =>
-    setDriverNumber(
-      e.target.value
-    )
-  }
-  className="border rounded-lg p-3"
-/>
+              <div>
+                <input
+                  type="tel"
+                  placeholder="Driver Number"
+                  value={driverNumber}
+                  maxLength={10}
+                  onChange={(e) =>
+                    setDriverNumber(
+                      e.target.value.replace(
+                        /\D/g,
+                        ""
+                      ).slice(0, 10)
+                    )
+                  }
+                  className={`border rounded-lg p-3 w-full ${
+                    fieldErrors.driverNumber
+                      ? "border-red-500"
+                      : ""
+                  }`}
+                />
+                {fieldErrors.driverNumber && (
+                  <p className="text-red-600 text-sm mt-1">
+                    {fieldErrors.driverNumber}
+                  </p>
+                )}
+              </div>
 
-             <input
-  placeholder="Vehicle Number"
-  value={vehicleNumber}
-  onChange={(e) =>
-    setVehicleNumber(
-      e.target.value
-    )
-  }
-  className="border rounded-lg p-3"
-/>
+              <div>
+                <input
+                  placeholder="Vehicle Number"
+                  value={vehicleNumber}
+                  onChange={(e) =>
+                    setVehicleNumber(
+                      e.target.value
+                    )
+                  }
+                  className={`border rounded-lg p-3 w-full ${
+                    fieldErrors.vehicleNumber
+                      ? "border-red-500"
+                      : ""
+                  }`}
+                />
+                {fieldErrors.vehicleNumber && (
+                  <p className="text-red-600 text-sm mt-1">
+                    {fieldErrors.vehicleNumber}
+                  </p>
+                )}
+              </div>
 
             </div>
 
@@ -353,7 +421,11 @@ const [feedback, setFeedback] =
               onChange={(e) =>
                 setCategory(e.target.value)
               }
-              className="w-full border rounded-lg p-3"
+              className={`w-full border rounded-lg p-3 ${
+                fieldErrors.category
+                  ? "border-red-500"
+                  : ""
+              }`}
             >
               <option value="">
                 Select Category
@@ -380,6 +452,11 @@ const [feedback, setFeedback] =
               </option>
 
             </select>
+            {fieldErrors.category && (
+              <p className="text-red-600 text-sm mt-1">
+                {fieldErrors.category}
+              </p>
+            )}
 
             {/* Material Details */}
 
