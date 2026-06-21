@@ -199,6 +199,29 @@ return (
         <h1 className="text-3xl font-bold mb-6">
           My Profile
         </h1>
+        <div className="
+mb-6
+rounded-3xl
+bg-gradient-to-r
+from-indigo-600
+via-blue-600
+to-cyan-600
+text-white
+p-8
+shadow-2xl
+">
+  <h2 className="text-3xl font-bold">
+    Welcome Back, {profile?.full_name || "User"} 👋
+  </h2>
+
+  <p className="mt-2 text-blue-100">
+    Track your gate pass activities,
+    approvals and daily performance.
+  </p>
+</div>
+        
+
+
 
         {loading ? (
 
@@ -212,20 +235,30 @@ return (
 
             <div className="grid lg:grid-cols-3 gap-6 mb-6">
 
-              <div className="bg-white rounded-2xl shadow p-6">
+             <div className="
+bg-gradient-to-br
+from-blue-600
+to-indigo-700
+text-white
+rounded-3xl
+shadow-2xl
+p-8
+border
+border-blue-400
+">
 
                 <div className="flex flex-col items-center">
 
                   <FaUserCircle
-                    size={100}
-                    className="text-blue-600"
-                  />
+  size={120}
+  className="text-white"
+/>
 
                   <h2 className="text-2xl font-bold mt-4">
                     {profile?.full_name}
                   </h2>
 
-                  <p className="text-slate-500">
+                 <p className="text-blue-100">
                     {profile?.role_name}
                   </p>
 
@@ -234,7 +267,7 @@ return (
                 <div className="mt-6 space-y-4">
 
                   <div>
-                    <p className="text-slate-500">
+                    <p className="text-blue-100">
                       Employee Code
                     </p>
 
@@ -244,7 +277,7 @@ return (
                   </div>
 
                   <div>
-                    <p className="text-slate-500">
+                   <p className="text-blue-100">
                       Email
                     </p>
 
@@ -254,7 +287,7 @@ return (
                   </div>
 
                   <div>
-                    <p className="text-slate-500">
+                    <p className="text-blue-100">
                       Joined
                     </p>
 
@@ -277,28 +310,38 @@ return (
 
                 <div className="grid md:grid-cols-4 gap-4">
 
-                  <div className="bg-blue-600 text-white rounded-xl p-5 shadow">
+                  <div className="
+bg-gradient-to-r
+from-blue-500
+to-blue-700
+text-white
+rounded-2xl
+p-6
+shadow-xl
+hover:scale-105
+transition
+">
                     <p>Total Passes</p>
                     <h2 className="text-3xl font-bold">
                       {totalPasses}
                     </h2>
                   </div>
 
-                  <div className="bg-yellow-500 text-white rounded-xl p-5 shadow">
+                  <div className="bg-gradient-to-r from-amber-400 to-orange-500s text-white rounded-xl p-5 shadow">
                     <p>Pending</p>
                     <h2 className="text-3xl font-bold">
                       {pendingPasses}
                     </h2>
                   </div>
 
-                  <div className="bg-green-600 text-white rounded-xl p-5 shadow">
+                  <div className="bg-gradient-to-r from-green-500 to-emerald-700 text-white rounded-xl p-5 shadow">
                     <p>Approved</p>
                     <h2 className="text-3xl font-bold">
                       {approvedPasses}
                     </h2>
                   </div>
 
-                  <div className="bg-red-600 text-white rounded-xl p-5 shadow">
+                  <div className="bg-gradient-to-r from-red-500 to-rose-700 text-white rounded-xl p-5 shadow">
                     <p>Rejected</p>
                     <h2 className="text-3xl font-bold">
                       {rejectedPasses}
@@ -313,7 +356,16 @@ return (
 
             <div className="grid md:grid-cols-3 gap-4 mb-6">
 
-              <div className="bg-white rounded-xl shadow p-5">
+              <div className="
+bg-white
+rounded-2xl
+shadow-lg
+border-l-8
+border-blue-500
+p-6
+hover:shadow-xl
+transition
+">
                 <p className="text-slate-500">
                   Visitor Passes
                 </p>
@@ -323,7 +375,16 @@ return (
                 </h2>
               </div>
 
-              <div className="bg-white rounded-xl shadow p-5">
+              <div className="
+bg-white
+rounded-2xl
+shadow-lg
+border-l-8
+border-green-500
+p-6
+hover:shadow-xl
+transition
+">
                 <p className="text-slate-500">
                   Regular Passes
                 </p>
@@ -333,7 +394,16 @@ return (
                 </h2>
               </div>
 
-              <div className="bg-white rounded-xl shadow p-5">
+              <div className="
+bg-white
+rounded-2xl
+shadow-lg
+border-l-8
+border-purple-500
+p-6
+hover:shadow-xl
+transition
+">
                 <p className="text-slate-500">
                   CKD Passes
                 </p>
@@ -347,10 +417,16 @@ return (
 
             <div className="grid lg:grid-cols-2 gap-6 mb-6">
 
-              <div className="bg-white rounded-xl shadow p-5">
-
+             <div className="
+bg-white
+rounded-3xl
+shadow-xl
+p-6
+border
+border-slate-200
+">
                 <h2 className="text-xl font-bold mb-4">
-                  Daily Pass Activity
+                  📈 Daily Pass Activity
                 </h2>
 
                 <ResponsiveContainer
@@ -388,13 +464,15 @@ return (
               <div className="bg-white rounded-xl shadow p-5">
 
                 <h2 className="text-xl font-bold mb-4">
-                  Calendar
+                 📅 Work Calendar
                 </h2>
 
-                <Calendar
-                  value={calendarDate}
-                  onChange={setCalendarDate}
-                />
+               <div className="flex justify-center">
+  <Calendar
+    value={calendarDate}
+    onChange={setCalendarDate}
+  />
+</div>
 
               </div>
 
@@ -405,7 +483,7 @@ return (
               <div className="bg-white rounded-xl shadow p-5">
 
                 <h2 className="text-xl font-bold mb-4">
-                  Pass Status Analytics
+                  📊 Pass Status Analytics
                 </h2>
 
                 <ResponsiveContainer
@@ -418,7 +496,7 @@ return (
                     <Pie
                       data={statusData}
                       dataKey="value"
-                      outerRadius={100}
+                      outerRadius={120}
                       label
                     >
 
@@ -439,16 +517,16 @@ return (
               <div className="bg-white rounded-xl shadow p-5">
 
                 <h2 className="text-xl font-bold mb-4">
-                  Recent Passes
+                  📝 Recent Passes
                 </h2>
 
                 <div className="overflow-auto">
 
-                  <table className="w-full">
+                  <table className="w-full text-sm">
 
                     <thead>
 
-                      <tr className="border-b">
+                      <tr className="border-b bg-slate-100">
 
                         <th className="text-left py-2">
                           Pass No
