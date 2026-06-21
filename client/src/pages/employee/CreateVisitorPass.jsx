@@ -206,7 +206,7 @@ const [feedback, setFeedback] =
           visitor.contact
         )
       ) {
-        errors.push(`Visitor ${rowNumber}: contact number must be 10 to 15 digits.`);
+        errors.push(`Visitor ${rowNumber}: contact number must be 10 digits.`);
       }
 
       if (!visitor.photo) {

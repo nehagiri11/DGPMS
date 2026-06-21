@@ -109,7 +109,7 @@ const [feedback, setFeedback] =
       driverNumber
     )
   ) {
-    errors.push("Driver number must be 10 to 15 digits.");
+    errors.push("Driver number must be 10  digits.");
   }
 
   if (!requiredText(truckNumber)) {
