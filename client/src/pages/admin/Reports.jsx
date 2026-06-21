@@ -8,10 +8,14 @@ import TableShell from "../../components/TableShell";
 import PaginationControls from "../../components/PaginationControls";
 import jsPDF from "jspdf";
 import { mapApiPass } from "../../utils/passMapper";
+import { useNavigate } from "react-router-dom";
 
 function Reports() {
   const [mobileOpen, setMobileOpen] =
   useState(false);
+
+  const navigate =
+    useNavigate();
 
   const [requests, setRequests] =
     useState([]);
@@ -67,7 +71,7 @@ function Reports() {
           )
         );
 
-      } catch (error) {
+      } catch {
 
         setRequests([]);
 
@@ -113,13 +117,6 @@ function Reports() {
       (r) =>
         r.status ===
         "Pending"
-    );
-
-  const rejectedPasses =
-    requests.filter(
-      (r) =>
-        r.status ===
-        "Rejected"
     );
 
   const insidePasses =
@@ -193,16 +190,6 @@ function Reports() {
       (page - 1) * pageSize,
       page * pageSize
     );
-
-  useEffect(() => {
-    setPage(1);
-  }, [
-    selectedType,
-    selectedStatus,
-    passNumberFilter,
-    dateFilter,
-    requesterFilter,
-  ]);
 
   const exportPDF = () => {
 
@@ -466,22 +453,24 @@ function Reports() {
                 type="text"
                 placeholder="Pass Number"
                 value={passNumberFilter}
-                onChange={(e) =>
+                onChange={(e) => {
                   setPassNumberFilter(
                     e.target.value
-                  )
-                }
+                  );
+                  setPage(1);
+                }}
                 className="border p-3 rounded-lg"
               />
 
               <input
                 type="date"
                 value={dateFilter}
-                onChange={(e) =>
+                onChange={(e) => {
                   setDateFilter(
                     e.target.value
-                  )
-                }
+                  );
+                  setPage(1);
+                }}
                 className="border p-3 rounded-lg"
               />
 
@@ -489,11 +478,12 @@ function Reports() {
                 type="text"
                 placeholder="Requester"
                 value={requesterFilter}
-                onChange={(e) =>
+                onChange={(e) => {
                   setRequesterFilter(
                     e.target.value
-                  )
-                }
+                  );
+                  setPage(1);
+                }}
                 className="border p-3 rounded-lg"
               />
 
@@ -505,11 +495,12 @@ function Reports() {
                 value={
                   selectedType
                 }
-                onChange={(e) =>
+                onChange={(e) => {
                   setSelectedType(
                     e.target.value
-                  )
-                }
+                  );
+                  setPage(1);
+                }}
                 className="border p-3 rounded-lg"
               >
 
@@ -535,11 +526,12 @@ function Reports() {
                 value={
                   selectedStatus
                 }
-                onChange={(e) =>
+                onChange={(e) => {
                   setSelectedStatus(
                     e.target.value
-                  )
-                }
+                  );
+                  setPage(1);
+                }}
                 className="border p-3 rounded-lg"
               >
 
@@ -570,6 +562,7 @@ function Reports() {
                 setRequesterFilter("");
                 setSelectedType("ALL");
                 setSelectedStatus("ALL");
+                setPage(1);
               }}
               className="mt-4 px-4 py-2 rounded-lg bg-slate-200 hover:bg-slate-300"
             >
@@ -657,6 +650,10 @@ function Reports() {
                     Exit Time
                   </th>
 
+                  <th className="p-4">
+                    Action
+                  </th>
+
                 </tr>
 
               </thead>
@@ -734,12 +731,26 @@ function Reports() {
 
                       </td>
 
+                      <td className="p-4">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            navigate(
+                              `/admin/pass-details/${request.passNo}`
+                            )
+                          }
+                          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                        >
+                          View Details
+                        </button>
+                      </td>
+
                     </tr>
 
                   )
                 ) : (
                   <tr>
-                    <td colSpan="7" className="p-0">
+                    <td colSpan="8" className="p-0">
                       <EmptyState
                         title="No Report Data"
                         message="Try changing the filters or creating a new pass."

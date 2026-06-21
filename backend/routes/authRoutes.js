@@ -8,7 +8,8 @@ express.Router();
 const {
   register,
   login,
-  profile
+  profile,
+  changePassword
 } = require(
   "../controllers/authController"
 );
@@ -44,6 +45,12 @@ router.get(
   "/profile",
   authMiddleware,
   profile
+);
+
+router.put(
+  "/change-password",
+  authMiddleware,
+  changePassword
 );
 router.get(
   "/test-email",

@@ -27,6 +27,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ToastProvider from "./components/ToastProvider";
 import ApproverNotifications
 from "./pages/approver/Notifications";
+import Profile from "./pages/common/Profile";
 
 function App() {
   const protect = (
@@ -48,6 +49,14 @@ function App() {
         
 
         <Route path="/" element={<Login />} />
+
+        <Route
+          path="/employee/profile"
+          element={protect(
+            <Profile />,
+            ["REQUESTER", "EMPLOYEE"]
+          )}
+        />
 
         <Route
           path="/employee/dashboard"
@@ -98,6 +107,14 @@ function App() {
             ["REQUESTER", "EMPLOYEE"]
           )}
         />
+        <Route
+          path="/approver/profile"
+          element={protect(
+            <Profile />,
+            ["APPROVER"]
+          )}
+        />
+
         <Route
           path="/approver/dashboard"
           element={protect(
@@ -160,7 +177,15 @@ function App() {
           )}
         />
 
-        <Route
+<Route
+  path="/security/profile"
+  element={protect(
+    <Profile />,
+    ["SECURITY"]
+  )}
+/>
+
+<Route
   path="/security/dashboard"
   element={protect(
     <SecurityDashboard />,
@@ -210,6 +235,14 @@ function App() {
 />
 
 <Route
+  path="/admin/profile"
+  element={protect(
+    <Profile />,
+    ["ADMIN"]
+  )}
+/>
+
+<Route
   path="/admin/dashboard"
   element={protect(
     <AdminDashboard />,
@@ -236,6 +269,14 @@ function App() {
   path="/admin/audit"
   element={protect(
     <AuditLogs />,
+    ["ADMIN"]
+  )}
+/>
+
+<Route
+  path="/admin/pass-details/:passNo"
+  element={protect(
+    <EmployeeRequestDetails />,
     ["ADMIN"]
   )}
 />

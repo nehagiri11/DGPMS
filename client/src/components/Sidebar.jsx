@@ -34,6 +34,10 @@ function Sidebar({
       title: "Notifications",
       path: "/employee/notifications",
     },
+    {
+      title: "Profile",
+      path: "/employee/profile",
+    },
   ];
 
   const approverMenu = [
@@ -75,6 +79,10 @@ function Sidebar({
   title: "Notifications",
   path: "/approver/notifications",
 },
+{
+  title: "Profile",
+  path: "/approver/profile",
+},
 
 ];
 
@@ -88,7 +96,11 @@ function Sidebar({
     {
   title: "Manual Verification",
   path: "/security/manual-verification",
-}
+},
+{
+  title: "Profile",
+  path: "/security/profile",
+},
   ];
 
   const adminMenu = [
@@ -109,6 +121,10 @@ function Sidebar({
       title: "Audit Logs",
       path: "/admin/audit",
     },
+    {
+      title: "Profile",
+      path: "/admin/profile",
+    },
 
     
   ];
@@ -125,7 +141,7 @@ const handleLogout = () => {
   navigate("/");
 };
 
-  let menuItems = [];
+  let menuItems;
 
   switch (role) {
     case "APPROVER":

@@ -8,7 +8,6 @@ import {
   useParams,
 } from "react-router-dom";
 import axios from "axios";
-import { QRCodeCanvas } from "qrcode.react";
 import { mapApiPass } from "../../utils/passMapper";
 
 
@@ -68,7 +67,7 @@ function RequestDetails() {
           mapApiPass(response.data.pass)
         );
 
-      } catch (error) {
+      } catch {
 
         setRequest(null);
 
@@ -657,6 +656,63 @@ function RequestDetails() {
   </div>
 
   
+  <div className="bg-slate-50 rounded-2xl p-6 mb-6">
+    <h2 className="text-2xl font-bold mb-4">
+      Security Action Logs
+    </h2>
+
+    {request.entryExitLogs?.length > 0 ? (
+      <table className="w-full">
+        <thead>
+          <tr className="bg-slate-100">
+            <th className="p-3 text-left">
+              Action
+            </th>
+            <th className="p-3 text-left">
+              Security User
+            </th>
+            <th className="p-3 text-left">
+              Gate Status
+            </th>
+            <th className="p-3 text-left">
+              Time
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {request.entryExitLogs.map((log) => (
+            <tr
+              key={log.log_id}
+              className="border-b"
+            >
+              <td className="p-3">
+                {log.action}
+              </td>
+              <td className="p-3">
+                {log.securityUserName ||
+                  log.security_user_name ||
+                  "-"}
+              </td>
+              <td className="p-3">
+                {log.gateStatusAfter ||
+                  log.gate_status_after ||
+                  "-"}
+              </td>
+              <td className="p-3">
+                {log.createdAt ||
+                  log.created_at ||
+                  "-"}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ) : (
+      <p className="text-slate-500">
+        No security entry/exit activity recorded yet.
+      </p>
+    )}
+  </div>
 
   {/* Approval Decision */}
 

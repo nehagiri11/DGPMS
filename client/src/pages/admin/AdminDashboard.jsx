@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
@@ -22,6 +23,9 @@ import {
 function AdminDashboard() {
   const [mobileOpen, setMobileOpen] =
   useState(false);
+
+  const navigate =
+    useNavigate();
 
   const [selectedView,
   setSelectedView] =
@@ -86,7 +90,7 @@ function AdminDashboard() {
           )
         );
 
-      } catch (error) {
+      } catch {
 
         setUsers([]);
         setRequests([]);
@@ -849,6 +853,10 @@ const selectedPasses =
                         Gate Status
                       </th>
 
+                      <th className="p-3 text-left">
+                        Action
+                      </th>
+
                     </tr>
 
                   </thead>
@@ -885,11 +893,25 @@ const selectedPasses =
                             "-"}
                         </td>
 
+                        <td className="p-3">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              navigate(
+                                `/admin/pass-details/${request.passNo}`
+                              )
+                            }
+                            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                          >
+                            View Details
+                          </button>
+                        </td>
+
                       </tr>
 
                     )) : (
                       <tr>
-                        <td colSpan="5" className="p-0">
+                        <td colSpan="6" className="p-0">
                           <EmptyState
                             title="No Passes Found"
                             message="Matching gate passes will appear here."

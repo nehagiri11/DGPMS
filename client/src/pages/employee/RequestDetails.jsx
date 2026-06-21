@@ -3,7 +3,6 @@ import Sidebar from "../../components/Sidebar";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { QRCodeCanvas } from "qrcode.react";
 import { mapApiPass } from "../../utils/passMapper";
 
 function RequestDetails() {
@@ -11,6 +10,17 @@ function RequestDetails() {
   useState(false);
 
   const { passNo } = useParams();
+
+  const loggedInUser =
+    JSON.parse(
+      localStorage.getItem("loggedInUser")
+    ) ||
+    JSON.parse(
+      localStorage.getItem("user")
+    );
+
+  const role =
+    loggedInUser?.role || "REQUESTER";
 
   const [request, setRequest] =
     useState(null);
@@ -45,7 +55,7 @@ function RequestDetails() {
           mapApiPass(response.data.pass)
         );
 
-      } catch (error) {
+      } catch {
 
         setRequest(null);
 
@@ -84,13 +94,13 @@ function RequestDetails() {
   return (
     <div className="flex">
 
-      <Sidebar role="REQUESTER" 
+      <Sidebar role={role} 
       mobileOpen={mobileOpen}
   setMobileOpen={setMobileOpen}/>
 
       <div className="flex-1 bg-slate-100 min-h-screen">
 
-        <Navbar role="REQUESTER" 
+        <Navbar role={role} 
         mobileOpen={mobileOpen}
   setMobileOpen={setMobileOpen}/>
 
@@ -622,6 +632,64 @@ request.items?.length > 0 && (
             </div>
 
           )}
+
+          <div className="bg-white rounded-3xl shadow-xl p-8 mb-8">
+            <h2 className="text-2xl font-bold mb-6">
+              Security Action Logs
+            </h2>
+
+            {request.entryExitLogs?.length > 0 ? (
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-slate-100">
+                    <th className="p-3 text-left">
+                      Action
+                    </th>
+                    <th className="p-3 text-left">
+                      Security User
+                    </th>
+                    <th className="p-3 text-left">
+                      Gate Status
+                    </th>
+                    <th className="p-3 text-left">
+                      Time
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {request.entryExitLogs.map((log) => (
+                    <tr
+                      key={log.log_id}
+                      className="border-b"
+                    >
+                      <td className="p-3">
+                        {log.action}
+                      </td>
+                      <td className="p-3">
+                        {log.securityUserName ||
+                          log.security_user_name ||
+                          "-"}
+                      </td>
+                      <td className="p-3">
+                        {log.gateStatusAfter ||
+                          log.gate_status_after ||
+                          "-"}
+                      </td>
+                      <td className="p-3">
+                        {log.createdAt ||
+                          log.created_at ||
+                          "-"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p className="text-slate-500">
+                No security entry/exit activity recorded yet.
+              </p>
+            )}
+          </div>
 
           {/* Print Button */}
 
