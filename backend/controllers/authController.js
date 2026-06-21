@@ -288,10 +288,12 @@ exports.profile = async (
 
         `
         SELECT
-          u.user_id,
-          u.full_name,
-          u.email,
-          r.role_name
+u.user_id,
+u.employee_code,
+u.full_name,
+u.email,
+u.created_at,
+r.role_name
         FROM users u
         JOIN roles r
           ON u.role_id = r.role_id

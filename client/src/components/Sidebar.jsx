@@ -34,10 +34,7 @@ function Sidebar({
       title: "Notifications",
       path: "/employee/notifications",
     },
-    {
-      title: "Profile",
-      path: "/employee/profile",
-    },
+    ,
   ];
 
   const approverMenu = [
@@ -79,10 +76,7 @@ function Sidebar({
   title: "Notifications",
   path: "/approver/notifications",
 },
-{
-  title: "Profile",
-  path: "/approver/profile",
-},
+
 
 ];
 
@@ -97,10 +91,7 @@ function Sidebar({
   title: "Manual Verification",
   path: "/security/manual-verification",
 },
-{
-  title: "Profile",
-  path: "/security/profile",
-},
+
   ];
 
   const adminMenu = [
@@ -121,14 +112,33 @@ function Sidebar({
       title: "Audit Logs",
       path: "/admin/audit",
     },
-    {
-      title: "Profile",
-      path: "/admin/profile",
-    },
+    
 
     
   ];
   const navigate = useNavigate();
+  const user =
+  JSON.parse(
+    localStorage.getItem("loggedInUser")
+  ) ||
+  JSON.parse(
+    localStorage.getItem("user")
+  );
+
+const getProfilePath = () => {
+
+  if (role === "APPROVER")
+    return "/approver/profile";
+
+  if (role === "SECURITY")
+    return "/security/profile";
+
+  if (role === "ADMIN")
+    return "/admin/profile";
+
+  return "/employee/profile";
+
+};
 
 const handleLogout = () => {
 
@@ -221,23 +231,82 @@ const handleLogout = () => {
         ))}
 
       </ul>
-      <div className="mt-auto p-4 border-t border-slate-700">
+      <div className="mt-auto border-t border-slate-700">
 
-  <button
-    onClick={handleLogout}
+  <Link
+    to={getProfilePath()}
+    onClick={() =>
+      setMobileOpen(false)
+    }
     className="
-      w-full
-      bg-red-600
-      hover:bg-red-700
-      text-white
-      py-3
-      rounded-lg
-      font-semibold
+      block
+      p-4
+      hover:bg-slate-800
       transition
+      border-b
+      border-slate-700
     "
   >
-    Logout
-  </button>
+
+    <div className="flex items-center gap-3">
+
+      <div
+        className="
+          h-12
+          w-12
+          rounded-full
+          bg-blue-600
+          flex
+          items-center
+          justify-center
+          text-white
+          font-bold
+          text-lg
+          shrink-0
+        "
+      >
+        {
+          user?.full_name
+            ?.charAt(0)
+            ?.toUpperCase() || "U"
+        }
+      </div>
+
+      <div className="overflow-hidden">
+
+        <p className="font-semibold truncate">
+          {user?.full_name || "User"}
+        </p>
+
+        <p className="text-xs text-slate-300 truncate">
+          {role}
+        </p>
+
+      </div>
+
+    </div>
+
+  </Link>
+
+  <div className="p-4">
+
+    <button
+      onClick={handleLogout}
+      className="
+        w-full
+        bg-red-600
+        hover:bg-red-700
+        text-white
+        py-3
+        rounded-lg
+        font-semibold
+        transition
+      "
+    >
+      Logout
+    </button>
+
+  </div>
 
 </div>
     </div>

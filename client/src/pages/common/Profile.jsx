@@ -1,210 +1,241 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+
 import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
-import FeedbackMessage from "../../components/FeedbackMessage";
-import { useToast } from "../../components/ToastProvider";
 
-function Profile() {
-  const [mobileOpen, setMobileOpen] =
-    useState(false);
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
 
-  const showToast =
-    useToast();
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid
+} from "recharts";
 
-  const loggedInUser =
-    JSON.parse(
-      localStorage.getItem("loggedInUser")
-    ) ||
-    JSON.parse(
-      localStorage.getItem("user")
-    );
+import { FaUserCircle } from "react-icons/fa";
+const [mobileOpen, setMobileOpen] =
+  useState(false);
 
-  const role =
-    loggedInUser?.role;
+const [profile, setProfile] =
+  useState(null);
 
-  const [profile, setProfile] =
-    useState(null);
+const [passes, setPasses] =
+  useState([]);
 
-  const [currentPassword, setCurrentPassword] =
-    useState("");
+const [loading, setLoading] =
+  useState(true);
 
-  const [newPassword, setNewPassword] =
-    useState("");
+const [calendarDate, setCalendarDate] =
+  useState(new Date());
 
-  const [confirmPassword, setConfirmPassword] =
-    useState("");
+const loggedInUser =
+  JSON.parse(
+    localStorage.getItem("loggedInUser")
+  ) ||
+  JSON.parse(
+    localStorage.getItem("user")
+  );
 
-  const [feedback, setFeedback] =
-    useState(null);
-
-  const [loading, setLoading] =
-    useState(true);
-
-  const [saving, setSaving] =
-    useState(false);
-
+const role =
+  loggedInUser?.role;
   useEffect(() => {
 
-    const loadProfile = async () => {
-
-      try {
-
-        const token =
-          localStorage.getItem("token");
-
-        const response =
-          await axios.get(
-            "/api/auth/profile",
-            {
-              headers: {
-                Authorization:
-                  `Bearer ${token}`
-              }
-            }
-          );
-
-        setProfile(
-          response.data.user
-        );
-
-      } catch {
-
-        setFeedback({
-          type: "error",
-          message: "Unable to load profile."
-        });
-
-      } finally {
-
-        setLoading(false);
-
-      }
-
-    };
-
-    loadProfile();
-
-  }, []);
-
-  const changePassword = async () => {
-
-    setFeedback(null);
-
-    if (
-      !currentPassword ||
-      !newPassword ||
-      !confirmPassword
-    ) {
-
-      setFeedback({
-        type: "error",
-        message: "Please fill all password fields."
-      });
-      return;
-
-    }
-
-    if (
-      newPassword !== confirmPassword
-    ) {
-
-      setFeedback({
-        type: "error",
-        message: "New password and confirm password do not match."
-      });
-      return;
-
-    }
+  const loadData = async () => {
 
     try {
-
-      setSaving(true);
 
       const token =
         localStorage.getItem("token");
 
-      await axios.put(
-        "/api/auth/change-password",
-        {
-          currentPassword,
-          newPassword
-        },
-        {
-          headers: {
-            Authorization:
-              `Bearer ${token}`
+      const profileRes =
+        await axios.get(
+          "/api/auth/profile",
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`
+            }
           }
-        }
+        );
+
+      const passRes =
+        await axios.get(
+          "/api/passes",
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`
+            }
+          }
+        );
+
+      setProfile(
+        profileRes.data.user
       );
 
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-
-      showToast?.(
-        "Password changed successfully",
-        "success"
+      setPasses(
+        passRes.data.passes || []
       );
 
     } catch (error) {
 
-      setFeedback({
-        type: "error",
-        message:
-          error.response?.data?.message ||
-          "Unable to change password."
-      });
+      console.log(error);
 
     } finally {
 
-      setSaving(false);
+      setLoading(false);
 
     }
 
   };
 
-  return (
-    <div className="flex">
-      <Sidebar
+  loadData();
+
+}, []);
+const totalPasses =
+  passes.length;
+
+const pendingPasses =
+  passes.filter(
+    p => p.status === "PENDING"
+  ).length;
+
+const approvedPasses =
+  passes.filter(
+    p => p.status === "APPROVED"
+  ).length;
+
+const rejectedPasses =
+  passes.filter(
+    p => p.status === "REJECTED"
+  ).length;
+
+const visitorPasses =
+  passes.filter(
+    p => p.pass_type === "VISITOR"
+  ).length;
+
+const regularPasses =
+  passes.filter(
+    p => p.pass_type === "REGULAR"
+  ).length;
+
+const ckdPasses =
+  passes.filter(
+    p => p.pass_type === "CKD"
+  ).length;
+  const statusData = [
+  {
+    name: "Approved",
+    value: approvedPasses
+  },
+  {
+    name: "Pending",
+    value: pendingPasses
+  },
+  {
+    name: "Rejected",
+    value: rejectedPasses
+  }
+];
+const activityMap = {};
+
+passes.forEach(pass => {
+
+  const day =
+    new Date(
+      pass.created_at
+    ).toLocaleDateString(
+      "en-US",
+      {
+        weekday: "short"
+      }
+    );
+
+  activityMap[day] =
+    (activityMap[day] || 0) + 1;
+
+});
+
+const dailyActivity =
+  Object.keys(activityMap).map(
+    day => ({
+      day,
+      count:
+        activityMap[day]
+    })
+  );
+return (
+  <div className="flex">
+
+    <Sidebar
+      role={role}
+      mobileOpen={mobileOpen}
+      setMobileOpen={setMobileOpen}
+    />
+
+    <div className="flex-1 bg-slate-100 min-h-screen">
+
+      <Navbar
         role={role}
         mobileOpen={mobileOpen}
         setMobileOpen={setMobileOpen}
       />
 
-      <div className="flex-1 bg-slate-100 min-h-screen">
-        <Navbar
-          role={role}
-          mobileOpen={mobileOpen}
-          setMobileOpen={setMobileOpen}
-        />
+      <div className="p-6">
 
-        <div className="p-6">
-          <h1 className="text-3xl font-bold mb-6">
-            My Profile
-          </h1>
+        <h1 className="text-3xl font-bold mb-6">
+          My Profile
+        </h1>
 
-          <FeedbackMessage
-            type={feedback?.type}
-            message={feedback?.message}
-          />
+        {loading ? (
 
-          <div className="grid lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-xl shadow p-6">
-              <h2 className="text-xl font-bold mb-5">
-                User Information
-              </h2>
+          <div className="text-center text-lg">
+            Loading...
+          </div>
 
-              {loading ? (
-                <p>Loading profile...</p>
-              ) : (
-                <div className="space-y-4">
+        ) : (
+
+          <>
+
+            <div className="grid lg:grid-cols-3 gap-6 mb-6">
+
+              <div className="bg-white rounded-2xl shadow p-6">
+
+                <div className="flex flex-col items-center">
+
+                  <FaUserCircle
+                    size={100}
+                    className="text-blue-600"
+                  />
+
+                  <h2 className="text-2xl font-bold mt-4">
+                    {profile?.full_name}
+                  </h2>
+
+                  <p className="text-slate-500">
+                    {profile?.role_name}
+                  </p>
+
+                </div>
+
+                <div className="mt-6 space-y-4">
+
                   <div>
                     <p className="text-slate-500">
-                      Full Name
+                      Employee Code
                     </p>
+
                     <p className="font-semibold">
-                      {profile?.full_name || "-"}
+                      {profile?.employee_code || "-"}
                     </p>
                   </div>
 
@@ -212,90 +243,270 @@ function Profile() {
                     <p className="text-slate-500">
                       Email
                     </p>
+
                     <p className="font-semibold">
-                      {profile?.email || "-"}
+                      {profile?.email}
                     </p>
                   </div>
 
                   <div>
                     <p className="text-slate-500">
-                      Role
+                      Joined
                     </p>
+
                     <p className="font-semibold">
-                      {profile?.role_name || role || "-"}
+                      {
+                        profile?.created_at
+                          ? new Date(
+                              profile.created_at
+                            ).toLocaleDateString()
+                          : "-"
+                      }
                     </p>
                   </div>
+
                 </div>
-              )}
-            </div>
 
-            <div className="bg-white rounded-xl shadow p-6">
-              <h2 className="text-xl font-bold mb-5">
-                Change Password
-              </h2>
-
-              <div className="space-y-4">
-                <input
-                  type="password"
-                  value={currentPassword}
-                  onChange={(e) =>
-                    setCurrentPassword(
-                      e.target.value
-                    )
-                  }
-                  placeholder="Current Password"
-                  className="w-full border rounded-lg p-3"
-                />
-
-                <input
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) =>
-                    setNewPassword(
-                      e.target.value
-                    )
-                  }
-                  placeholder="New Password"
-                  className="w-full border rounded-lg p-3"
-                />
-
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) =>
-                    setConfirmPassword(
-                      e.target.value
-                    )
-                  }
-                  placeholder="Confirm New Password"
-                  className="w-full border rounded-lg p-3"
-                />
-
-                <button
-                  type="button"
-                  onClick={changePassword}
-                  disabled={saving}
-                  className="
-                    bg-blue-700
-                    text-white
-                    px-6
-                    py-3
-                    rounded-lg
-                    hover:bg-blue-800
-                    disabled:opacity-60
-                  "
-                >
-                  {saving
-                    ? "Updating..."
-                    : "Update Password"}
-                </button>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
+              <div className="lg:col-span-2">
+
+                <div className="grid md:grid-cols-4 gap-4">
+
+                  <div className="bg-blue-600 text-white rounded-xl p-5 shadow">
+                    <p>Total Passes</p>
+                    <h2 className="text-3xl font-bold">
+                      {totalPasses}
+                    </h2>
+                  </div>
+
+                  <div className="bg-yellow-500 text-white rounded-xl p-5 shadow">
+                    <p>Pending</p>
+                    <h2 className="text-3xl font-bold">
+                      {pendingPasses}
+                    </h2>
+                  </div>
+
+                  <div className="bg-green-600 text-white rounded-xl p-5 shadow">
+                    <p>Approved</p>
+                    <h2 className="text-3xl font-bold">
+                      {approvedPasses}
+                    </h2>
+                  </div>
+
+                  <div className="bg-red-600 text-white rounded-xl p-5 shadow">
+                    <p>Rejected</p>
+                    <h2 className="text-3xl font-bold">
+                      {rejectedPasses}
+                    </h2>
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-4 mb-6">
+
+              <div className="bg-white rounded-xl shadow p-5">
+                <p className="text-slate-500">
+                  Visitor Passes
+                </p>
+
+                <h2 className="text-3xl font-bold text-blue-600">
+                  {visitorPasses}
+                </h2>
+              </div>
+
+              <div className="bg-white rounded-xl shadow p-5">
+                <p className="text-slate-500">
+                  Regular Passes
+                </p>
+
+                <h2 className="text-3xl font-bold text-green-600">
+                  {regularPasses}
+                </h2>
+              </div>
+
+              <div className="bg-white rounded-xl shadow p-5">
+                <p className="text-slate-500">
+                  CKD Passes
+                </p>
+
+                <h2 className="text-3xl font-bold text-purple-600">
+                  {ckdPasses}
+                </h2>
+              </div>
+
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-6 mb-6">
+
+              <div className="bg-white rounded-xl shadow p-5">
+
+                <h2 className="text-xl font-bold mb-4">
+                  Daily Pass Activity
+                </h2>
+
+                <ResponsiveContainer
+                  width="100%"
+                  height={300}
+                >
+
+                  <BarChart
+                    data={dailyActivity}
+                  >
+
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                    />
+
+                    <XAxis
+                      dataKey="day"
+                    />
+
+                    <YAxis />
+
+                    <Tooltip />
+
+                    <Bar
+                      dataKey="count"
+                      fill="#2563eb"
+                    />
+
+                  </BarChart>
+
+                </ResponsiveContainer>
+
+              </div>
+
+              <div className="bg-white rounded-xl shadow p-5">
+
+                <h2 className="text-xl font-bold mb-4">
+                  Calendar
+                </h2>
+
+                <Calendar
+                  value={calendarDate}
+                  onChange={setCalendarDate}
+                />
+
+              </div>
+
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-6 mb-6">
+
+              <div className="bg-white rounded-xl shadow p-5">
+
+                <h2 className="text-xl font-bold mb-4">
+                  Pass Status Analytics
+                </h2>
+
+                <ResponsiveContainer
+                  width="100%"
+                  height={300}
+                >
+
+                  <PieChart>
+
+                    <Pie
+                      data={statusData}
+                      dataKey="value"
+                      outerRadius={100}
+                      label
+                    >
+
+                      <Cell fill="#22c55e" />
+                      <Cell fill="#f59e0b" />
+                      <Cell fill="#ef4444" />
+
+                    </Pie>
+
+                    <Tooltip />
+
+                  </PieChart>
+
+                </ResponsiveContainer>
+
+              </div>
+
+              <div className="bg-white rounded-xl shadow p-5">
+
+                <h2 className="text-xl font-bold mb-4">
+                  Recent Passes
+                </h2>
+
+                <div className="overflow-auto">
+
+                  <table className="w-full">
+
+                    <thead>
+
+                      <tr className="border-b">
+
+                        <th className="text-left py-2">
+                          Pass No
+                        </th>
+
+                        <th className="text-left py-2">
+                          Type
+                        </th>
+
+                        <th className="text-left py-2">
+                          Status
+                        </th>
+
+                      </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                      {passes
+                        .slice(0, 5)
+                        .map(pass => (
+
+                        <tr
+                          key={pass.pass_no}
+                          className="border-b"
+                        >
+
+                          <td className="py-2">
+                            {pass.pass_no}
+                          </td>
+
+                          <td>
+                            {pass.pass_type}
+                          </td>
+
+                          <td>
+                            {pass.status}
+                          </td>
+
+                        </tr>
+
+                      ))}
+
+                    </tbody>
+
+                  </table>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </>
+
+        )}
+
+      </div>
+
+    </div>
+
+  </div>
+);
 export default Profile;
