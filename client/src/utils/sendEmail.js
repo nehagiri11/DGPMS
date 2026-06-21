@@ -2,14 +2,11 @@ const nodemailer = require("nodemailer");
 
 const transporter =
   nodemailer.createTransport({
-
     service: "gmail",
-
     auth: {
       user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
+      pass: process.env.EMAIL_PASSWORD
     }
-
   });
 
 const sendEmail = async (
@@ -18,20 +15,38 @@ const sendEmail = async (
   html
 ) => {
 
-  await transporter.sendMail({
+  try {
 
-    from:
-      `"DGPMS" <${process.env.EMAIL_USER}>`,
+    const info =
+      await transporter.sendMail({
 
-    to,
+        from:
+          `"DGPMS" <${process.env.EMAIL_USER}>`,
 
-    subject,
+        to,
 
-    html
+        subject,
 
-  });
+        html
+
+      });
+
+    console.log(
+      "EMAIL SENT:",
+      info.messageId
+    );
+
+  } catch (error) {
+
+    console.error(
+      "EMAIL ERROR:",
+      error
+    );
+
+  }
 
 };
 
-module.exports =
-  sendEmail;
+module.exports = {
+  sendEmail
+};
