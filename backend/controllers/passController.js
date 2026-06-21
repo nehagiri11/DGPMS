@@ -503,6 +503,173 @@ function validationError(
 
 }
 
+async function runSideEffect(
+  label,
+  task
+) {
+
+  try {
+
+    await task();
+
+  } catch (error) {
+
+    console.error(
+      `${label} failed:`,
+      error.message
+    );
+
+  }
+
+}
+
+async function notifyApprovers(
+  title,
+  message,
+  passId
+) {
+
+  await runSideEffect(
+    "Approver notification",
+    async () => {
+
+      const [approvers] =
+        await db.query(
+          `
+          SELECT u.user_id
+          FROM users u
+          JOIN roles r
+            ON u.role_id = r.role_id
+          WHERE r.role_name = 'APPROVER'
+          `
+        );
+
+      for (
+        const approver
+        of approvers
+      ) {
+
+        await createNotification(
+          approver.user_id,
+          title,
+          message,
+          "PASS_CREATED",
+          passId
+        );
+
+      }
+
+    }
+  );
+
+}
+
+async function emailApprovers(
+  passNo
+) {
+
+  await runSideEffect(
+    "Approver email",
+    async () => {
+
+      const [approversEmails] =
+        await db.query(
+          `
+          SELECT u.email
+          FROM users u
+          JOIN roles r
+            ON u.role_id = r.role_id
+          WHERE r.role_name = 'APPROVER'
+          `
+        );
+
+      for (
+        const approver
+        of approversEmails
+      ) {
+
+        await sendEmail(
+          approver.email,
+          "New Gate Pass Requires Approval",
+          `
+            <h2>DGPMS Notification</h2>
+
+            <p>A new pass has been submitted.</p>
+
+            <p><b>Pass Number:</b> ${passNo}</p>
+
+            <p>Please login to approve or reject it.</p>
+          `
+        );
+
+      }
+
+    }
+  );
+
+}
+
+async function notifyPassRequester(
+  passId,
+  title,
+  message,
+  type,
+  emailSubject,
+  emailBody
+) {
+
+  await runSideEffect(
+    "Requester notification",
+    async () => {
+
+      const [requester] =
+        await db.query(
+          `
+          SELECT
+            u.user_id,
+            u.email,
+            u.full_name,
+            gp.pass_no
+          FROM gate_passes gp
+          JOIN users u
+            ON gp.requester_id =
+               u.user_id
+          WHERE gp.pass_id = ?
+          `,
+          [passId]
+        );
+
+      if (
+        requester.length === 0
+      ) {
+
+        return;
+
+      }
+
+      await createNotification(
+        requester[0].user_id,
+        title,
+        message(
+          requester[0].pass_no
+        ),
+        type,
+        passId
+      );
+
+      await sendEmail(
+        requester[0].email,
+        emailSubject,
+        emailBody(
+          requester[0]
+        )
+      );
+
+    }
+  );
+
+}
+
 function validateVisitorPass(body) {
 
   const errors = [];
@@ -1140,64 +1307,15 @@ async (req, res) => {
   "PASS_CREATED",
   `${passNo} created`
 );
-    const [approvers] =
-  await db.query(
-    `
-    SELECT u.user_id
-    FROM users u
-    JOIN roles r
-      ON u.role_id = r.role_id
-    WHERE r.role_name = 'APPROVER'
-    `
-  );
+    await notifyApprovers(
+      "New Visitor Pass Submitted",
+      `${passNo} requires approval`,
+      passId
+    );
 
-for (
-  const approver
-  of approvers
-) {
-
-  await createNotification(
-    approver.user_id,
-
-    "New Visitor Pass Submitted",
-
-    `${passNo} requires approval`,
-
-    "PASS_CREATED",
-
-    passId
-  );
-
-}
-
-   const [approversEmails] =
-  await db.query(
-    `
-    SELECT u.email
-    FROM users u
-    JOIN roles r
-      ON u.role_id = r.role_id
-    WHERE r.role_name = 'APPROVER'
-    `
-  );
-
-for (const approver of approversEmails) {
-
-  await sendEmail(
-    approver.email,
-    "New Gate Pass Requires Approval",
-    `
-      <h2>DGPMS Notification</h2>
-
-      <p>A new pass has been submitted.</p>
-
-      <p><b>Pass Number:</b> ${passNo}</p>
-
-      <p>Please login to approve or reject it.</p>
-    `
-  );
-
-}
+    await emailApprovers(
+      passNo
+    );
 
     res.json({
 
@@ -1327,63 +1445,15 @@ async (req, res) => {
   `${passNo} created`
 );
 
-    const [approvers] =
-  await db.query(
-    `
-    SELECT u.user_id
-    FROM users u
-    JOIN roles r
-      ON u.role_id = r.role_id
-    WHERE r.role_name = 'APPROVER'
-    `
-  );
+    await notifyApprovers(
+      "New Regular Pass Submitted",
+      `${passNo} requires approval`,
+      result.insertId
+    );
 
-for (
-  const approver
-  of approvers
-) {
-
-  await createNotification(
-    approver.user_id,
-
-    "New Regular Pass Submitted",
-
-    `${passNo} requires approval`,
-
-    "PASS_CREATED",
-
-    result.insertId
-  );
-
-}
-   const [approversEmails] =
-  await db.query(
-    `
-    SELECT u.email
-    FROM users u
-    JOIN roles r
-      ON u.role_id = r.role_id
-    WHERE r.role_name = 'APPROVER'
-    `
-  );
-
-for (const approver of approversEmails) {
-
-  await sendEmail(
-    approver.email,
-    "New Gate Pass Requires Approval",
-    `
-      <h2>DGPMS Notification</h2>
-
-      <p>A new pass has been submitted.</p>
-
-      <p><b>Pass Number:</b> ${passNo}</p>
-
-      <p>Please login to approve or reject it.</p>
-    `
-  );
-
-}
+    await emailApprovers(
+      passNo
+    );
 
     res.json({
 
@@ -1519,63 +1589,15 @@ async (req, res) => {
   `${passNo} created`
 );
 
-    const [approvers] =
-  await db.query(
-    `
-    SELECT u.user_id
-    FROM users u
-    JOIN roles r
-      ON u.role_id = r.role_id
-    WHERE r.role_name = 'APPROVER'
-    `
-  );
+    await notifyApprovers(
+      "New CKD Pass Submitted",
+      `${passNo} requires approval`,
+      result.insertId
+    );
 
-for (
-  const approver
-  of approvers
-) {
-
-  await createNotification(
-    approver.user_id,
-
-    "New CKD Pass Submitted",
-
-    `${passNo} requires approval`,
-
-    "PASS_CREATED",
-
-    result.insertId
-  );
-
-}
-   const [approversEmails] =
-  await db.query(
-    `
-    SELECT u.email
-    FROM users u
-    JOIN roles r
-      ON u.role_id = r.role_id
-    WHERE r.role_name = 'APPROVER'
-    `
-  );
-
-for (const approver of approversEmails) {
-
-  await sendEmail(
-    approver.email,
-    "New Gate Pass Requires Approval",
-    `
-      <h2>DGPMS Notification</h2>
-
-      <p>A new pass has been submitted.</p>
-
-      <p><b>Pass Number:</b> ${passNo}</p>
-
-      <p>Please login to approve or reject it.</p>
-    `
-  );
-
-}
+    await emailApprovers(
+      passNo
+    );
 
     res.json({
 
@@ -2057,57 +2079,43 @@ async (req, res) => {
       ]
 
     );
-    const [requester] =
-  await db.query(
-    `
-    SELECT
-      u.user_id,
-      u.email,
-      u.full_name,
-      gp.pass_no
-    FROM gate_passes gp
-    JOIN users u
-      ON gp.requester_id =
-         u.user_id
-    WHERE gp.pass_id = ?
-    `,
-    [id]
-  );
+    const [passRows] =
+      await db.query(
+        `
+        SELECT pass_no
+        FROM gate_passes
+        WHERE pass_id = ?
+        `,
+        [id]
+      );
 
-if (requester.length > 0) {
-  await createNotification(
-  requester[0].user_id,
+    const passNo =
+      passRows[0]?.pass_no ||
+      `Pass ${id}`;
 
-  "Pass Approved",
+    await notifyPassRequester(
+      id,
+      "Pass Approved",
+      (number) =>
+        `${number} has been approved`,
+      "PASS_APPROVED",
+      "Gate Pass Approved",
+      (requester) => `
+        <h2>DGPMS Notification</h2>
 
-  `${requester[0].pass_no} has been approved`,
+        <p>Hello ${requester.full_name},</p>
 
-  "PASS_APPROVED",
+        <p>Your pass has been approved.</p>
 
-  id
-);
-
-  await sendEmail(
-    requester[0].email,
-    "Gate Pass Approved",
-    `
-      <h2>DGPMS Notification</h2>
-
-      <p>Hello ${requester[0].full_name},</p>
-
-      <p>Your pass has been approved.</p>
-
-      <p><b>Pass Number:</b>
-      ${requester[0].pass_no}</p>
-    `
-  );
-
-}
+        <p><b>Pass Number:</b>
+        ${requester.pass_no}</p>
+      `
+    );
 
    await writeAuditLog(
   req.user?.userId,
   "PASS_APPROVED",
-  `${requester[0]?.pass_no || `Pass ${id}`} approved by ${await getUserName(req.user?.userId)}`
+  `${passNo} approved by ${await getUserName(req.user?.userId)}`
 );
 
     res.json({
@@ -2168,60 +2176,46 @@ async (req, res) => {
       ]
 
     );
-    const [requester] =
-  await db.query(
-    `
-    SELECT
-      u.user_id,
-      u.email,
-      u.full_name,
-      gp.pass_no
-    FROM gate_passes gp
-    JOIN users u
-      ON gp.requester_id =
-         u.user_id
-    WHERE gp.pass_id = ?
-    `,
-    [id]
-  );
+    const [passRows] =
+      await db.query(
+        `
+        SELECT pass_no
+        FROM gate_passes
+        WHERE pass_id = ?
+        `,
+        [id]
+      );
 
-if (requester.length > 0) {
-  await createNotification(
-  requester[0].user_id,
+    const passNo =
+      passRows[0]?.pass_no ||
+      `Pass ${id}`;
 
-  "Pass Rejected",
+    await notifyPassRequester(
+      id,
+      "Pass Rejected",
+      (number) =>
+        `${number} has been rejected`,
+      "PASS_REJECTED",
+      "Gate Pass Rejected",
+      (requester) => `
+        <h2>DGPMS Notification</h2>
 
-  `${requester[0].pass_no} has been rejected`,
+        <p>Hello ${requester.full_name},</p>
 
-  "PASS_REJECTED",
+        <p>Your pass has been rejected.</p>
 
-  id
-);
+        <p><b>Pass Number:</b>
+        ${requester.pass_no}</p>
 
-  await sendEmail(
-    requester[0].email,
-    "Gate Pass Rejected",
-    `
-      <h2>DGPMS Notification</h2>
-
-      <p>Hello ${requester[0].full_name},</p>
-
-      <p>Your pass has been rejected.</p>
-
-      <p><b>Pass Number:</b>
-      ${requester[0].pass_no}</p>
-
-      <p><b>Remarks:</b>
-      ${remarks || "No remarks"}</p>
-    `
-  );
-
-}
+        <p><b>Remarks:</b>
+        ${remarks || "No remarks"}</p>
+      `
+    );
 
    await writeAuditLog(
   req.user?.userId,
   "PASS_REJECTED",
-  `${requester[0]?.pass_no || `Pass ${id}`} rejected by ${await getUserName(req.user?.userId)}`
+  `${passNo} rejected by ${await getUserName(req.user?.userId)}`
 );
 
     res.json({
