@@ -9,7 +9,9 @@ const {
   register,
   login,
   profile,
-  changePassword
+  changePassword,
+  forgotPassword,
+  resetPassword
 } = require(
   "../controllers/authController"
 );
@@ -34,6 +36,17 @@ router.post(
   "/login",
   login
 );
+
+router.post(
+  "/forgot-password",
+  forgotPassword
+);
+
+router.post(
+  "/reset-password",
+  resetPassword
+);
+
 router.get("/test", (req, res) => {
   res.json({
     success: true,

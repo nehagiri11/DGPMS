@@ -34,12 +34,6 @@ function VisitorPrint({ request }) {
       .map((part) => part.charAt(0).toUpperCase())
       .join("") || "V";
 
-  const getVisitorQrValue = (visitor) =>
-    JSON.stringify({
-      passNo: request.passNo,
-      visitor: visitor.name,
-    });
-
   const detailRow = (label, value) => (
     <div className="grid grid-cols-[95px_1fr] gap-2 py-1">
       <span className="font-semibold">
@@ -100,7 +94,7 @@ function VisitorPrint({ request }) {
 
         <div className="visitor-card-qr">
           <QRCodeCanvas
-            value={getVisitorQrValue(visitor)}
+            value={request.passNo}
             size={72}
           />
         </div>
