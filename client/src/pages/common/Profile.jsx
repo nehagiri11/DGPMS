@@ -199,29 +199,7 @@ return (
         <h1 className="text-3xl font-bold mb-6">
           My Profile
         </h1>
-        <div className="
-mb-6
-rounded-3xl
-bg-gradient-to-r
-from-indigo-600
-via-blue-600
-to-cyan-600
-text-white
-p-8
-shadow-2xl
-">
-  <h2 className="text-3xl font-bold">
-    Welcome Back, {profile?.full_name || "User"} 👋
-  </h2>
-
-  <p className="mt-2 text-blue-100">
-    Track your gate pass activities,
-    approvals and daily performance.
-  </p>
-</div>
         
-
-
 
         {loading ? (
 
@@ -351,6 +329,9 @@ transition
                 </div>
                  
 
+              </div>
+              <div className="grid md:grid-cols-3 gap-4 mb-6">
+
               <div className="
 bg-white
 rounded-2xl
@@ -409,8 +390,6 @@ transition
               </div>
 
             </div>
-
-          
 
             </div>
 
