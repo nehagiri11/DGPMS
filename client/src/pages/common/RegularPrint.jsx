@@ -76,7 +76,7 @@ function RegularPrint({ request }) {
         </div>
       </div>
 
-      <table className="w-full border-collapse border border-black mt-5 text-[15px]">
+      <table className="w-full border-collapse border border-black mt-5 text-[13px]">
         <thead>
           <tr>
             <th className="border border-black p-4 text-center">
