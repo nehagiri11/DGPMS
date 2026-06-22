@@ -575,6 +575,11 @@ async function emailApprovers(
           `
         );
 
+      console.log(
+        "Approver email recipients found:",
+        approversEmails.length
+      );
+
       for (
         const approver
         of approversEmails
@@ -635,6 +640,11 @@ async function notifyPassRequester(
         requester.length === 0
       ) {
 
+        console.log(
+          "Requester email skipped: requester not found for pass",
+          passId
+        );
+
         return;
 
       }
@@ -647,6 +657,11 @@ async function notifyPassRequester(
         ),
         type,
         passId
+      );
+
+      console.log(
+        "Requester email recipient:",
+        requester[0].email
       );
 
       await sendEmail(

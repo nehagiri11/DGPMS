@@ -191,7 +191,7 @@
   }
 
   .copy-section {
-    height: 128mm !important;
+    height: 139mm !important;
     margin: 0 !important;
     padding: 5mm !important;
     box-sizing: border-box !important;
@@ -257,7 +257,7 @@
   }
 
   .cut-line {
-    margin: 3mm 0 !important;
+    margin: 2mm 0 !important;
     height: 0 !important;
   }
 
@@ -273,6 +273,18 @@
   .ckd-print-copy {
     font-size: 9.5px !important;
     line-height: 1.12 !important;
+  }
+
+  .regular-print-copy > div:first-child,
+  .ckd-print-copy > div:first-child {
+    min-height: 24mm !important;
+    padding-bottom: 2mm !important;
+  }
+
+  .regular-print-copy > div:first-child > div:first-child,
+  .ckd-print-copy > div:first-child > div:first-child {
+    top: 1mm !important;
+    right: 2mm !important;
   }
 
   .regular-print-copy > div:nth-child(2),

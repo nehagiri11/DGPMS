@@ -1,6 +1,17 @@
 const nodemailer =
   require("nodemailer");
 
+const maskEmail = (email) => {
+  if (!email) {
+    return "not-set";
+  }
+
+  const [name, domain] =
+    String(email).split("@");
+
+  return `${name?.slice(0, 2) || "**"}***@${domain || "***"}`;
+};
+
 const isEmailConfigured =
   Boolean(
     process.env.EMAIL_USER &&
@@ -36,13 +47,32 @@ const sendEmail =
       return;
     }
 
-    await transporter.sendMail({
+    console.log(
+      "Email sending:",
+      {
+        from: maskEmail(process.env.EMAIL_USER),
+        to: maskEmail(to),
+        subject
+      }
+    );
+
+    const result =
+      await transporter.sendMail({
       from:
         process.env.EMAIL_USER,
       to,
       subject,
       html,
     });
+
+    console.log(
+      "Email sent:",
+      {
+        accepted: result.accepted,
+        rejected: result.rejected,
+        response: result.response
+      }
+    );
 
   };
 

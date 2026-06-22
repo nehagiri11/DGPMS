@@ -71,8 +71,22 @@ router.get(
 
     try {
 
+      const recipient =
+        req.query.to ||
+        process.env.EMAIL_TEST_TO ||
+        process.env.EMAIL_USER;
+
+      if (!recipient) {
+
+        return res.status(400).json({
+          success: false,
+          message: "Set EMAIL_USER or pass ?to=email@example.com"
+        });
+
+      }
+
       await sendEmail(
-        "foranyuse6342@gmail.com",
+        recipient,
         "DGPMS Test Email",
         `
           <h2>DGPMS Working</h2>
@@ -82,16 +96,28 @@ router.get(
 
       res.json({
         success: true,
+        sentTo: recipient
       });
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        "TEST EMAIL ERROR:",
+        error
+      );
 
       res.status(500).json({
         success: false,
         message:
           error.message,
+        code:
+          error.code,
+        command:
+          error.command,
+        response:
+          error.response,
+        responseCode:
+          error.responseCode
       });
 
     }
