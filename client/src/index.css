@@ -269,6 +269,50 @@
   min-height: 13mm !important;
 }
 
+  .regular-print-copy,
+  .ckd-print-copy {
+    font-size: 9.5px !important;
+    line-height: 1.12 !important;
+  }
+
+  .regular-print-copy > div:nth-child(2),
+  .ckd-print-copy > div:nth-child(2) {
+    padding-top: 2.4mm !important;
+    padding-bottom: 2.4mm !important;
+  }
+
+  .regular-print-copy table,
+  .ckd-print-copy table {
+    margin-top: 2mm !important;
+    font-size: 9px !important;
+  }
+
+  .regular-print-copy th,
+  .regular-print-copy td,
+  .ckd-print-copy th,
+  .ckd-print-copy td {
+    padding: 1.25mm !important;
+    line-height: 1.08 !important;
+  }
+
+  .regular-print-copy .remarks-box,
+  .ckd-print-copy .remarks-box {
+    min-height: 8mm !important;
+    margin-top: 2mm !important;
+    padding: 1.5mm !important;
+    font-size: 9px !important;
+  }
+
+  .regular-print-copy .print-person-name,
+  .ckd-print-copy .print-person-name {
+    font-size: 9.5px !important;
+  }
+
+  .regular-print-copy .generated-note,
+  .ckd-print-copy .generated-note {
+    font-size: 8px !important;
+  }
+
   .visitor-print-page {
     width: 194mm !important;
     min-height: auto !important;

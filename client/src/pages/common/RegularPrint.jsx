@@ -23,8 +23,8 @@ function RegularPrint({ request }) {
   };
 
  const detailRow = (label, value) => (
-  <div className="flex py-2 text-[15px]">
-    <span className="font-semibold w-[160px] whitespace-nowrap text-[15px]">
+  <div className="flex py-1 text-[12px]">
+    <span className="font-semibold w-[120px] whitespace-nowrap text-[12px]">
       {label}
     </span>
 
@@ -35,8 +35,8 @@ function RegularPrint({ request }) {
 );
 
   const renderCopy = (copyTitle, showSecurityFields) => (
-    <section className="copy-section border-2 border-black flex flex-col justify-between p-4">
-      <div className="relative border-b border-black pb-8">
+    <section className="copy-section regular-print-copy border-2 border-black flex flex-col p-4">
+      <div className="relative border-b border-black pb-5">
         <div className="absolute right-2 -top-2 bg-white p-1">
           <QRCodeCanvas
             value={request.passNo}
@@ -51,16 +51,16 @@ function RegularPrint({ request }) {
           <h2 className="font-semibold text-sm leading-tight mt-1">
             RAMGRAM-13, PARASI
           </h2>
-          <h3 className="font-bold text-base leading-tight mt-3">
+          <h3 className="font-bold text-base leading-tight mt-2">
             REGULAR GATE PASS (OUT)
           </h3>
-          <p className="font-semibold text-[10px] mt-2">
+          <p className="font-semibold text-[10px] mt-1">
             {copyTitle}
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-20 border-b border-black py-5">
+      <div className="grid grid-cols-2 gap-14 border-b border-black py-3">
         <div>
           {detailRow("Company Name", request.companyName)}
           {detailRow("Driver Name", request.driverName)}
@@ -76,19 +76,19 @@ function RegularPrint({ request }) {
         </div>
       </div>
 
-      <table className="w-full border-collapse border border-black mt-5 text-[13px]">
+      <table className="w-full border-collapse border border-black mt-3 text-[11px]">
         <thead>
           <tr>
-            <th className="border border-black p-4 text-center">
+            <th className="border border-black p-2 text-center">
               S.N
             </th>
-            <th className="border border-black p-4">
+            <th className="border border-black p-2">
               ITEM/DESCRIPTION
             </th>
-            <th className="border border-black p-4">
+            <th className="border border-black p-2">
               QUANTITY
             </th>
-            <th className="border border-black p-4">
+            <th className="border border-black p-2">
               REMARKS
             </th>
           </tr>
@@ -96,16 +96,16 @@ function RegularPrint({ request }) {
         <tbody>
           {request.items?.map((item, index) => (
             <tr key={index}>
-              <td className="border border-black p-3 text-center">
+              <td className="border border-black p-2 text-center">
                 {index + 1}
               </td>
-              <td className="border border-black p-3">
+              <td className="border border-black p-2">
                 {item.itemDescription}
               </td>
-              <td className="border border-black p-3">
+              <td className="border border-black p-2">
                 {item.quantity}
               </td>
-              <td className="border border-black p-3">
+              <td className="border border-black p-2">
                 {item.remarks}
               </td>
             </tr>
@@ -113,13 +113,13 @@ function RegularPrint({ request }) {
         </tbody>
       </table>
 
-      <div className="border border-black p-4 mt-4 min-h-[70px] text-[15px]">
+      <div className="remarks-box border border-black p-2 mt-3 min-h-[34px] text-[11px]">
         <strong>Remarks:</strong> {request.remarks || "-"}
       </div>
 
-<div className="h-2 min-h-[50px]"></div>
+<div className="h-2"></div>
       {showSecurityFields ? (
-        <div className="grid grid-cols-3 gap-8 mt-3 items-end">
+        <div className="grid grid-cols-3 gap-8 mt-2 items-end">
           <div>
             <p className="text-gray-500">
               Prepared By
@@ -150,7 +150,7 @@ function RegularPrint({ request }) {
 </div>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-8 mt-4 items-end">
+        <div className="grid grid-cols-2 gap-8 mt-3 items-end">
           <div>
             <p className="text-gray-500">
               Prepared By
@@ -170,8 +170,8 @@ function RegularPrint({ request }) {
           </div>
         </div>
       )}
-      <div className="text-center mt-auto pb-2">
-  <p className="text-[9px] font-medium text-slate-600">
+      <div className="text-center mt-auto pt-1">
+  <p className="generated-note text-[9px] font-medium text-slate-600">
     This is a computer generated gate pass and does not require a signature.
   </p>
 </div>

@@ -23,8 +23,8 @@ function CKDPrint({ request }) {
   };
 
   const detailRow = (label, value) => (
-  <div className="flex py-2 text-[15px]">
-      <span className="font-semibold w-[160px] whitespace-nowrap text-[15px]">
+  <div className="flex py-1 text-[12px]">
+      <span className="font-semibold w-[120px] whitespace-nowrap text-[12px]">
         {label}
       </span>
       <span>
@@ -34,8 +34,8 @@ function CKDPrint({ request }) {
   );
 
   const renderCopy = (copyTitle, showSecurityFields) => (
-    <section className="copy-section border-2 border-black flex flex-col justify-between p-4">
-      <div className="relative border-b border-black pb-8">
+    <section className="copy-section ckd-print-copy border-2 border-black flex flex-col p-4">
+      <div className="relative border-b border-black pb-5">
         <div className="absolute right-2 -top-2 bg-white p-1">
           <QRCodeCanvas
             value={request.passNo}
@@ -59,7 +59,7 @@ function CKDPrint({ request }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-20 border-b border-black py-5">
+      <div className="grid grid-cols-2 gap-14 border-b border-black py-3">
         <div>
           {detailRow("Company Name", request.companyName)}
           {detailRow("Driver Name", request.driverName)}
@@ -75,19 +75,19 @@ function CKDPrint({ request }) {
         </div>
       </div>
 
-      <table className="w-full border-collapse border border-black mt-5 text-[15px]">
+      <table className="w-full border-collapse border border-black mt-3 text-[11px]">
         <thead>
           <tr>
-            <th className="border border-black p-4">
+            <th className="border border-black p-2">
               S.N
             </th>
-            <th className="border border-black p-4">
+            <th className="border border-black p-2">
               ITEM/DESCRIPTION
             </th>
-            <th className="border border-black p-4">
+            <th className="border border-black p-2">
               QUANTITY
             </th>
-            <th className="border border-black p-4">
+            <th className="border border-black p-2">
               REMARKS
             </th>
           </tr>
@@ -112,14 +112,14 @@ function CKDPrint({ request }) {
         </tbody>
       </table>
 
-      <div className="border border-black p-4 mt-4 min-h-[70px] text-[15px]">
+      <div className="remarks-box border border-black p-2 mt-3 min-h-[34px] text-[11px]">
         <strong>Remarks:</strong> {request.remarks || "-"}
       </div>
 
       <div className="h-2"></div>
 
       {showSecurityFields ? (
-        <div className="grid grid-cols-3 gap-8 mt-7 items-end">
+        <div className="grid grid-cols-3 gap-8 mt-2 items-end">
           <div>
             <p className="text-gray-500">
               Prepared By
@@ -150,7 +150,7 @@ function CKDPrint({ request }) {
 </div>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-8 mt-10 items-end">
+        <div className="grid grid-cols-2 gap-8 mt-3 items-end">
           <div>
             <p className="text-gray-500">
               Prepared By
@@ -171,9 +171,11 @@ function CKDPrint({ request }) {
         </div>
       )}
 
-      <p className="text-center text-[9px] font-medium text-slate-600 mt-3">
-        This is a computer generated gate pass and does not require a signature.
-      </p>
+      <div className="text-center mt-auto pt-1">
+        <p className="generated-note text-[9px] font-medium text-slate-600">
+          This is a computer generated gate pass and does not require a signature.
+        </p>
+      </div>
     </section>
   );
 

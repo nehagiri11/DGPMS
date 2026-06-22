@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/auth/Login";
+import ResetPassword from "./pages/auth/ResetPassword";
 import Dashboard from "./pages/employee/Dashboard";
 import CreateVisitorPass from "./pages/employee/CreateVisitorPass";
 import CreateCKDPass from "./pages/employee/CreateCKDPass";
@@ -49,6 +50,11 @@ function App() {
         
 
         <Route path="/" element={<Login />} />
+
+        <Route
+          path="/reset-password/:token"
+          element={<ResetPassword />}
+        />
 
         <Route
           path="/employee/profile"

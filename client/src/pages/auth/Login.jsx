@@ -29,6 +29,9 @@ function Login() {
   const [showPassword, setShowPassword] =
     useState(false);
 
+  const [forgotSending, setForgotSending] =
+    useState(false);
+
   const [name, setName] =
     useState("");
 
@@ -202,6 +205,53 @@ const handleLogin = async (e) => {
     }
   };
 
+  const handleForgotPassword = async (e) => {
+
+    e.preventDefault();
+
+    const normalizedEmail =
+      email.trim().toLowerCase();
+
+    if (!normalizedEmail) {
+      setError(
+        "Enter your company email to reset your password."
+      );
+      return;
+    }
+
+    try {
+
+      setForgotSending(true);
+
+      await axios.post(
+        "/api/auth/forgot-password",
+        {
+          email: normalizedEmail
+        }
+      );
+
+      setError("");
+      showToast?.(
+        "If this email exists, a reset link has been sent.",
+        "success"
+      );
+      setActiveTab("signin");
+
+    } catch (error) {
+
+      setError(
+        error.response?.data?.message ||
+        "Unable to send reset link."
+      );
+
+    } finally {
+
+      setForgotSending(false);
+
+    }
+
+  };
+
   return (
     <div className="min-h-screen flex">
 
@@ -362,12 +412,10 @@ const handleLogin = async (e) => {
 
               <button
   type="button"
-  onClick={() =>
-    showToast?.(
-      "Forgot Password functionality will be added later.",
-      "info"
-    )
-  }
+  onClick={() => {
+    setError("");
+    setActiveTab("forgot");
+  }}
   className="text-blue-600 font-medium hover:text-blue-800"
 >
   Forgot Password?
@@ -400,6 +448,62 @@ const handleLogin = async (e) => {
               Continue with Google
             </button>
 
+          </form>
+
+        )}
+
+        {activeTab === "forgot" && (
+
+          <form
+            onSubmit={handleForgotPassword}
+            className="mt-6"
+          >
+            <p className="text-slate-600 mb-4">
+              Enter your company email and we will send a password reset link.
+            </p>
+
+            <input
+              type="email"
+              placeholder="Company Email"
+              value={email}
+              onChange={(e) =>
+                setEmail(
+                  e.target.value
+                )
+              }
+              className="w-full border rounded-lg p-3 mb-4"
+            />
+
+            <button
+              type="submit"
+              disabled={forgotSending}
+              className="
+                w-full
+                bg-blue-900
+                text-white
+                py-4
+                rounded-xl
+                hover:bg-blue-800
+                transition
+                font-semibold
+                disabled:opacity-60
+              "
+            >
+              {forgotSending
+                ? "Sending..."
+                : "Send Reset Link"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setError("");
+                setActiveTab("signin");
+              }}
+              className="w-full mt-4 text-blue-600 font-medium hover:text-blue-800"
+            >
+              Back to Sign In
+            </button>
           </form>
 
         )}
