@@ -286,7 +286,7 @@ border-blue-400
 
               <div className="lg:col-span-2">
 
-                <div className="grid md:grid-cols-4 gap-4">
+                <div className="grid md:grid-cols-4 gap-4 mb-10">
 
                   <div className="
 bg-gradient-to-r

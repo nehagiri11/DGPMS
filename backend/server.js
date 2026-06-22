@@ -25,6 +25,10 @@ require(
   "./routes/notificationRoutes"
 );
 
+const reportRoutes =
+  require(
+    "./routes/reportRoutes"
+  );
 
 const app = express();
 
@@ -48,6 +52,10 @@ app.use(
   passRoutes
 );
 app.use(
+  "/api/reports",
+  reportRoutes
+);
+app.use(
   "/api/audit-logs",
   auditRoutes
 );
@@ -56,6 +64,7 @@ app.use(
   "/api/notifications",
   notificationRoutes
 );
+
 
 app.get("/", async (req, res) => {
 

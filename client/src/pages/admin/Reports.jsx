@@ -7,6 +7,7 @@ import EmptyState from "../../components/EmptyState";
 import TableShell from "../../components/TableShell";
 import PaginationControls from "../../components/PaginationControls";
 import jsPDF from "jspdf";
+import * as XLSX from "xlsx";
 import { mapApiPass } from "../../utils/passMapper";
 import { useNavigate } from "react-router-dom";
 
@@ -225,89 +226,114 @@ function Reports() {
     );
 
   };
+const exportExcel = async () => {
 
-  const exportCSV = () => {
+  try {
 
-    const rows = [
+    const token =
+      localStorage.getItem("token");
 
-      [
-        "Pass No",
-        "Type",
-        "Requester",
-        "Status",
-        "Gate Status",
-        "Entry Time",
-        "Exit Time"
-      ]
-
-    ];
-
-    filteredRequests.forEach(
-      (request) => {
-
-        rows.push([
-
-          request.passNo,
-
-          request.type,
-
-          request.requester,
-
-          request.status,
-
-          request.gateStatus ||
-
-          "",
-
-          request.entryTime ||
-
-          "",
-
-          request.exitTime ||
-
-          ""
-
-        ]);
-
-      }
-    );
-
-    const csvContent =
-      rows
-        .map(
-          (row) =>
-            row.join(",")
-        )
-        .join("\n");
-
-    const blob =
-      new Blob(
-        [csvContent],
+    const response =
+      await axios.get(
+        "/api/reports/export",
         {
-          type:
-            "text/csv",
+          headers: {
+            Authorization:
+              `Bearer ${token}`
+          }
         }
       );
 
-    const url =
-      URL.createObjectURL(
-        blob
+    const workbook =
+      XLSX.utils.book_new();
+
+    const allPassesSheet =
+      XLSX.utils.json_to_sheet(
+        response.data.allPasses
       );
 
-    const link =
-      document.createElement(
-        "a"
+    XLSX.utils.book_append_sheet(
+      workbook,
+      allPassesSheet,
+      "All Passes"
+    );
+
+    const visitorSheet =
+      XLSX.utils.json_to_sheet(
+        response.data.visitorPasses
       );
 
-    link.href =
-      url;
+    XLSX.utils.book_append_sheet(
+      workbook,
+      visitorSheet,
+      "Visitor Passes"
+    );
 
-    link.download =
-      "DGPMS_Report.csv";
+    const regularSheet =
+      XLSX.utils.json_to_sheet(
+        response.data.regularPasses
+      );
 
-    link.click();
+    XLSX.utils.book_append_sheet(
+      workbook,
+      regularSheet,
+      "Regular Passes"
+    );
 
-  };
+    const ckdSheet =
+      XLSX.utils.json_to_sheet(
+        response.data.ckdPasses
+      );
+
+    XLSX.utils.book_append_sheet(
+      workbook,
+      ckdSheet,
+      "CKD Passes"
+    );
+
+    const passItemsSheet =
+      XLSX.utils.json_to_sheet(
+        response.data.passItems
+      );
+
+    XLSX.utils.book_append_sheet(
+      workbook,
+      passItemsSheet,
+      "Pass Items"
+    );
+
+    const gateLogsSheet =
+      XLSX.utils.json_to_sheet(
+        response.data.gateLogs
+      );
+
+    XLSX.utils.book_append_sheet(
+      workbook,
+      gateLogsSheet,
+      "Gate Logs"
+    );
+
+    XLSX.writeFile(
+      workbook,
+      `DGPMS_Report_${
+        new Date()
+          .toISOString()
+          .split("T")[0]
+      }.xlsx`
+    );
+
+  } catch (error) {
+
+    console.log(error);
+
+    alert(
+      "Failed to export report"
+    );
+
+  }
+
+};
+  
 
   return (
 
@@ -592,8 +618,8 @@ function Reports() {
 
             <button
               onClick={
-                exportCSV
-              }
+  exportExcel
+}
               className="
                 bg-green-600
                 text-white
