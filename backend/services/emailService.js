@@ -2,6 +2,10 @@ const nodemailer =
   require("nodemailer");
 const dns =
   require("dns");
+const net =
+  require("net");
+const tls =
+  require("tls");
 
 dns.setDefaultResultOrder("ipv4first");
 
@@ -51,6 +55,48 @@ const smtpLookup =
     );
   };
 
+const createSmtpSocket =
+  (
+    options,
+    callback
+  ) => {
+    dns.resolve4(
+      smtpHost,
+      (dnsError, addresses) => {
+        if (dnsError) {
+          callback(dnsError);
+          return;
+        }
+
+        const address =
+          addresses[0];
+
+        console.log(
+          "SMTP IPv4 resolved:",
+          {
+            host: smtpHost,
+            address
+          }
+        );
+
+        const socketOptions = {
+          ...options,
+          host: address,
+          servername: smtpHost
+        };
+
+        const socket =
+          smtpSecure
+            ? tls.connect(socketOptions)
+            : net.connect(socketOptions);
+
+        callback(null, {
+          connection: socket
+        });
+      }
+    );
+  };
+
 const transporter =
   isEmailConfigured
     ? nodemailer.createTransport({
@@ -59,6 +105,7 @@ const transporter =
         secure: smtpSecure,
         family: 4,
         lookup: smtpLookup,
+        getSocket: createSmtpSocket,
         requireTLS: !smtpSecure,
         connectionTimeout: 30000,
         greetingTimeout: 30000,
