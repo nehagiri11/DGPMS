@@ -26,6 +26,10 @@ function AdminDashboard() {
 
   const navigate =
     useNavigate();
+    const loggedInUser =
+  JSON.parse(
+    localStorage.getItem("loggedInUser")
+  );
 
   const [selectedView,
   setSelectedView] =
@@ -264,6 +268,62 @@ const selectedPasses =
           {loading && (
             <LoadingState message="Loading admin dashboard..." />
           )}
+
+          <div
+  className="
+    mb-8
+    rounded-3xl
+    bg-gradient-to-r
+    from-blue-700
+    via-indigo-700
+    to-purple-700
+    text-white
+    p-8
+    shadow-2xl
+    overflow-hidden
+    relative
+  "
+>
+
+  <div className="relative z-10">
+
+    <h2 className="text-4xl font-bold mb-2">
+      Welcome Back, {loggedInUser?.full_name || "Admin"} 👋
+    </h2>
+
+    <p className="text-blue-100 text-lg">
+      Manage users, monitor gate pass activity,
+      review reports, and oversee security
+      operations from a single dashboard.
+    </p>
+
+  </div>
+
+  <div
+    className="
+      absolute
+      -right-10
+      -top-10
+      w-48
+      h-48
+      bg-white/10
+      rounded-full
+    "
+  />
+
+  <div
+    className="
+      absolute
+      right-20
+      bottom-0
+      w-32
+      h-32
+      bg-white/10
+      rounded-full
+    "
+  />
+
+</div>
 
           {/* DASHBOARD CARDS */}
 

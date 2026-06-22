@@ -72,76 +72,76 @@ async (req, res) => {
   await db.query(`
     SELECT
 
-      gp.pass_no            AS "Pass Number",
+  gp.pass_no            AS "Pass Number",
 
-      rpd.company_name      AS "Company",
+  rpd.company_name      AS "Company",
 
-      rpd.driver_name       AS "Driver Name",
+  rpd.driver_name       AS "Driver Name",
 
-      rpd.driver_number     AS "Driver Number",
+  rpd.driver_number     AS "Driver Number",
 
-      rpd.vehicle_no        AS "Vehicle Number",
+  rpd.vehicle_no        AS "Vehicle Number",
 
-      rpd.category          AS "Category",
+  rpd.category          AS "Category",
 
-      rpd.remarks           AS "Remarks"
+  pi.item_description   AS "Item Description",
 
-    FROM regular_pass_details rpd
+  pi.quantity           AS "Quantity",
 
-    JOIN gate_passes gp
-    ON rpd.pass_id =
-       gp.pass_id
+  pi.remarks            AS "Item Remarks",
 
-    ORDER BY rpd.created_at DESC
+  rpd.remarks           AS "Pass Remarks"
+
+FROM regular_pass_details rpd
+
+JOIN gate_passes gp
+ON rpd.pass_id = gp.pass_id
+
+LEFT JOIN pass_items pi
+ON gp.pass_id = pi.pass_id
+
+WHERE gp.pass_type = 'REGULAR'
+
+ORDER BY gp.created_at DESC
   `);
    const [ckdPasses] =
   await db.query(`
-    SELECT
+   SELECT
 
-      gp.pass_no           AS "Pass Number",
+  gp.pass_no           AS "Pass Number",
 
-      cpd.company_name     AS "Company",
+  cpd.company_name     AS "Company",
 
-      cpd.driver_name      AS "Driver Name",
+  cpd.driver_name      AS "Driver Name",
 
-      cpd.driver_number    AS "Driver Number",
+  cpd.driver_number    AS "Driver Number",
 
-      cpd.truck_number     AS "Truck Number",
+  cpd.truck_number     AS "Truck Number",
 
-      cpd.seal_number      AS "Seal Number",
+  cpd.seal_number      AS "Seal Number",
 
-      cpd.remarks          AS "Remarks"
+  pi.item_description  AS "Item Description",
 
-    FROM ckd_pass_details cpd
+  pi.quantity          AS "Quantity",
 
-    JOIN gate_passes gp
-    ON cpd.pass_id =
-       gp.pass_id
+  pi.remarks           AS "Item Remarks",
 
-    ORDER BY cpd.created_at DESC
+  cpd.remarks          AS "Pass Remarks"
+
+FROM ckd_pass_details cpd
+
+JOIN gate_passes gp
+ON cpd.pass_id = gp.pass_id
+
+LEFT JOIN pass_items pi
+ON gp.pass_id = pi.pass_id
+
+WHERE gp.pass_type = 'CKD'
+
+ORDER BY gp.created_at DESC
   `);
 
-    const [passItems] =
-  await db.query(`
-    SELECT
-
-      gp.pass_no             AS "Pass Number",
-
-      pi.item_description    AS "Item Description",
-
-      pi.quantity            AS "Quantity",
-
-      pi.remarks             AS "Remarks"
-
-    FROM pass_items pi
-
-    JOIN gate_passes gp
-    ON pi.pass_id =
-       gp.pass_id
-
-    ORDER BY pi.created_at DESC
-  `);
-
+   
    const [gateLogs] =
   await db.query(`
     SELECT
@@ -172,7 +172,6 @@ async (req, res) => {
 
       ckdPasses,
 
-      passItems,
 
       gateLogs
 

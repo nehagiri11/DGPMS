@@ -284,17 +284,41 @@ const exportMonthlyReport = () => {
 };
 const exportDateRangeReport = () => {
 
+  if (!fromDate || !toDate) {
+
+    alert(
+      "Please select both dates"
+    );
+
+    return;
+
+  }
+
+  const startDate =
+    new Date(fromDate);
+
+  const endDate =
+    new Date(toDate);
+
+  endDate.setHours(
+    23,
+    59,
+    59,
+    999
+  );
+
   const filtered =
     requests.filter(r => {
 
       const passDate =
-        new Date(r.date);
+        new Date(
+          r.date ||
+          r.created_at
+        );
 
       return (
-        passDate >=
-          new Date(fromDate) &&
-        passDate <=
-          new Date(toDate)
+        passDate >= startDate &&
+        passDate <= endDate
       );
 
     });
@@ -302,6 +326,31 @@ const exportDateRangeReport = () => {
   exportExcelData(
     filtered,
     "Date_Range_Report"
+  );
+
+};
+const exportExcelData = (
+  data,
+  fileName
+) => {
+
+  const workbook =
+    XLSX.utils.book_new();
+
+  const worksheet =
+    XLSX.utils.json_to_sheet(
+      data
+    );
+
+  XLSX.utils.book_append_sheet(
+    workbook,
+    worksheet,
+    "Report"
+  );
+
+  XLSX.writeFile(
+    workbook,
+    `${fileName}.xlsx`
   );
 
 };
@@ -373,16 +422,6 @@ const exportExcel = async () => {
       "CKD Passes"
     );
 
-    const passItemsSheet =
-      XLSX.utils.json_to_sheet(
-        response.data.passItems
-      );
-
-    XLSX.utils.book_append_sheet(
-      workbook,
-      passItemsSheet,
-      "Pass Items"
-    );
 
     const gateLogsSheet =
       XLSX.utils.json_to_sheet(
@@ -550,137 +589,166 @@ const exportExcel = async () => {
           <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
 
             <h2 className="text-xl font-bold mb-4">
+  Search & Filter
+</h2>
 
-              Search & Filter
+{/* Row 1 */}
 
-            </h2>
+<div className="grid md:grid-cols-3 gap-4 mb-4">
 
-            <div className="grid md:grid-cols-3 gap-4 mb-4">
+  <input
+    type="text"
+    placeholder="Pass Number"
+    value={passNumberFilter}
+    onChange={(e) => {
+      setPassNumberFilter(
+        e.target.value
+      );
+      setPage(1);
+    }}
+    className="border p-3 rounded-lg"
+  />
 
-              <input
-                type="text"
-                placeholder="Pass Number"
-                value={passNumberFilter}
-                onChange={(e) => {
-                  setPassNumberFilter(
-                    e.target.value
-                  );
-                  setPage(1);
-                }}
-                className="border p-3 rounded-lg"
-              />
+  <input
+    type="date"
+    value={dateFilter}
+    onChange={(e) => {
+      setDateFilter(
+        e.target.value
+      );
+      setPage(1);
+    }}
+    className="border p-3 rounded-lg"
+  />
 
-              <input
-                type="date"
-                value={dateFilter}
-                onChange={(e) => {
-                  setDateFilter(
-                    e.target.value
-                  );
-                  setPage(1);
-                }}
-                className="border p-3 rounded-lg"
-              />
+  <input
+    type="text"
+    placeholder="Requester"
+    value={requesterFilter}
+    onChange={(e) => {
+      setRequesterFilter(
+        e.target.value
+      );
+      setPage(1);
+    }}
+    className="border p-3 rounded-lg"
+  />
 
-              <input
-                type="text"
-                placeholder="Requester"
-                value={requesterFilter}
-                onChange={(e) => {
-                  setRequesterFilter(
-                    e.target.value
-                  );
-                  setPage(1);
-                }}
-                className="border p-3 rounded-lg"
-              />
+</div>
 
-            </div>
-            <input
-  type="date"
-  value={fromDate}
-  onChange={(e)=>
-    setFromDate(
-      e.target.value
-    )
-  }
-/>
+{/* Row 2 */}
 
-<input
-  type="date"
-  value={toDate}
-  onChange={(e)=>
-    setToDate(
-      e.target.value
-    )
-  }
-/>
+<div className="grid md:grid-cols-2 gap-4 mb-4">
 
-            <div className="grid md:grid-cols-2 gap-4">
+  <div>
 
-              <select
-                value={
-                  selectedType
-                }
-                onChange={(e) => {
-                  setSelectedType(
-                    e.target.value
-                  );
-                  setPage(1);
-                }}
-                className="border p-3 rounded-lg"
-              >
+    <label className="block mb-1 text-sm font-medium">
+      From Date
+    </label>
 
-                <option value="ALL">
-                  All Types
-                </option>
+    <input
+      type="date"
+      value={fromDate}
+      onChange={(e) =>
+        setFromDate(
+          e.target.value
+        )
+      }
+      className="
+        border
+        p-3
+        rounded-lg
+        w-full
+      "
+    />
 
-                <option value="Visitor">
-                  Visitor
-                </option>
+  </div>
 
-                <option value="Regular">
-                  Regular
-                </option>
+  <div>
 
-                <option value="CKD">
-                  CKD
-                </option>
+    <label className="block mb-1 text-sm font-medium">
+      To Date
+    </label>
 
-              </select>
+    <input
+      type="date"
+      value={toDate}
+      onChange={(e) =>
+        setToDate(
+          e.target.value
+        )
+      }
+      className="
+        border
+        p-3
+        rounded-lg
+        w-full
+      "
+    />
 
-              <select
-                value={
-                  selectedStatus
-                }
-                onChange={(e) => {
-                  setSelectedStatus(
-                    e.target.value
-                  );
-                  setPage(1);
-                }}
-                className="border p-3 rounded-lg"
-              >
+  </div>
 
-                <option value="ALL">
-                  All Status
-                </option>
+</div>
 
-                <option value="Approved">
-                  Approved
-                </option>
+{/* Row 3 */}
 
-                <option value="Pending">
-                  Pending
-                </option>
+<div className="grid md:grid-cols-2 gap-4">
 
-                <option value="Rejected">
-                  Rejected
-                </option>
+  <select
+    value={selectedType}
+    onChange={(e) => {
+      setSelectedType(
+        e.target.value
+      );
+      setPage(1);
+    }}
+    className="border p-3 rounded-lg"
+  >
+    <option value="ALL">
+      All Types
+    </option>
 
-              </select>
+    <option value="Visitor">
+      Visitor
+    </option>
 
-            </div>
+    <option value="Regular">
+      Regular
+    </option>
+
+    <option value="CKD">
+      CKD
+    </option>
+  </select>
+
+  <select
+    value={selectedStatus}
+    onChange={(e) => {
+      setSelectedStatus(
+        e.target.value
+      );
+      setPage(1);
+    }}
+    className="border p-3 rounded-lg"
+  >
+    <option value="ALL">
+      All Status
+    </option>
+
+    <option value="Approved">
+      Approved
+    </option>
+
+    <option value="Pending">
+      Pending
+    </option>
+
+    <option value="Rejected">
+      Rejected
+    </option>
+  </select>
+
+</div>
 
 
             <button
@@ -718,7 +786,7 @@ const exportExcel = async () => {
   <button
     onClick={exportMonthlyReport}
     className="
-      bg-purple-600
+      bg-blue-600
       text-white
       px-5
       py-3
@@ -728,26 +796,25 @@ const exportExcel = async () => {
     Export Monthly Report
   </button>
 
-  <button
-    onClick={exportDateRangeReport}
-    className="
-      bg-orange-600
-      text-white
-      px-5
-      py-3
-      rounded-lg
-    "
-  >
+ <button
+  onClick={exportDateRangeReport}
+  disabled={
+    !fromDate ||
+    !toDate
+  }
+  className="
+    bg-blue-600
+    text-white
+    px-5
+    py-3
+    rounded-lg
+    disabled:opacity-50
+  "
+>
     Export Date Range Report
   </button>
 
-</div>
-
-          {/* EXPORT */}
-
-          <div className="flex gap-4 mb-8">
-
-            
+       
             <button
               onClick={
   exportExcel
@@ -760,10 +827,12 @@ const exportExcel = async () => {
                 rounded-lg
               "
             >
-              Export Excel
+              Export Full Report
             </button>
 
-          </div>
+
+</div>          
+          
 
           {/* TABLE */}
 
