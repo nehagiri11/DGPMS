@@ -698,11 +698,18 @@ function RequestDetails() {
                   log.gate_status_after ||
                   "-"}
               </td>
-              <td className="p-3">
-                {log.createdAt ||
-                  log.created_at ||
-                  "-"}
-              </td>
+              <td>
+  {new Date(log.created_at)
+    .toLocaleTimeString(
+      "en-US",
+      {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true
+      }
+    )}
+</td>
             </tr>
           ))}
         </tbody>

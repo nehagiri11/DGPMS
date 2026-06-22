@@ -23,8 +23,8 @@ function RegularPrint({ request }) {
   };
 
  const detailRow = (label, value) => (
-  <div className="flex py-1">
-    <span className="font-semibold w-[130px] whitespace-nowrap">
+  <div className="flex py-2 text-[15px]">
+    <span className="font-semibold w-[160px] whitespace-nowrap text-[15px]">
       {label}
     </span>
 
@@ -35,7 +35,7 @@ function RegularPrint({ request }) {
 );
 
   const renderCopy = (copyTitle, showSecurityFields) => (
-    <section className="copy-section border-2 border-black flex flex-col min-h-[46vh]">
+    <section className="copy-section border-2 border-black flex flex-col min-h-[55vh] p-3">
       <div className="relative border-b border-black pb-8">
         <div className="absolute right-2 -top-2 bg-white p-1">
           <QRCodeCanvas
@@ -60,7 +60,7 @@ function RegularPrint({ request }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-16 border-b border-black py-3">
+      <div className="grid grid-cols-2 gap-20 border-b border-black py-5">
         <div>
           {detailRow("Company Name", request.companyName)}
           {detailRow("Driver Name", request.driverName)}
@@ -76,19 +76,19 @@ function RegularPrint({ request }) {
         </div>
       </div>
 
-      <table className="w-full border-collapse border border-black mt-4 text-sm">
+      <table className="w-full border-collapse border border-black mt-5 text-[15px]">
         <thead>
           <tr>
-            <th className="border border-black p-3">
+            <th className="border border-black p-4 text-center">
               S.N
             </th>
-            <th className="border border-black p-3">
+            <th className="border border-black p-4">
               ITEM/DESCRIPTION
             </th>
-            <th className="border border-black p-3">
+            <th className="border border-black p-4">
               QUANTITY
             </th>
-            <th className="border border-black p-3">
+            <th className="border border-black p-4">
               REMARKS
             </th>
           </tr>
@@ -113,7 +113,7 @@ function RegularPrint({ request }) {
         </tbody>
       </table>
 
-      <div className="border border-black p-2 mt-3 min-h-8">
+      <div className="border border-black p-4 mt-4 min-h-[70px] text-[15px]">
         <strong>Remarks:</strong> {request.remarks || "-"}
       </div>
 

@@ -38,6 +38,13 @@ function Reports() {
   const [dateFilter,
   setDateFilter] =
   useState("");
+  const [fromDate,
+setFromDate] =
+useState("");
+
+const [toDate,
+setToDate] =
+useState("");
 
   const [requesterFilter,
   setRequesterFilter] =
@@ -226,8 +233,82 @@ function Reports() {
     );
 
   };
+
+  const exportTodayReport = () => {
+
+  const today =
+    new Date()
+      .toISOString()
+      .split("T")[0];
+
+  const filtered =
+    requests.filter(
+      r =>
+        r.date === today
+    );
+
+  exportExcelData(
+    filtered,
+    "Today_Report"
+  );
+
+};
+const exportMonthlyReport = () => {
+
+  const currentMonth =
+    new Date().getMonth();
+
+  const currentYear =
+    new Date().getFullYear();
+
+  const filtered =
+    requests.filter(r => {
+
+      const d =
+        new Date(r.date);
+
+      return (
+        d.getMonth() ===
+          currentMonth &&
+        d.getFullYear() ===
+          currentYear
+      );
+
+    });
+
+  exportExcelData(
+    filtered,
+    "Monthly_Report"
+  );
+
+};
+const exportDateRangeReport = () => {
+
+  const filtered =
+    requests.filter(r => {
+
+      const passDate =
+        new Date(r.date);
+
+      return (
+        passDate >=
+          new Date(fromDate) &&
+        passDate <=
+          new Date(toDate)
+      );
+
+    });
+
+  exportExcelData(
+    filtered,
+    "Date_Range_Report"
+  );
+
+};
+
+
 const exportExcel = async () => {
-   console.log("EXPORT EXCEL RUNNING");
+  
 
   try {
 
@@ -515,6 +596,25 @@ const exportExcel = async () => {
               />
 
             </div>
+            <input
+  type="date"
+  value={fromDate}
+  onChange={(e)=>
+    setFromDate(
+      e.target.value
+    )
+  }
+/>
+
+<input
+  type="date"
+  value={toDate}
+  onChange={(e)=>
+    setToDate(
+      e.target.value
+    )
+  }
+/>
 
             <div className="grid md:grid-cols-2 gap-4">
 
@@ -582,10 +682,13 @@ const exportExcel = async () => {
 
             </div>
 
+
             <button
               onClick={() => {
                 setPassNumberFilter("");
                 setDateFilter("");
+                setFromDate("");
+                setToDate("");
                 setRequesterFilter("");
                 setSelectedType("ALL");
                 setSelectedStatus("ALL");
@@ -597,26 +700,54 @@ const exportExcel = async () => {
             </button>
 
           </div>
+          <div className="flex gap-3 mb-6 flex-wrap">
+
+  <button
+    onClick={exportTodayReport}
+    className="
+      bg-blue-600
+      text-white
+      px-5
+      py-3
+      rounded-lg
+    "
+  >
+    Export Today's Report
+  </button>
+
+  <button
+    onClick={exportMonthlyReport}
+    className="
+      bg-purple-600
+      text-white
+      px-5
+      py-3
+      rounded-lg
+    "
+  >
+    Export Monthly Report
+  </button>
+
+  <button
+    onClick={exportDateRangeReport}
+    className="
+      bg-orange-600
+      text-white
+      px-5
+      py-3
+      rounded-lg
+    "
+  >
+    Export Date Range Report
+  </button>
+
+</div>
 
           {/* EXPORT */}
 
           <div className="flex gap-4 mb-8">
 
-            <button
-              onClick={
-                exportPDF
-              }
-              className="
-                bg-red-600
-                text-white
-                px-6
-                py-3
-                rounded-lg
-              "
-            >
-              Export PDF
-            </button>
-
+            
             <button
               onClick={
   exportExcel
