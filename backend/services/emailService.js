@@ -1,5 +1,9 @@
 const nodemailer =
   require("nodemailer");
+const dns =
+  require("dns");
+
+dns.setDefaultResultOrder("ipv4first");
 
 const maskEmail = (email) => {
   if (!email) {
@@ -36,6 +40,7 @@ const transporter =
         host: smtpHost,
         port: smtpPort,
         secure: smtpSecure,
+        family: 4,
         requireTLS: !smtpSecure,
         connectionTimeout: 30000,
         greetingTimeout: 30000,
