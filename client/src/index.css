@@ -191,14 +191,14 @@
   }
 
   .copy-section {
-    height: 140mm !important;
+    height: 135mm !important;
     margin: 0 !important;
     padding: 4.5mm !important;
     box-sizing: border-box !important;
     overflow: hidden !important;
     break-inside: avoid;
     page-break-inside: avoid;
-    font-size: 10px !important;
+    font-size: 12px !important;
     line-height: 1.2 !important;
   }
 
@@ -231,23 +231,24 @@
 }
 
   .copy-section p {
-    margin: 0 !important;
-  }
+  margin: 0 !important;
+  font-size: 12px !important;
+}
 
   .print-person-name {
-    font-size: 10px !important;
+    font-size: 13px !important;
     line-height: 1.15 !important;
   }
 
   .copy-section table {
     margin-top: 2.5mm !important;
-    font-size: 10px !important;
+    font-size: 12px !important;
   }
 
   .copy-section th,
   .copy-section td {
-    padding: 2mm !important;
-    line-height: 1.15 !important;
+    padding: 2.5mm !important;
+    line-height: 1.10 !important;
   }
 
   .copy-section canvas {
@@ -264,6 +265,9 @@
     font-size: 7px !important;
     top: -2.2mm !important;
   }
+  .remarks-box {
+  min-height: 20mm !important;
+}
 
   .visitor-print-page {
     width: 194mm !important;

@@ -35,7 +35,7 @@ function RegularPrint({ request }) {
 );
 
   const renderCopy = (copyTitle, showSecurityFields) => (
-    <section className="copy-section border-2 border-black flex flex-col min-h-[55vh] p-3">
+    <section className="copy-section border-2 border-black flex flex-col justify-between p-4">
       <div className="relative border-b border-black pb-8">
         <div className="absolute right-2 -top-2 bg-white p-1">
           <QRCodeCanvas
