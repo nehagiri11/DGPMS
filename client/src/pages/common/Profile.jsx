@@ -305,7 +305,7 @@ transition
                     </h2>
                   </div>
 
-                  <div className="bg-gradient-to-r from-amber-400 to-orange-500s text-white rounded-xl p-5 shadow">
+                  <div className="bg-gradient-to-r from-amber-400 to-orange-500 text-white rounded-xl p-5 shadow">
                     <p>Pending</p>
                     <h2 className="text-3xl font-bold">
                       {pendingPasses}
@@ -327,7 +327,7 @@ transition
                   </div>
 
                 </div>
-                <div className="grid md:grid-cols-3 gap-4 mb-6">
+                <div className="grid md:grid-cols-3 gap-6 mt-10 pt-6 border-t border-slate-200">
 
               <div className="
 bg-white

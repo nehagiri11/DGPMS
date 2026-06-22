@@ -227,6 +227,7 @@ function Reports() {
 
   };
 const exportExcel = async () => {
+   console.log("EXPORT EXCEL RUNNING");
 
   try {
 
