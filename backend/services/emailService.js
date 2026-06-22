@@ -34,6 +34,23 @@ const smtpHost =
   process.env.EMAIL_HOST ||
   "smtp.gmail.com";
 
+const smtpLookup =
+  (
+    hostname,
+    options,
+    callback
+  ) => {
+    dns.lookup(
+      hostname,
+      {
+        ...options,
+        family: 4,
+        all: false
+      },
+      callback
+    );
+  };
+
 const transporter =
   isEmailConfigured
     ? nodemailer.createTransport({
@@ -41,6 +58,7 @@ const transporter =
         port: smtpPort,
         secure: smtpSecure,
         family: 4,
+        lookup: smtpLookup,
         requireTLS: !smtpSecure,
         connectionTimeout: 30000,
         greetingTimeout: 30000,
