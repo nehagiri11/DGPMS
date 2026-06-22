@@ -33,6 +33,40 @@ const transporter =
       })
     : null;
 
+console.log(
+  "Email configuration:",
+  {
+    configured: isEmailConfigured,
+    user: maskEmail(process.env.EMAIL_USER),
+    passwordPresent: Boolean(process.env.EMAIL_PASSWORD),
+    verifyOnStart:
+      process.env.EMAIL_VERIFY_ON_START === "true"
+  }
+);
+
+if (
+  transporter &&
+  process.env.EMAIL_VERIFY_ON_START === "true"
+) {
+  transporter
+    .verify()
+    .then(() => {
+      console.log("Email SMTP verification succeeded");
+    })
+    .catch((error) => {
+      console.error(
+        "Email SMTP verification failed:",
+        {
+          message: error.message,
+          code: error.code,
+          command: error.command,
+          response: error.response,
+          responseCode: error.responseCode
+        }
+      );
+    });
+}
+
 const sendEmail =
   async (
     to,

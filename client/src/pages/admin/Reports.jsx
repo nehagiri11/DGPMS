@@ -808,7 +808,6 @@ const exportExcel = async () => {
     px-5
     py-3
     rounded-lg
-    disabled:opacity-50
   "
 >
     Export Date Range Report
