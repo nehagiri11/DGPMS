@@ -32,9 +32,7 @@ async (req, res) => {
 
       gp.purpose               AS "Purpose",
 
-      gp.vehicle_no            AS "Vehicle Number",
-
-      gp.return_date           AS "Return Date"
+      gp.vehicle_no            AS "Vehicle Number"
 
     FROM gate_passes gp
 
