@@ -166,7 +166,7 @@
 @media print {
   @page {
     size: A4 portrait;
-    margin: 8mm;
+    margin: 5mm;
   }
 
   html,
@@ -184,21 +184,21 @@
   }
 
   .print-container {
-    width: 194mm !important;
+    width: 200mm !important;
     padding: 0 !important;
     margin: 0 auto !important;
     background: #ffffff !important;
   }
 
   .copy-section {
-    height: 135mm !important;
+    height: 138mm !important;
     margin: 0 !important;
     padding: 4.5mm !important;
     box-sizing: border-box !important;
     overflow: hidden !important;
     break-inside: avoid;
     page-break-inside: avoid;
-    font-size: 12px !important;
+    font-size: 11px !important;
     line-height: 1.2 !important;
   }
 
@@ -232,17 +232,17 @@
 
   .copy-section p {
   margin: 0 !important;
-  font-size: 12px !important;
+  font-size: 11px !important;
 }
 
   .print-person-name {
-    font-size: 13px !important;
+    font-size: 11px !important;
     line-height: 1.15 !important;
   }
 
   .copy-section table {
     margin-top: 2.5mm !important;
-    font-size: 12px !important;
+    font-size: 11px !important;
   }
 
   .copy-section th,
@@ -266,7 +266,7 @@
     top: -2.2mm !important;
   }
   .remarks-box {
-  min-height: 20mm !important;
+  min-height: 15mm !important;
 }
 
   .visitor-print-page {
