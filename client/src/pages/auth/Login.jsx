@@ -9,6 +9,13 @@ import {
 } from "react-icons/fa";
 
 import { FcGoogle } from "react-icons/fc";
+
+const ALLOWED_EMAIL_DOMAIN =
+  "@laxmimotocorp.com";
+
+const isAllowedCompanyEmail = (value) =>
+  value.endsWith(ALLOWED_EMAIL_DOMAIN);
+
 function Login() {
   
   const navigate = useNavigate();
@@ -44,6 +51,27 @@ const handleLogin = async (e) => {
 
   e.preventDefault();
 
+  const normalizedEmail =
+    email.trim().toLowerCase();
+
+  if (!normalizedEmail || !password) {
+    setError(
+      "Email and password are required."
+    );
+    return;
+  }
+
+  if (
+    !isAllowedCompanyEmail(
+      normalizedEmail
+    )
+  ) {
+    setError(
+      "Only company email addresses are allowed."
+    );
+    return;
+  }
+
   try {
 
     const response =
@@ -52,7 +80,7 @@ const handleLogin = async (e) => {
         "/api/auth/login",
 
         {
-          email,
+          email: normalizedEmail,
           password
         }
 
@@ -153,8 +181,8 @@ const handleLogin = async (e) => {
     }
 
     if (
-      !normalizedEmail.endsWith(
-        "@laxmimotorcorp.com"
+      !isAllowedCompanyEmail(
+        normalizedEmail
       )
     ) {
       setError(
@@ -600,7 +628,7 @@ const handleLogin = async (e) => {
 
             <div className="bg-blue-50 border border-blue-200 text-blue-700 p-4 rounded-lg mb-4">
               Only users with a
-              @laxmimotorcorp.com
+              @laxmimotocorp.com
               company email can register.
             </div>
 

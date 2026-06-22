@@ -163,6 +163,11 @@
   page-break-inside: avoid;
 }
 
+.visitor-record-sheet {
+  width: min(1100px, 100%);
+  margin: 0 auto;
+}
+
 @media print {
   @page {
     size: A4 portrait;
@@ -335,53 +340,58 @@
 
   .visitor-card-sheet {
     width: 194mm !important;
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
+    min-height: 291mm !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-content: flex-start !important;
     gap: 5mm !important;
     margin: 0 !important;
+    break-after: page;
+    page-break-after: always;
   }
 
   .visitor-pass-card {
-    width: 61.3mm !important;
-    height: 97mm !important;
+    width: 5.4cm !important;
+    height: 8.5cm !important;
     border: 0.8mm solid #1c3564 !important;
     break-inside: avoid;
     page-break-inside: avoid;
+    box-sizing: border-box !important;
   }
 
   .visitor-card-company {
-    font-size: 9px !important;
-    padding: 2.2mm 1mm 1.4mm !important;
+    font-size: 5.5px !important;
+    padding: 1.3mm 0.8mm 1mm !important;
   }
 
   .visitor-card-title {
-    font-size: 11px !important;
-    padding: 2.8mm 1mm 2.2mm !important;
+    font-size: 7px !important;
+    padding: 1.8mm 1mm 1.4mm !important;
   }
 
   .visitor-card-photo-band {
-    padding-top: 2mm !important;
+    padding-top: 1.4mm !important;
   }
 
   .visitor-card-photo {
-    width: 28mm !important;
-    height: 36mm !important;
-    font-size: 18px !important;
+    width: 22mm !important;
+    height: 25mm !important;
+    font-size: 14px !important;
   }
 
   .visitor-card-body {
-    min-height: 39mm !important;
-    padding: 2.2mm 3mm 3mm !important;
+    min-height: 35mm !important;
+    padding: 1.6mm 2mm 2mm !important;
   }
 
   .visitor-card-details {
-    padding-right: 19mm !important;
+    padding-right: 16mm !important;
   }
 
   .visitor-card-details p {
-    margin-bottom: 1.3mm !important;
-    font-size: 7.5px !important;
-    line-height: 1.18 !important;
+    margin-bottom: 0.9mm !important;
+    font-size: 5.8px !important;
+    line-height: 1.12 !important;
   }
 
   .visitor-card-dates {
@@ -390,31 +400,41 @@
   }
 
   .visitor-card-qr {
-    top: 2.4mm !important;
-    right: 2.8mm !important;
+    top: 1.8mm !important;
+    right: 2mm !important;
   }
 
   .visitor-card-qr canvas {
-    width: 17mm !important;
-    height: 17mm !important;
+    width: 14mm !important;
+    height: 14mm !important;
   }
 
   .visitor-card-footer {
-    right: 3mm !important;
-    bottom: 2.4mm !important;
-    left: 3mm !important;
+    right: 2mm !important;
+    bottom: 1.8mm !important;
+    left: 2mm !important;
   }
 
   .visitor-card-brandmark {
-    width: 18mm !important;
-    height: 9mm !important;
+    width: 15mm !important;
+    height: 7mm !important;
     gap: 1.2mm !important;
     border-radius: 1.5mm !important;
-    font-size: 4.8px !important;
+    font-size: 3.8px !important;
   }
 
   .visitor-card-sign {
-    font-size: 7px !important;
+    font-size: 5.5px !important;
+  }
+
+  .visitor-record-sheet {
+    width: 194mm !important;
+    min-height: 291mm !important;
+    margin: 0 auto !important;
+    break-before: page;
+    page-break-before: always;
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 
   .visitor-record-pass {
@@ -431,19 +451,16 @@
     page-break-inside: avoid;
   }
 
-  .visitor-card-sheet + .visitor-section-divider + .visitor-record-pass {
-    margin-top: 8mm !important;
-    break-before: page;
-    page-break-before: always;
-  }
-
-  .visitor-card-sheet + .visitor-section-divider + .visitor-record-copy {
-    margin-top: 0 !important;
-    break-before: page;
-    page-break-before: always;
-  }
-
   .visitor-record-copy {
+    width: 194mm !important;
+    min-height: 92mm !important;
+    margin: 0 auto !important;
+    padding: 4.5mm !important;
+    border: 0.5mm solid #111111 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
     font-size: 11px !important;
     line-height: 1.25 !important;
   }

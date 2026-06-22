@@ -6,6 +6,15 @@ const {
   sendEmail
 } = require("../services/emailService");
 
+const ALLOWED_EMAIL_DOMAIN =
+  "@laxmimotocorp.com";
+
+const isAllowedCompanyEmail = (email) =>
+  String(email || "")
+    .trim()
+    .toLowerCase()
+    .endsWith(ALLOWED_EMAIL_DOMAIN);
+
 exports.register = async (req, res) => {
 
   try {
@@ -46,9 +55,7 @@ exports.register = async (req, res) => {
     if (!normalizedEmail) {
       errors.push("Company email is required");
     } else if (
-      !normalizedEmail.endsWith(
-        "@laxmimotorcorp.com"
-      )
+      !isAllowedCompanyEmail(normalizedEmail)
     ) {
       errors.push("Only company email addresses are allowed");
     }
@@ -159,7 +166,12 @@ exports.login = async (req, res) => {
 
   try {
 
-    const { email, password } = req.body;
+    const email =
+      String(req.body.email || "")
+        .trim()
+        .toLowerCase();
+
+    const { password } = req.body;
 
     if (!email || !password) {
 
@@ -167,6 +179,17 @@ exports.login = async (req, res) => {
 
         success: false,
         message: "Email and password are required"
+
+      });
+
+    }
+
+    if (!isAllowedCompanyEmail(email)) {
+
+      return res.status(400).json({
+
+        success: false,
+        message: "Only company email addresses are allowed"
 
       });
 

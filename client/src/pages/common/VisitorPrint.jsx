@@ -113,8 +113,14 @@ function VisitorPrint({ request }) {
     </section>
   );
 
-  const renderVisitorGatePass = (copyTitle, showSecurityFields) => (
-    <section className="copy-section border-2 border-black flex flex-col justify-between p-4">
+  const renderVisitorGatePass = (
+    copyTitle,
+    showSecurityFields,
+    copyClassName
+  ) => (
+    <section
+      className={`copy-section ${copyClassName} border-2 border-black flex flex-col justify-between p-4`}
+    >
       <div className="relative border-b border-black pb-8">
         <div className="absolute right-2 -top-2 bg-white p-1">
           <QRCodeCanvas
@@ -288,15 +294,25 @@ function VisitorPrint({ request }) {
         Visitor Gate Pass / Office Record
       </div>
 
-      {renderVisitorGatePass("SECURITY COPY - 1", true)}
+      <div className="visitor-record-sheet">
+        {renderVisitorGatePass(
+          "SECURITY COPY - 1",
+          true,
+          "visitor-record-pass"
+        )}
 
-      <div className="visitor-record-cut-line cut-line border-t-2 border-dotted border-black my-4 relative">
-        <span className="absolute left-1/2 -translate-x-1/2 -top-3 bg-white px-3 text-xs font-semibold">
-          Cut here
-        </span>
+        <div className="visitor-record-cut-line cut-line border-t-2 border-dotted border-black my-4 relative">
+          <span className="absolute left-1/2 -translate-x-1/2 -top-3 bg-white px-3 text-xs font-semibold">
+            Cut here
+          </span>
+        </div>
+
+        {renderVisitorGatePass(
+          "OFFICE COPY - 2",
+          false,
+          "visitor-record-copy"
+        )}
       </div>
-
-      {renderVisitorGatePass("OFFICE COPY - 2", false)}
     </div>
   );
 }

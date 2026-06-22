@@ -1,7 +1,7 @@
 export const users = [
   {
     name: "Neha",
-    email: "neha.giri@laxmimotorcorp.com",
+    email: "neha.giri@laxmimotocorp.com",
     password: "123456",
     role: "REQUESTER",
     approved: true,
@@ -9,7 +9,7 @@ export const users = [
 
   {
     name: "Test Employee",
-    email: "try@laxmimotorcorp.com",
+    email: "try@laxmimotocorp.com",
     password: "123456",
     role: "REQUESTER",
     approved: true,
@@ -17,7 +17,7 @@ export const users = [
 
   {
     name: "Manager",
-    email: "manager@laxmimotorcorp.com",
+    email: "manager@laxmimotocorp.com",
     password: "123456",
     role: "APPROVER",
     approved: true,
@@ -25,21 +25,21 @@ export const users = [
 
 
   {
-    email: "security@laxmimotorcorp.com",
+    email: "security@laxmimotocorp.com",
     password: "123456",
     role: "SECURITY",
     approved: true,
   },
 
   {
-    email: "admin@laxmimotorcorp.com",
+    email: "admin@laxmimotocorp.com",
     password: "123456",
     role: "ADMIN",
     approved: true,
   },
 
   {
-    email: "pending@laxmimotorcorp.com",
+    email: "pending@laxmimotocorp.com",
     password: "123456",
     role: "EMPLOYEE",
     approved: false,
