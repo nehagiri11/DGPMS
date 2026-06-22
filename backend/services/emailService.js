@@ -18,10 +18,28 @@ const isEmailConfigured =
     process.env.EMAIL_PASSWORD
   );
 
+const smtpPort =
+  Number(process.env.EMAIL_PORT || 587);
+
+const smtpSecure =
+  process.env.EMAIL_SECURE
+    ? process.env.EMAIL_SECURE === "true"
+    : smtpPort === 465;
+
+const smtpHost =
+  process.env.EMAIL_HOST ||
+  "smtp.gmail.com";
+
 const transporter =
   isEmailConfigured
     ? nodemailer.createTransport({
-        service: "gmail",
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpSecure,
+        requireTLS: !smtpSecure,
+        connectionTimeout: 30000,
+        greetingTimeout: 30000,
+        socketTimeout: 30000,
 
         auth: {
           user:
@@ -39,6 +57,9 @@ console.log(
     configured: isEmailConfigured,
     user: maskEmail(process.env.EMAIL_USER),
     passwordPresent: Boolean(process.env.EMAIL_PASSWORD),
+    host: smtpHost,
+    port: smtpPort,
+    secure: smtpSecure,
     verifyOnStart:
       process.env.EMAIL_VERIFY_ON_START === "true"
   }
@@ -86,7 +107,10 @@ const sendEmail =
       {
         from: maskEmail(process.env.EMAIL_USER),
         to: maskEmail(to),
-        subject
+        subject,
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpSecure
       }
     );
 
