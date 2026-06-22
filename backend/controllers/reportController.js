@@ -182,17 +182,14 @@ async (req, res) => {
 
   } catch (error) {
 
-    console.log(error);
+  console.log("EXPORT ERROR:");
+  console.log(error);
 
-    res.status(500).json({
+  res.status(500).json({
+    success: false,
+    message: error.message
+  });
 
-      success: false,
-
-      message:
-        "Export failed"
-
-    });
-
-  }
+}
 
 };
