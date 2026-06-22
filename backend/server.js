@@ -93,11 +93,14 @@ app.get("/", async (req, res) => {
 
 });
 
+const port =
+  process.env.PORT || 5000;
+
 app.listen(
-  process.env.PORT || 5000,
+  port,
   () => {
     console.log(
-      "Server running on port 5000"
+      `Server running on port ${port}`
     );
   }
 );
