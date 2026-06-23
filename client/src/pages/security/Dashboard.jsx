@@ -49,6 +49,16 @@ function SecurityDashboard() {
   const [scannerVisible,
   setScannerVisible] =
   useState(false);
+  const [cameraDevices,
+  setCameraDevices] =
+  useState([]);
+  const [selectedCameraId,
+  setSelectedCameraId] =
+  useState(
+    localStorage.getItem(
+      "securityCameraId"
+    ) || ""
+  );
 
   const [selectedView,
   setSelectedView] =
@@ -105,6 +115,64 @@ function SecurityDashboard() {
 
     return message ||
       "Unable to start camera scanner.";
+  };
+
+  const isVirtualCamera = (camera) =>
+    /obs|virtual|snap|manycam|xsplit/i.test(
+      camera?.label || ""
+    );
+
+  const chooseCamera = (cameras) => {
+    if (!cameras?.length) {
+      return null;
+    }
+
+    const savedCamera =
+      cameras.find(
+        (camera) =>
+          camera.id === selectedCameraId
+      );
+
+    if (savedCamera) {
+      return savedCamera;
+    }
+
+    const physicalCameras =
+      cameras.filter(
+        (camera) =>
+          !isVirtualCamera(camera)
+      );
+
+    return (
+      physicalCameras.find((camera) =>
+        /back|rear|environment/i.test(
+          camera.label || ""
+        )
+      ) ||
+      physicalCameras[
+        physicalCameras.length - 1
+      ] ||
+      cameras.find(
+        (camera) =>
+          !isVirtualCamera(camera)
+      ) ||
+      cameras[0]
+    );
+  };
+
+  const restartScannerWithCamera = (cameraId) => {
+    setSelectedCameraId(cameraId);
+    localStorage.setItem(
+      "securityCameraId",
+      cameraId
+    );
+
+    if (scannerVisible) {
+      setScannerVisible(false);
+      window.setTimeout(() => {
+        setScannerVisible(true);
+      }, 250);
+    }
   };
 
   const loadRequests = async (
@@ -577,19 +645,22 @@ showToast?.(
         await Html5Qrcode.getCameras();
 
       const preferredCamera =
-        cameras.find((camera) =>
-          /back|rear|environment/i.test(
-            camera.label || ""
-          )
-        ) ||
-        cameras[cameras.length - 1] ||
-        cameras[0];
+        chooseCamera(cameras);
 
       if (!preferredCamera) {
         throw new Error(
           "No camera was found on this device."
         );
       }
+
+      setCameraDevices(cameras);
+      setSelectedCameraId(
+        preferredCamera.id
+      );
+      localStorage.setItem(
+        "securityCameraId",
+        preferredCamera.id
+      );
 
       cameraConfig = {
           deviceId: {
@@ -772,6 +843,43 @@ showToast?.(
   : "Scan Exit QR"}
 
 </h2>
+
+{cameraDevices.length > 1 && (
+  <div className="mb-4 max-w-md">
+    <label className="block text-sm font-semibold text-slate-600 mb-2">
+      Camera
+    </label>
+    <select
+      value={selectedCameraId}
+      onChange={(event) =>
+        restartScannerWithCamera(
+          event.target.value
+        )
+      }
+      className="
+        w-full
+        rounded-xl
+        border
+        border-slate-300
+        bg-white
+        px-4
+        py-3
+        text-slate-800
+        shadow-sm
+      "
+    >
+      {cameraDevices.map((camera, index) => (
+        <option
+          key={camera.id}
+          value={camera.id}
+        >
+          {camera.label ||
+            `Camera ${index + 1}`}
+        </option>
+      ))}
+    </select>
+  </div>
+)}
 
 <div
   id="reader"

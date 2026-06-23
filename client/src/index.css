@@ -343,6 +343,38 @@
     font-size: 8px !important;
   }
 
+  .regular-ckd-print-container {
+    width: 194mm !important;
+    height: 291mm !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    display: grid !important;
+    grid-template-rows: 144mm 3mm 144mm !important;
+    align-items: stretch !important;
+    background: #ffffff !important;
+  }
+
+  .regular-ckd-print-container .regular-print-copy,
+  .regular-ckd-print-container .ckd-print-copy {
+    width: 194mm !important;
+    height: 144mm !important;
+    min-height: 144mm !important;
+    margin: 0 !important;
+    padding: 4mm !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  .regular-ckd-print-container .cut-line {
+    align-self: center !important;
+    margin: 0 !important;
+    height: 0 !important;
+  }
+
+  .regular-ckd-print-container .cut-line span {
+    top: -2.1mm !important;
+  }
+
   .visitor-print-page {
     width: 194mm !important;
     min-height: auto !important;

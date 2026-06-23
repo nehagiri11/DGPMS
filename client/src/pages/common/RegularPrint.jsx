@@ -179,7 +179,7 @@ function RegularPrint({ request }) {
   );
 
   return (
-    <div className="print-container p-4 bg-white">
+    <div className="print-container regular-ckd-print-container p-4 bg-white">
       <button
         onClick={() => window.print()}
         className="
