@@ -2,6 +2,7 @@ const db = require("../config/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
+const https = require("https");
 const {
   sendEmail
 } = require("../services/emailService");
@@ -21,6 +22,55 @@ const getGoogleClientId = () =>
     process.env.VITE_GOOGLE_CLIENT_ID ||
     ""
   ).trim();
+
+const fetchJson = (url) =>
+  new Promise((resolve, reject) => {
+    https
+      .get(url, (response) => {
+        let body = "";
+
+        response.on("data", (chunk) => {
+          body += chunk;
+        });
+
+        response.on("end", () => {
+          try {
+            resolve({
+              ok:
+                response.statusCode >= 200 &&
+                response.statusCode < 300,
+              status:
+                response.statusCode,
+              data:
+                JSON.parse(body || "{}")
+            });
+          } catch (error) {
+            reject(error);
+          }
+        });
+      })
+      .on("error", reject);
+  });
+
+const verifyGoogleCredential = async (credential) => {
+  const url =
+    `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`;
+
+  if (typeof fetch === "function") {
+    const response =
+      await fetch(url);
+
+    return {
+      ok: response.ok,
+      status: response.status,
+      data:
+        await response.json()
+          .catch(() => ({}))
+    };
+  }
+
+  return fetchJson(url);
+};
 
 const createLoginResponse = (user) => {
   const token = jwt.sign(
@@ -334,19 +384,30 @@ exports.googleAuth = async (req, res) => {
     }
 
     const verifyResponse =
-      await fetch(
-        `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`
+      await verifyGoogleCredential(
+        credential
       );
 
     const googleProfile =
-      await verifyResponse.json()
-        .catch(() => ({}));
+      verifyResponse.data || {};
 
     if (
       !verifyResponse.ok ||
       googleProfile.aud !== googleClientId ||
       String(googleProfile.email_verified) !== "true"
     ) {
+
+      console.log(
+        "GOOGLE AUTH VERIFY FAILED:",
+        {
+          status: verifyResponse.status,
+          expectedAudPresent: Boolean(googleClientId),
+          receivedAudPresent: Boolean(googleProfile.aud),
+          emailVerified: googleProfile.email_verified,
+          error: googleProfile.error,
+          errorDescription: googleProfile.error_description
+        }
+      );
 
       return res.status(401).json({
         success: false,
@@ -457,11 +518,26 @@ exports.googleAuth = async (req, res) => {
 
   } catch (error) {
 
-    console.log("GOOGLE AUTH ERROR:", error);
+    console.log(
+      "GOOGLE AUTH ERROR:",
+      {
+        message: error.message,
+        code: error.code,
+        errno: error.errno,
+        sqlMessage: error.sqlMessage
+      }
+    );
 
     res.status(500).json({
       success: false,
-      message: "Google sign-in failed"
+      message:
+        error.code === "ENOTFOUND" ||
+        error.code === "ETIMEDOUT" ||
+        error.code === "ECONNRESET"
+          ? "Server could not reach Google to verify sign-in"
+          : error.sqlMessage
+          ? "Google account could not be saved in the database"
+          : "Google sign-in failed on the server"
     });
 
   }
