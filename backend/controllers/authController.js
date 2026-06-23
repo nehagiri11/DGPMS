@@ -350,15 +350,6 @@ exports.googleAuth = async (req, res) => {
         .trim()
         .toLowerCase();
 
-    if (!isAllowedCompanyEmail(email)) {
-
-      return res.status(400).json({
-        success: false,
-        message: "Only company email addresses are allowed"
-      });
-
-    }
-
     const [users] =
       await db.query(
         `
@@ -451,7 +442,7 @@ exports.googleAuth = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Account created and waiting for admin approval"
+      message: "Google account created and waiting for admin approval"
     });
 
   } catch (error) {
