@@ -8,6 +8,7 @@ express.Router();
 const {
   register,
   login,
+  googleAuth,
   profile,
   changePassword,
   forgotPassword,
@@ -35,6 +36,11 @@ router.post(
 router.post(
   "/login",
   login
+);
+
+router.post(
+  "/google",
+  googleAuth
 );
 
 router.post(

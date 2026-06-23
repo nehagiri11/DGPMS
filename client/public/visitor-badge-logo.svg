@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 130" role="img" aria-labelledby="title">
+  <title id="title">Hyundai and Laxmi Group</title>
+  <rect width="360" height="130" fill="#f7f7f7"/>
+  <line x1="180" y1="12" x2="180" y2="118" stroke="#ffffff" stroke-width="4"/>
+
+  <g transform="translate(21 19)" fill="#063d70">
+    <ellipse cx="58" cy="31" rx="50" ry="27" fill="none" stroke="#063d70" stroke-width="8"/>
+    <path d="M36 13c18 4 44 9 66 20-20 4-47 3-72 18 4-14 3-27 6-38z" fill="#063d70"/>
+    <path d="M31 19c-10 6-18 17-23 32 7 4 16 4 25 0 8-15 20-26 36-34-14-3-27-3-38 2z" fill="#f7f7f7"/>
+    <path d="M79 10c-17 2-29 8-39 20 17-3 37-1 57 5 10-8 12-16-18-25z" fill="#f7f7f7"/>
+    <path d="M41 62c17-2 34-10 49-23-19 0-38 4-60 18 2 4 6 5 11 5z" fill="#f7f7f7"/>
+    <text x="58" y="91" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="800" letter-spacing="1">HYUNDAI</text>
+  </g>
+
+  <g transform="translate(211 13)" fill="#f58220">
+    <path d="M55 2c21 31 40 53 40 76 0 19-16 29-40 29S15 97 15 78C15 55 34 33 55 2z" fill="none" stroke="#f58220" stroke-width="4"/>
+    <path d="M55 43c9 12 9 19 0 29-9-10-9-17 0-29z"/>
+    <path d="M39 55c9 1 16 6 20 17-12-1-19-6-20-17z"/>
+    <path d="M71 55c-9 1-16 6-20 17 12-1 19-6 20-17z"/>
+    <path d="M30 66c11-1 20 3 27 12-14 1-23-3-27-12z"/>
+    <path d="M80 66c-11-1-20 3-27 12 14 1 23-3 27-12z"/>
+    <rect x="31" y="79" width="48" height="14" rx="2"/>
+    <path d="M31 85h-17v15h17zm48 0h17v15H79z" opacity=".9"/>
+    <path d="M32 94c8 8 13 10 19 4 3 4 8 5 13 1 5 4 10 3 14-5" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+    <text x="55" y="120" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="800">Laxmi Group</text>
+    <line x1="17" y1="124" x2="93" y2="124" stroke="#f58220" stroke-width="3"/>
+  </g>
+</svg>

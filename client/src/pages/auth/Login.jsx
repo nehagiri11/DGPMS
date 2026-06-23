@@ -1,4 +1,8 @@
-import { useState } from "react";
+import {
+  useEffect,
+  useRef,
+  useState
+} from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useToast } from "../../components/ToastProvider";
@@ -15,6 +19,48 @@ const ALLOWED_EMAIL_DOMAIN =
 
 const isAllowedCompanyEmail = (value) =>
   value.endsWith(ALLOWED_EMAIL_DOMAIN);
+
+const GOOGLE_CLIENT_ID =
+  import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
+
+const loadGoogleIdentityScript = () =>
+  new Promise((resolve, reject) => {
+    if (window.google?.accounts?.id) {
+      resolve();
+      return;
+    }
+
+    const existingScript =
+      document.querySelector(
+        'script[src="https://accounts.google.com/gsi/client"]'
+      );
+
+    if (existingScript) {
+      existingScript.addEventListener(
+        "load",
+        resolve,
+        { once: true }
+      );
+      existingScript.addEventListener(
+        "error",
+        reject,
+        { once: true }
+      );
+      return;
+    }
+
+    const script =
+      document.createElement("script");
+
+    script.src =
+      "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    script.onload = resolve;
+    script.onerror = reject;
+
+    document.body.appendChild(script);
+  });
 
 function Login() {
   
@@ -39,6 +85,21 @@ function Login() {
   const [forgotSending, setForgotSending] =
     useState(false);
 
+  const [googleReady, setGoogleReady] =
+    useState(false);
+
+  const [googleBusy, setGoogleBusy] =
+    useState(false);
+
+  const googleSignInButtonRef =
+    useRef(null);
+
+  const googleSignUpButtonRef =
+    useRef(null);
+
+  const googleModeRef =
+    useRef(activeTab);
+
   const [name, setName] =
     useState("");
 
@@ -47,6 +108,193 @@ function Login() {
 
   const [department, setDepartment] =
     useState("");
+
+const handleAuthenticatedUser = (user, token) => {
+
+  localStorage.setItem(
+    "token",
+    token
+  );
+
+  localStorage.setItem(
+    "user",
+    JSON.stringify(user)
+  );
+
+  localStorage.setItem(
+    "loggedInUser",
+    JSON.stringify(user)
+  );
+
+  setError("");
+
+  if (
+    user.role === "REQUESTER"
+  ) {
+
+    navigate(
+      "/employee/dashboard"
+    );
+
+  }
+
+  else if (
+    user.role === "APPROVER"
+  ) {
+
+    navigate(
+      "/approver/dashboard"
+    );
+
+  }
+
+  else if (
+    user.role === "SECURITY"
+  ) {
+
+    navigate(
+      "/security/dashboard"
+    );
+
+  }
+
+  else if (
+    user.role === "ADMIN"
+  ) {
+
+    navigate(
+      "/admin/dashboard"
+    );
+
+  }
+
+};
+
+const handleGoogleCredential = async (response) => {
+
+  if (!response?.credential) {
+    setError(
+      "Google sign-in did not return a credential."
+    );
+    return;
+  }
+
+  try {
+
+    setGoogleBusy(true);
+
+    const result =
+      await axios.post(
+        "/api/auth/google",
+        {
+          credential: response.credential,
+          mode:
+            googleModeRef.current === "signup"
+              ? "signup"
+              : "signin"
+        }
+      );
+
+    if (result.data?.token && result.data?.user) {
+      handleAuthenticatedUser(
+        result.data.user,
+        result.data.token
+      );
+      return;
+    }
+
+    setError("");
+    setActiveTab("signin");
+    showToast?.(
+      result.data?.message ||
+      "Account created and waiting for admin approval.",
+      "success"
+    );
+
+  } catch (error) {
+
+    setError(
+      error.response?.data?.message ||
+      "Google sign-in failed."
+    );
+
+  } finally {
+
+    setGoogleBusy(false);
+
+  }
+
+};
+
+useEffect(() => {
+  googleModeRef.current = activeTab;
+}, [activeTab]);
+
+useEffect(() => {
+
+  if (!GOOGLE_CLIENT_ID) {
+    return;
+  }
+
+  let cancelled = false;
+
+  loadGoogleIdentityScript()
+    .then(() => {
+      if (cancelled) {
+        return;
+      }
+
+      window.google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleGoogleCredential
+      });
+
+      setGoogleReady(true);
+    })
+    .catch(() => {
+      if (!cancelled) {
+        setGoogleReady(false);
+      }
+    });
+
+  return () => {
+    cancelled = true;
+  };
+
+}, []);
+
+useEffect(() => {
+
+  if (!googleReady) {
+    return;
+  }
+
+  const buttonRef =
+    activeTab === "signup"
+      ? googleSignUpButtonRef
+      : googleSignInButtonRef;
+
+  if (!buttonRef.current) {
+    return;
+  }
+
+  buttonRef.current.innerHTML = "";
+
+  window.google.accounts.id.renderButton(
+    buttonRef.current,
+    {
+      theme: "outline",
+      size: "large",
+      width: buttonRef.current.offsetWidth || 400,
+      text:
+        activeTab === "signup"
+          ? "signup_with"
+          : "signin_with"
+    }
+  );
+
+}, [activeTab, googleReady]);
+
 const handleLogin = async (e) => {
 
   e.preventDefault();
@@ -91,62 +339,10 @@ const handleLogin = async (e) => {
       user
     } = response.data;
 
-    localStorage.setItem(
-      "token",
+    handleAuthenticatedUser(
+      user,
       token
     );
-
-    localStorage.setItem(
-      "user",
-      JSON.stringify(user)
-    );
-
-    localStorage.setItem(
-      "loggedInUser",
-      JSON.stringify(user)
-    );
-
-    setError("");
-
-    if (
-      user.role === "REQUESTER"
-    ) {
-
-      navigate(
-        "/employee/dashboard"
-      );
-
-    }
-
-    else if (
-      user.role === "APPROVER"
-    ) {
-
-      navigate(
-        "/approver/dashboard"
-      );
-
-    }
-
-    else if (
-      user.role === "SECURITY"
-    ) {
-
-      navigate(
-        "/security/dashboard"
-      );
-
-    }
-
-    else if (
-      user.role === "ADMIN"
-    ) {
-
-      navigate(
-        "/admin/dashboard"
-      );
-
-    }
 
   } catch (error) {
 
@@ -462,19 +658,30 @@ const handleLogin = async (e) => {
               OR
             </div>
 
-            <button
-              type="button"
-              className="w-full border py-4 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-3 font-medium transition"
-              onClick={() =>
-                showToast?.(
-                  "Google Login will be connected later.",
-                  "info"
-                )
-              }
-            >
-              <FcGoogle size={24} />
-              Continue with Google
-            </button>
+            {GOOGLE_CLIENT_ID ? (
+              <div
+                ref={googleSignInButtonRef}
+                className={`w-full flex justify-center ${
+                  googleBusy
+                    ? "opacity-60 pointer-events-none"
+                    : ""
+                }`}
+              />
+            ) : (
+              <button
+                type="button"
+                className="w-full border py-4 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-3 font-medium transition"
+                onClick={() =>
+                  showToast?.(
+                    "Set VITE_GOOGLE_CLIENT_ID to enable Google sign-in.",
+                    "info"
+                  )
+                }
+              >
+                <FcGoogle size={24} />
+                Continue with Google
+              </button>
+            )}
 
           </form>
 
@@ -638,6 +845,35 @@ const handleLogin = async (e) => {
             >
               Create Account
             </button>
+
+            <div className="my-5 text-center text-gray-400">
+              OR
+            </div>
+
+            {GOOGLE_CLIENT_ID ? (
+              <div
+                ref={googleSignUpButtonRef}
+                className={`w-full flex justify-center ${
+                  googleBusy
+                    ? "opacity-60 pointer-events-none"
+                    : ""
+                }`}
+              />
+            ) : (
+              <button
+                type="button"
+                className="w-full border py-4 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-3 font-medium transition"
+                onClick={() =>
+                  showToast?.(
+                    "Set VITE_GOOGLE_CLIENT_ID to enable Google sign-up.",
+                    "info"
+                  )
+                }
+              >
+                <FcGoogle size={24} />
+                Sign up with Google
+              </button>
+            )}
 
           </form>
 

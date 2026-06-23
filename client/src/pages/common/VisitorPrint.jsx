@@ -100,10 +100,11 @@ function VisitorPrint({ request }) {
         </div>
 
         <div className="visitor-card-footer">
-          <div className="visitor-card-brandmark">
-            <span>HYUNDAI</span>
-            <span>LAXMI</span>
-          </div>
+          <img
+            className="visitor-card-brandmark"
+            src="/visitor-badge-logo.svg"
+            alt="Hyundai and Laxmi Group"
+          />
 
           <div className="visitor-card-sign">
             Auth. Sign

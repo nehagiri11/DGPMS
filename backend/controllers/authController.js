@@ -15,6 +15,30 @@ const isAllowedCompanyEmail = (email) =>
     .toLowerCase()
     .endsWith(ALLOWED_EMAIL_DOMAIN);
 
+const createLoginResponse = (user) => {
+  const token = jwt.sign(
+    {
+      userId: user.user_id,
+      role: user.role_name
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "1d"
+    }
+  );
+
+  return {
+    success: true,
+    token,
+    user: {
+      id: user.user_id,
+      name: user.full_name,
+      email: user.email,
+      role: user.role_name
+    }
+  };
+};
+
 exports.register = async (req, res) => {
 
   try {
@@ -253,37 +277,9 @@ exports.login = async (req, res) => {
 
     }
 
-    const token = jwt.sign(
-
-      {
-        userId: user.user_id,
-        role: user.role_name
-      },
-
-      process.env.JWT_SECRET,
-
-      {
-        expiresIn: "1d"
-      }
-
+    res.json(
+      createLoginResponse(user)
     );
-
-    res.json({
-
-      success: true,
-
-      token,
-
-      user: {
-
-        id: user.user_id,
-        name: user.full_name,
-        email: user.email,
-        role: user.role_name
-
-      }
-
-    });
 
   } catch (error) {
 
@@ -294,6 +290,177 @@ exports.login = async (req, res) => {
       success: false,
       message: "Server Error"
 
+    });
+
+  }
+
+};
+
+exports.googleAuth = async (req, res) => {
+
+  try {
+
+    const {
+      credential,
+      mode = "signin"
+    } = req.body;
+
+    if (!process.env.GOOGLE_CLIENT_ID) {
+
+      return res.status(500).json({
+        success: false,
+        message: "Google sign-in is not configured"
+      });
+
+    }
+
+    if (!credential) {
+
+      return res.status(400).json({
+        success: false,
+        message: "Google credential is required"
+      });
+
+    }
+
+    const verifyResponse =
+      await fetch(
+        `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`
+      );
+
+    const googleProfile =
+      await verifyResponse.json()
+        .catch(() => ({}));
+
+    if (
+      !verifyResponse.ok ||
+      googleProfile.aud !== process.env.GOOGLE_CLIENT_ID ||
+      String(googleProfile.email_verified) !== "true"
+    ) {
+
+      return res.status(401).json({
+        success: false,
+        message: "Google sign-in could not be verified"
+      });
+
+    }
+
+    const email =
+      String(googleProfile.email || "")
+        .trim()
+        .toLowerCase();
+
+    if (!isAllowedCompanyEmail(email)) {
+
+      return res.status(400).json({
+        success: false,
+        message: "Only company email addresses are allowed"
+      });
+
+    }
+
+    const [users] =
+      await db.query(
+        `
+        SELECT
+          u.*,
+          r.role_name
+        FROM users u
+        JOIN roles r
+          ON u.role_id = r.role_id
+        WHERE u.email = ?
+        `,
+        [email]
+      );
+
+    if (users.length > 0) {
+
+      const user = users[0];
+
+      if (!user.approved) {
+
+        return res.status(403).json({
+          success: false,
+          message: "Your account is waiting for admin approval"
+        });
+
+      }
+
+      return res.json(
+        createLoginResponse(user)
+      );
+
+    }
+
+    if (mode !== "signup") {
+
+      return res.status(404).json({
+        success: false,
+        message: "No account found. Please sign up first."
+      });
+
+    }
+
+    const [roles] =
+      await db.query(
+        `
+        SELECT role_id
+        FROM roles
+        WHERE role_name = 'REQUESTER'
+        `
+      );
+
+    if (roles.length === 0) {
+
+      return res.status(500).json({
+        success: false,
+        message: "Requester role is missing"
+      });
+
+    }
+
+    const passwordHash =
+      await bcrypt.hash(
+        crypto.randomBytes(32)
+          .toString("hex"),
+        10
+      );
+
+    await db.query(
+      `
+      INSERT INTO users
+      (
+        employee_code,
+        full_name,
+        email,
+        password_hash,
+        role_id,
+        approved
+      )
+      VALUES
+      (?, ?, ?, ?, ?, 0)
+      `,
+      [
+        null,
+        googleProfile.name || email,
+        email,
+        passwordHash,
+        roles[0].role_id
+      ]
+    );
+
+    res.status(201).json({
+      success: true,
+      message: "Account created and waiting for admin approval"
+    });
+
+  } catch (error) {
+
+    console.log("GOOGLE AUTH ERROR:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Google sign-in failed"
     });
 
   }

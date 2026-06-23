@@ -113,21 +113,11 @@
 }
 
 .visitor-card-brandmark {
-  display: flex;
-  width: 88px;
-  height: 40px;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  border: 1px solid #d8dee9;
-  border-radius: 8px;
-  color: #2454a6;
-  font-size: 8px;
-  font-weight: 800;
-}
-
-.visitor-card-brandmark span:last-child {
-  color: #c78a21;
+  display: block;
+  width: 96px;
+  height: 35px;
+  object-fit: contain;
+  transform: translateY(8px);
 }
 
 .visitor-card-sign {
@@ -288,7 +278,7 @@
 
   .regular-print-copy > div:first-child > div:first-child,
   .ckd-print-copy > div:first-child > div:first-child {
-    top: 1mm !important;
+    top: -3mm !important;
     right: 2mm !important;
   }
 
@@ -416,11 +406,9 @@
   }
 
   .visitor-card-brandmark {
-    width: 15mm !important;
-    height: 7mm !important;
-    gap: 1.2mm !important;
-    border-radius: 1.5mm !important;
-    font-size: 3.8px !important;
+    width: 18mm !important;
+    height: 6.5mm !important;
+    transform: translateY(2mm) !important;
   }
 
   .visitor-card-sign {
