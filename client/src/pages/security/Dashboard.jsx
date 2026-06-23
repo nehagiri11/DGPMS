@@ -5,7 +5,7 @@ import EmptyState from "../../components/EmptyState";
 import TableShell from "../../components/TableShell";
 import PaginationControls from "../../components/PaginationControls";
 import { useToast } from "../../components/ToastProvider";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import {
   Html5Qrcode,
@@ -20,6 +20,9 @@ import {
 function SecurityDashboard() {
   const showToast =
     useToast();
+
+  const scanLockedRef =
+    useRef(false);
 
   const [mobileOpen, setMobileOpen] =
   useState(false);
@@ -66,6 +69,43 @@ function SecurityDashboard() {
   const [selectedPage, setSelectedPage] =
     useState(1);
   const pageSize = 10;
+
+  const getCameraErrorMessage = (error) => {
+    const message =
+      error?.message ||
+      String(error || "");
+
+    if (
+      /permission|notallowed/i.test(message)
+    ) {
+      return "Camera permission was blocked. Please allow camera access in the browser and try again.";
+    }
+
+    if (
+      /notfound|no camera|requested device not found/i.test(message)
+    ) {
+      return "No camera was found on this device.";
+    }
+
+    if (
+      /notreadable|could not start|in use/i.test(message)
+    ) {
+      return "Camera is already in use by another app or browser tab.";
+    }
+
+    if (
+      window.location.protocol !== "https:" &&
+      ![
+        "localhost",
+        "127.0.0.1"
+      ].includes(window.location.hostname)
+    ) {
+      return "Camera needs HTTPS. Open the deployed HTTPS URL, or use localhost while testing.";
+    }
+
+    return message ||
+      "Unable to start camera scanner.";
+  };
 
   const loadRequests = async (
     filters = {
@@ -273,22 +313,24 @@ function SecurityDashboard() {
     return Promise.resolve();
   };
 
-  scanner.start(
-    {
-      facingMode: {
-        ideal: "environment"
-      }
-    },
-    {
+  const scannerConfig = {
       fps: 10,
       qrbox: {
         width: 250,
         height: 250
       },
       aspectRatio: 1
-    },
+    };
+
+  const onScanSuccess =
 
     async (decodedText) => {
+
+      if (scanLockedRef.current) {
+        return;
+      }
+
+      scanLockedRef.current = true;
 
       const passNo =
   decodedText.trim();
@@ -520,14 +562,56 @@ showToast?.(
 
       loadRequests();
 
-    },
+    };
 
-    () => {}
+  const startScanner = async () => {
+    scanLockedRef.current = false;
 
-  ).catch((error) => {
+    try {
+      await scanner.start(
+        {
+          facingMode: {
+            ideal: "environment"
+          }
+        },
+        scannerConfig,
+        onScanSuccess,
+        () => {}
+      );
+      return;
+    } catch {
+      const cameras =
+        await Html5Qrcode.getCameras();
+
+      const preferredCamera =
+        cameras.find((camera) =>
+          /back|rear|environment/i.test(
+            camera.label || ""
+          )
+        ) || cameras[0];
+
+      if (!preferredCamera) {
+        throw new Error(
+          "No camera was found on this device."
+        );
+      }
+
+      await scanner.start(
+        {
+          deviceId: {
+            exact: preferredCamera.id
+          }
+        },
+        scannerConfig,
+        onScanSuccess,
+        () => {}
+      );
+    }
+  };
+
+  startScanner().catch((error) => {
     setScanError(
-      error?.message ||
-      "Unable to start camera scanner."
+      getCameraErrorMessage(error)
     );
     setScannerVisible(false);
   });
