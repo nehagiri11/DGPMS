@@ -846,9 +846,13 @@ const handleLogin = async (e) => {
             </div>
 
             <div className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-800">
-              Only users with a
-              @laxmimotocorp.com
-              company email can register.
+              Manual signup requires an
+              {" "}
+              <span className="font-semibold">
+                @laxmimotocorp.com
+              </span>
+              {" "}
+              email. Google signup can use any Google account, but admin approval is required before login.
             </div>
 
             <button

@@ -309,7 +309,7 @@ exports.googleAuth = async (req, res) => {
 
       return res.status(500).json({
         success: false,
-        message: "Google sign-in is not configured"
+        message: "Google sign-in is not configured on the server"
       });
 
     }
