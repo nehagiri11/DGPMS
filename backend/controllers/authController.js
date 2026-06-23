@@ -15,6 +15,13 @@ const isAllowedCompanyEmail = (email) =>
     .toLowerCase()
     .endsWith(ALLOWED_EMAIL_DOMAIN);
 
+const getGoogleClientId = () =>
+  String(
+    process.env.GOOGLE_CLIENT_ID ||
+    process.env.VITE_GOOGLE_CLIENT_ID ||
+    ""
+  ).trim();
+
 const createLoginResponse = (user) => {
   const token = jwt.sign(
     {
@@ -305,7 +312,10 @@ exports.googleAuth = async (req, res) => {
       mode = "signin"
     } = req.body;
 
-    if (!process.env.GOOGLE_CLIENT_ID) {
+    const googleClientId =
+      getGoogleClientId();
+
+    if (!googleClientId) {
 
       return res.status(500).json({
         success: false,
@@ -334,7 +344,7 @@ exports.googleAuth = async (req, res) => {
 
     if (
       !verifyResponse.ok ||
-      googleProfile.aud !== process.env.GOOGLE_CLIENT_ID ||
+      googleProfile.aud !== googleClientId ||
       String(googleProfile.email_verified) !== "true"
     ) {
 
