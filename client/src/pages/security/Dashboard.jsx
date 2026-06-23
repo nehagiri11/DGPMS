@@ -566,20 +566,13 @@ showToast?.(
 
   const startScanner = async () => {
     scanLockedRef.current = false;
+    let cameraConfig = {
+      facingMode: {
+        ideal: "environment"
+      }
+    };
 
     try {
-      await scanner.start(
-        {
-          facingMode: {
-            ideal: "environment"
-          }
-        },
-        scannerConfig,
-        onScanSuccess,
-        () => {}
-      );
-      return;
-    } catch {
       const cameras =
         await Html5Qrcode.getCameras();
 
@@ -588,7 +581,9 @@ showToast?.(
           /back|rear|environment/i.test(
             camera.label || ""
           )
-        ) || cameras[0];
+        ) ||
+        cameras[cameras.length - 1] ||
+        cameras[0];
 
       if (!preferredCamera) {
         throw new Error(
@@ -596,17 +591,21 @@ showToast?.(
         );
       }
 
-      await scanner.start(
-        {
+      cameraConfig = {
           deviceId: {
             exact: preferredCamera.id
           }
-        },
-        scannerConfig,
-        onScanSuccess,
-        () => {}
-      );
+        };
+    } catch {
+      // Keep the default environment-facing constraint.
     }
+
+    await scanner.start(
+      cameraConfig,
+      scannerConfig,
+      onScanSuccess,
+      () => {}
+    );
   };
 
   startScanner().catch((error) => {
@@ -662,11 +661,16 @@ showToast?.(
   <button
     onClick={() => {
 
+      if (scannerVisible) {
+        return;
+      }
+
       setScanError("");
       setScanMode("ENTRY");
       setScannerVisible(true);
 
     }}
+    disabled={scannerVisible}
     className="
       bg-gradient-to-r
       from-green-500
@@ -679,6 +683,9 @@ showToast?.(
       transition-all
       duration-300
       md:hover:scale-105
+      disabled:opacity-60
+      disabled:cursor-not-allowed
+      disabled:hover:scale-100
     "
   >
 
@@ -700,11 +707,16 @@ showToast?.(
   <button
     onClick={() => {
 
+      if (scannerVisible) {
+        return;
+      }
+
       setScanError("");
       setScanMode("EXIT");
       setScannerVisible(true);
 
     }}
+    disabled={scannerVisible}
     className="
       bg-gradient-to-r
       from-red-500
@@ -717,6 +729,9 @@ showToast?.(
       transition-all
       duration-300
       md:hover:scale-105
+      disabled:opacity-60
+      disabled:cursor-not-allowed
+      disabled:hover:scale-100
     "
   >
 
