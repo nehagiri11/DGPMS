@@ -6,7 +6,7 @@ import CreateVisitorPass from "./pages/employee/CreateVisitorPass";
 import CreateCKDPass from "./pages/employee/CreateCKDPass";
 import CreateRegularPass from "./pages/employee/CreateRegularPass";
 import MyRequests from "./pages/employee/MyRequests";
-import EmployeeNotifications from "./pages/employee/Notifications";
+import EmployeeNotifications from "./pages/employee/NotificationCenterPage";
 import ApproverDashboard from "./pages/approver/Dashboard";
 import PendingRequests from "./pages/approver/PendingRequests";
 import ApproverRequestDetails from "./pages/approver/RequestDetails";
@@ -27,7 +27,7 @@ from "./pages/admin/AuditLogs";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ToastProvider from "./components/ToastProvider";
 import ApproverNotifications
-from "./pages/approver/Notifications";
+from "./pages/approver/NotificationCenterPage";
 import Profile from "./pages/common/Profile";
 
 function App() {
