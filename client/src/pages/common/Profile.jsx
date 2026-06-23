@@ -1,12 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
-
-import Navbar from "../../components/Navbar";
-import Sidebar from "../../components/Sidebar";
-
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-
 import {
   ResponsiveContainer,
   PieChart,
@@ -19,10 +14,48 @@ import {
   YAxis,
   CartesianGrid
 } from "recharts";
+import {
+  FiCalendar,
+  FiCheckCircle,
+  FiClock,
+  FiLock,
+  FiMail,
+  FiShield,
+  FiUser,
+  FiXCircle
+} from "react-icons/fi";
+import Navbar from "../../components/Navbar";
+import Sidebar from "../../components/Sidebar";
+import LoadingState from "../../components/LoadingState";
+import EmptyState from "../../components/EmptyState";
+import TableShell from "../../components/TableShell";
+import { useToast } from "../../components/ToastProvider";
+import { mapApiPass } from "../../utils/passMapper";
 
-import { FaUserCircle } from "react-icons/fa";
+const cardClass =
+  "rounded-2xl border border-slate-200 bg-white p-5 shadow-sm";
+
+const inputClass =
+  "w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-600 focus:ring-4 focus:ring-blue-100";
+
+const formatDate = (value) => {
+  if (!value) {
+    return "-";
+  }
+
+  const date =
+    new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleDateString();
+};
 
 function Profile() {
+  const showToast =
+    useToast();
 
   const [mobileOpen, setMobileOpen] =
     useState(false);
@@ -39,6 +72,15 @@ function Profile() {
   const [calendarDate, setCalendarDate] =
     useState(new Date());
 
+  const [currentPassword, setCurrentPassword] =
+    useState("");
+
+  const [newPassword, setNewPassword] =
+    useState("");
+
+  const [savingPassword, setSavingPassword] =
+    useState(false);
+
   const loggedInUser =
     JSON.parse(
       localStorage.getItem("loggedInUser")
@@ -51,529 +93,524 @@ function Profile() {
     loggedInUser?.role;
 
   useEffect(() => {
+    const loadData = async () => {
+      try {
+        const token =
+          localStorage.getItem("token");
 
-  const loadData = async () => {
+        const [profileRes, passRes] =
+          await Promise.all([
+            axios.get(
+              "/api/auth/profile",
+              {
+                headers: {
+                  Authorization:
+                    `Bearer ${token}`
+                }
+              }
+            ),
+            axios.get(
+              "/api/passes",
+              {
+                headers: {
+                  Authorization:
+                    `Bearer ${token}`
+                }
+              }
+            )
+          ]);
+
+        setProfile(
+          profileRes.data.user
+        );
+
+        setPasses(
+          (passRes.data.passes || []).map(
+            mapApiPass
+          )
+        );
+      } catch (error) {
+        console.error(error);
+        setProfile(null);
+        setPasses([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  const metrics =
+    useMemo(() => {
+      const approved =
+        passes.filter(
+          (pass) => pass.status === "Approved"
+        ).length;
+
+      const pending =
+        passes.filter(
+          (pass) => pass.status === "Pending"
+        ).length;
+
+      const rejected =
+        passes.filter(
+          (pass) => pass.status === "Rejected"
+        ).length;
+
+      const expired =
+        passes.filter(
+          (pass) => pass.status === "Expired"
+        ).length;
+
+      return {
+        total: passes.length,
+        approved,
+        pending,
+        rejected,
+        expired,
+        visitor:
+          passes.filter(
+            (pass) => pass.type === "Visitor"
+          ).length,
+        regular:
+          passes.filter(
+            (pass) => pass.type === "Regular"
+          ).length,
+        ckd:
+          passes.filter(
+            (pass) => pass.type === "CKD"
+          ).length
+      };
+    }, [passes]);
+
+  const statusData = [
+    {
+      name: "Approved",
+      value: metrics.approved
+    },
+    {
+      name: "Pending",
+      value: metrics.pending
+    },
+    {
+      name: "Rejected",
+      value: metrics.rejected
+    },
+    {
+      name: "Expired",
+      value: metrics.expired
+    }
+  ];
+
+  const typeData = [
+    {
+      name: "Visitor",
+      count: metrics.visitor
+    },
+    {
+      name: "Regular",
+      count: metrics.regular
+    },
+    {
+      name: "CKD",
+      count: metrics.ckd
+    }
+  ];
+
+  const recentPasses =
+    passes.slice(0, 6);
+
+  const handleChangePassword = async (event) => {
+    event.preventDefault();
+
+    if (!currentPassword || !newPassword) {
+      showToast?.(
+        "Enter current and new password.",
+        "error"
+      );
+      return;
+    }
 
     try {
+      setSavingPassword(true);
 
       const token =
         localStorage.getItem("token");
 
-      const profileRes =
-        await axios.get(
-          "/api/auth/profile",
-          {
-            headers: {
-              Authorization:
-                `Bearer ${token}`
-            }
+      await axios.put(
+        "/api/auth/change-password",
+        {
+          currentPassword,
+          newPassword
+        },
+        {
+          headers: {
+            Authorization:
+              `Bearer ${token}`
           }
-        );
-
-      const passRes =
-        await axios.get(
-          "/api/passes",
-          {
-            headers: {
-              Authorization:
-                `Bearer ${token}`
-            }
-          }
-        );
-
-      setProfile(
-        profileRes.data.user
+        }
       );
 
-      setPasses(
-        passRes.data.passes || []
+      setCurrentPassword("");
+      setNewPassword("");
+      showToast?.(
+        "Password changed successfully.",
+        "success"
       );
-
     } catch (error) {
-
-      console.log(error);
-
+      showToast?.(
+        error.response?.data?.message ||
+        "Unable to change password.",
+        "error"
+      );
     } finally {
-
-      setLoading(false);
-
+      setSavingPassword(false);
     }
-
   };
 
-  loadData();
-
-}, []);
-const totalPasses =
-  passes.length;
-
-const pendingPasses =
-  passes.filter(
-    p => p.status === "PENDING"
-  ).length;
-
-const approvedPasses =
-  passes.filter(
-    p => p.status === "APPROVED"
-  ).length;
-
-const rejectedPasses =
-  passes.filter(
-    p => p.status === "REJECTED"
-  ).length;
-
-const visitorPasses =
-  passes.filter(
-    p => p.pass_type === "VISITOR"
-  ).length;
-
-const regularPasses =
-  passes.filter(
-    p => p.pass_type === "REGULAR"
-  ).length;
-
-const ckdPasses =
-  passes.filter(
-    p => p.pass_type === "CKD"
-  ).length;
-  const statusData = [
-  {
-    name: "Approved",
-    value: approvedPasses
-  },
-  {
-    name: "Pending",
-    value: pendingPasses
-  },
-  {
-    name: "Rejected",
-    value: rejectedPasses
-  }
-];
-const activityMap = {};
-
-passes.forEach(pass => {
-
-  const day =
-    new Date(
-      pass.created_at
-    ).toLocaleDateString(
-      "en-US",
-      {
-        weekday: "short"
-      }
-    );
-
-  activityMap[day] =
-    (activityMap[day] || 0) + 1;
-
-});
-
-const dailyActivity =
-  Object.keys(activityMap).map(
-    day => ({
-      day,
-      count:
-        activityMap[day]
-    })
-  );
-return (
-  <div className="flex">
-
-    <Sidebar
-      role={role}
-      mobileOpen={mobileOpen}
-      setMobileOpen={setMobileOpen}
-    />
-
-    <div className="flex-1 bg-slate-100 min-h-screen">
-
-      <Navbar
+  return (
+    <div className="flex">
+      <Sidebar
         role={role}
         mobileOpen={mobileOpen}
         setMobileOpen={setMobileOpen}
       />
 
-      <div className="p-6">
+      <div className="min-h-screen flex-1 bg-slate-100">
+        <Navbar
+          role={role}
+          mobileOpen={mobileOpen}
+          setMobileOpen={setMobileOpen}
+        />
 
-        <h1 className="text-3xl font-bold mb-6">
-          My Profile
-        </h1>
-        
-
-        {loading ? (
-
-          <div className="text-center text-lg">
-            Loading...
+        <main className="p-4 sm:p-6">
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+              My Profile
+            </h1>
+            <p className="mt-2 text-sm text-slate-500">
+              Review account information, pass activity, and security settings.
+            </p>
           </div>
 
-        ) : (
+          {loading ? (
+            <LoadingState message="Loading profile..." />
+          ) : (
+            <div className="space-y-6">
+              <section className="grid gap-6 xl:grid-cols-[360px_1fr]">
+                <div className="overflow-hidden rounded-3xl border border-blue-200 bg-white shadow-sm">
+                  <div className="bg-blue-900 p-6 text-white">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20">
+                      <FiUser size={42} />
+                    </div>
 
-          <>
+                    <h2 className="mt-5 text-2xl font-bold">
+                      {profile?.full_name || "User"}
+                    </h2>
 
-            <div className="grid lg:grid-cols-3 gap-6 mb-6">
+                    <p className="mt-1 text-sm text-blue-100">
+                      {profile?.role_name || role}
+                    </p>
+                  </div>
 
-             <div className="
-bg-gradient-to-br
-from-blue-600
-to-indigo-700
-text-white
-rounded-3xl
-shadow-2xl
-p-8
-border
-border-blue-400
-">
+                  <div className="space-y-4 p-6">
+                    <div className="flex gap-3">
+                      <FiShield className="mt-1 text-blue-700" />
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                          Employee Code
+                        </p>
+                        <p className="font-semibold text-slate-900">
+                          {profile?.employee_code || "-"}
+                        </p>
+                      </div>
+                    </div>
 
-                <div className="flex flex-col items-center">
+                    <div className="flex gap-3">
+                      <FiMail className="mt-1 text-blue-700" />
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                          Email
+                        </p>
+                        <p className="break-all font-semibold text-slate-900">
+                          {profile?.email || "-"}
+                        </p>
+                      </div>
+                    </div>
 
-                  <FaUserCircle
-  size={120}
-  className="text-white"
-/>
+                    <div className="flex gap-3">
+                      <FiCalendar className="mt-1 text-blue-700" />
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                          Joined
+                        </p>
+                        <p className="font-semibold text-slate-900">
+                          {formatDate(profile?.created_at)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-                  <h2 className="text-2xl font-bold mt-4">
-                    {profile?.full_name}
+                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                  {[
+                    {
+                      label: "Total Passes",
+                      value: metrics.total,
+                      color: "text-blue-700",
+                      icon: FiShield
+                    },
+                    {
+                      label: "Pending",
+                      value: metrics.pending,
+                      color: "text-amber-600",
+                      icon: FiClock
+                    },
+                    {
+                      label: "Approved",
+                      value: metrics.approved,
+                      color: "text-emerald-700",
+                      icon: FiCheckCircle
+                    },
+                    {
+                      label: "Rejected",
+                      value: metrics.rejected,
+                      color: "text-rose-700",
+                      icon: FiXCircle
+                    }
+                  ].map((item) => {
+                    const Icon =
+                      item.icon;
+
+                    return (
+                      <div
+                        key={item.label}
+                        className={cardClass}
+                      >
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm font-semibold text-slate-500">
+                            {item.label}
+                          </p>
+                          <Icon className={item.color} />
+                        </div>
+                        <p className={`mt-4 text-4xl font-bold ${item.color}`}>
+                          {item.value}
+                        </p>
+                      </div>
+                    );
+                  })}
+
+                  <div className={`${cardClass} sm:col-span-2 xl:col-span-4`}>
+                    <div className="grid gap-4 sm:grid-cols-3">
+                      <div>
+                        <p className="text-sm text-slate-500">
+                          Visitor Passes
+                        </p>
+                        <p className="text-3xl font-bold text-blue-700">
+                          {metrics.visitor}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-slate-500">
+                          Regular Passes
+                        </p>
+                        <p className="text-3xl font-bold text-emerald-700">
+                          {metrics.regular}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-slate-500">
+                          CKD Passes
+                        </p>
+                        <p className="text-3xl font-bold text-violet-700">
+                          {metrics.ckd}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section className="grid gap-6 xl:grid-cols-2">
+                <div className={cardClass}>
+                  <h2 className="text-lg font-bold text-slate-900">
+                    Pass Type Activity
+                  </h2>
+                  <div className="mt-4 h-72">
+                    <ResponsiveContainer
+                      width="100%"
+                      height="100%"
+                    >
+                      <BarChart data={typeData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis allowDecimals={false} />
+                        <Tooltip />
+                        <Bar
+                          dataKey="count"
+                          fill="#2563eb"
+                          radius={[8, 8, 0, 0]}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                <div className={cardClass}>
+                  <h2 className="text-lg font-bold text-slate-900">
+                    Pass Status Analytics
+                  </h2>
+                  <div className="mt-4 h-72">
+                    <ResponsiveContainer
+                      width="100%"
+                      height="100%"
+                    >
+                      <PieChart>
+                        <Pie
+                          data={statusData}
+                          dataKey="value"
+                          innerRadius={60}
+                          outerRadius={100}
+                          paddingAngle={3}
+                        >
+                          <Cell fill="#22c55e" />
+                          <Cell fill="#f59e0b" />
+                          <Cell fill="#ef4444" />
+                          <Cell fill="#64748b" />
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </section>
+
+              <section className="grid gap-6 xl:grid-cols-[1fr_360px]">
+                <div className={cardClass}>
+                  <h2 className="text-lg font-bold text-slate-900">
+                    Recent Passes
                   </h2>
 
-                 <p className="text-blue-100">
-                    {profile?.role_name}
-                  </p>
-
+                  <div className="mt-4">
+                    {recentPasses.length > 0 ? (
+                      <TableShell>
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="bg-slate-100 text-left">
+                              <th className="p-3">
+                                Pass No
+                              </th>
+                              <th className="p-3">
+                                Type
+                              </th>
+                              <th className="p-3">
+                                Status
+                              </th>
+                              <th className="p-3">
+                                Date
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {recentPasses.map((pass) => (
+                              <tr
+                                key={pass.passNo}
+                                className="border-b last:border-0"
+                              >
+                                <td className="p-3 font-semibold text-slate-900">
+                                  {pass.passNo}
+                                </td>
+                                <td className="p-3">
+                                  {pass.type}
+                                </td>
+                                <td className="p-3">
+                                  {pass.status}
+                                </td>
+                                <td className="p-3">
+                                  {pass.date || "-"}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </TableShell>
+                    ) : (
+                      <EmptyState
+                        title="No Passes Yet"
+                        message="Recent gate passes will appear here."
+                      />
+                    )}
+                  </div>
                 </div>
 
-                <div className="mt-6 space-y-4">
+                <div className={cardClass}>
+                  <h2 className="text-lg font-bold text-slate-900">
+                    Work Calendar
+                  </h2>
+                  <div className="mt-4 flex justify-center profile-calendar">
+                    <Calendar
+                      value={calendarDate}
+                      onChange={setCalendarDate}
+                    />
+                  </div>
+                </div>
+              </section>
 
+              <section className={cardClass}>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
+                    <FiLock />
+                  </div>
                   <div>
-                    <p className="text-blue-100">
-                      Employee Code
-                    </p>
-
-                    <p className="font-semibold">
-                      {profile?.employee_code || "-"}
+                    <h2 className="font-bold text-slate-900">
+                      Change Password
+                    </h2>
+                    <p className="text-sm text-slate-500">
+                      Keep your account secure with a fresh password.
                     </p>
                   </div>
-
-                  <div>
-                   <p className="text-blue-100">
-                      Email
-                    </p>
-
-                    <p className="font-semibold">
-                      {profile?.email}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-blue-100">
-                      Joined
-                    </p>
-
-                    <p className="font-semibold">
-                      {
-                        profile?.created_at
-                          ? new Date(
-                              profile.created_at
-                            ).toLocaleDateString()
-                          : "-"
-                      }
-                    </p>
-                  </div>
-
                 </div>
 
-              </div>
-
-              <div className="lg:col-span-2">
-
-                <div className="grid md:grid-cols-4 gap-4 mb-10">
-
-                  <div className="
-bg-gradient-to-r
-from-blue-500
-to-blue-700
-text-white
-rounded-2xl
-p-6
-shadow-xl
-hover:scale-105
-transition
-">
-                    <p>Total Passes</p>
-                    <h2 className="text-3xl font-bold">
-                      {totalPasses}
-                    </h2>
-                  </div>
-
-                  <div className="bg-gradient-to-r from-amber-400 to-orange-500 text-white rounded-xl p-5 shadow">
-                    <p>Pending</p>
-                    <h2 className="text-3xl font-bold">
-                      {pendingPasses}
-                    </h2>
-                  </div>
-
-                  <div className="bg-gradient-to-r from-green-500 to-emerald-700 text-white rounded-xl p-5 shadow">
-                    <p>Approved</p>
-                    <h2 className="text-3xl font-bold">
-                      {approvedPasses}
-                    </h2>
-                  </div>
-
-                  <div className="bg-gradient-to-r from-red-500 to-rose-700 text-white rounded-xl p-5 shadow">
-                    <p>Rejected</p>
-                    <h2 className="text-3xl font-bold">
-                      {rejectedPasses}
-                    </h2>
-                  </div>
-
-                </div>
-                <div className="grid md:grid-cols-3 gap-6 mt-10 pt-6 border-t border-slate-200">
-
-              <div className="
-bg-white
-rounded-2xl
-shadow-lg
-border-l-8
-border-blue-500
-p-6
-hover:shadow-xl
-transition
-">
-                <p className="text-slate-500">
-                  Visitor Passes
-                </p>
-
-                <h2 className="text-3xl font-bold text-blue-600">
-                  {visitorPasses}
-                </h2>
-              </div>
-
-              <div className="
-bg-white
-rounded-2xl
-shadow-lg
-border-l-8
-border-green-500
-p-6
-hover:shadow-xl
-transition
-">
-                <p className="text-slate-500">
-                  Regular Passes
-                </p>
-
-                <h2 className="text-3xl font-bold text-green-600">
-                  {regularPasses}
-                </h2>
-              </div>
-
-              <div className="
-bg-white
-rounded-2xl
-shadow-lg
-border-l-8
-border-purple-500
-p-6
-hover:shadow-xl
-transition
-">
-                <p className="text-slate-500">
-                  CKD Passes
-                </p>
-
-                <h2 className="text-3xl font-bold text-purple-600">
-                  {ckdPasses}
-                </h2>
-              </div>
-
-            </div>
-
-                 
-
-              </div>
-              
-            </div>
-
-           
-
-            <div className="grid lg:grid-cols-2 gap-6 mb-6">
-
-             <div className="
-bg-white
-rounded-3xl
-shadow-xl
-p-6
-border
-border-slate-200
-">
-                <h2 className="text-xl font-bold mb-4">
-                  📈 Daily Pass Activity
-                </h2>
-
-                <ResponsiveContainer
-                  width="100%"
-                  height={300}
+                <form
+                  onSubmit={handleChangePassword}
+                  className="mt-5 grid gap-4 md:grid-cols-[1fr_1fr_auto]"
                 >
-
-                  <BarChart
-                    data={dailyActivity}
+                  <input
+                    type="password"
+                    value={currentPassword}
+                    onChange={(event) =>
+                      setCurrentPassword(event.target.value)
+                    }
+                    placeholder="Current password"
+                    className={inputClass}
+                  />
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(event) =>
+                      setNewPassword(event.target.value)
+                    }
+                    placeholder="New password"
+                    className={inputClass}
+                  />
+                  <button
+                    type="submit"
+                    disabled={savingPassword}
+                    className="rounded-xl bg-blue-900 px-6 py-3 font-semibold text-white transition hover:bg-blue-800 disabled:opacity-60"
                   >
-
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                    />
-
-                    <XAxis
-                      dataKey="day"
-                    />
-
-                    <YAxis />
-
-                    <Tooltip />
-
-                    <Bar
-                      dataKey="count"
-                      fill="#2563eb"
-                    />
-
-                  </BarChart>
-
-                </ResponsiveContainer>
-
-              </div>
-
-              <div className="bg-white rounded-xl shadow p-5">
-
-                <h2 className="text-xl font-bold mb-4">
-                 📅 Work Calendar
-                </h2>
-
-               <div className="flex justify-center">
-  <Calendar
-    value={calendarDate}
-    onChange={setCalendarDate}
-  />
-</div>
-
-              </div>
-
+                    {savingPassword
+                      ? "Saving..."
+                      : "Update"}
+                  </button>
+                </form>
+              </section>
             </div>
-
-            <div className="grid lg:grid-cols-2 gap-6 mb-6">
-
-              <div className="bg-white rounded-xl shadow p-5">
-
-                <h2 className="text-xl font-bold mb-4">
-                  📊 Pass Status Analytics
-                </h2>
-
-                <ResponsiveContainer
-                  width="100%"
-                  height={300}
-                >
-
-                  <PieChart>
-
-                    <Pie
-                      data={statusData}
-                      dataKey="value"
-                      outerRadius={120}
-                      label
-                    >
-
-                      <Cell fill="#22c55e" />
-                      <Cell fill="#f59e0b" />
-                      <Cell fill="#ef4444" />
-
-                    </Pie>
-
-                    <Tooltip />
-
-                  </PieChart>
-
-                </ResponsiveContainer>
-
-              </div>
-
-              <div className="bg-white rounded-xl shadow p-5">
-
-                <h2 className="text-xl font-bold mb-4">
-                  📝 Recent Passes
-                </h2>
-
-                <div className="overflow-auto">
-
-                  <table className="w-full text-sm">
-
-                    <thead>
-
-                      <tr className="border-b bg-slate-100">
-
-                        <th className="text-left py-2">
-                          Pass No
-                        </th>
-
-                        <th className="text-left py-2">
-                          Type
-                        </th>
-
-                        <th className="text-left py-2">
-                          Status
-                        </th>
-
-                      </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                      {passes
-                        .slice(0, 5)
-                        .map(pass => (
-
-                        <tr
-                          key={pass.pass_no}
-                          className="border-b"
-                        >
-
-                          <td className="py-2">
-                            {pass.pass_no}
-                          </td>
-
-                          <td>
-                            {pass.pass_type}
-                          </td>
-
-                          <td>
-                            {pass.status}
-                          </td>
-
-                        </tr>
-
-                      ))}
-
-                    </tbody>
-
-                  </table>
-
-                </div>
-
-              </div>
-
-            </div>
-
-          </>
-
-        )}
-
+          )}
+        </main>
       </div>
-
     </div>
-
-  </div>
-
-
-);
+  );
 }
 
 export default Profile;

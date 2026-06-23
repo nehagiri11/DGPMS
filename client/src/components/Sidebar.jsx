@@ -169,6 +169,15 @@ const handleLogout = () => {
     default:
       menuItems = employeeMenu;
   }
+
+  menuItems =
+    [
+      ...menuItems.filter(Boolean),
+      {
+        title: "Profile",
+        path: getProfilePath()
+      }
+    ];
   
 
   return (

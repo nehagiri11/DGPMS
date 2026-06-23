@@ -2,6 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
+.profile-calendar .react-calendar {
+  width: 100%;
+  max-width: 320px;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  font-family: inherit;
+  overflow: hidden;
+}
+
+.profile-calendar .react-calendar__navigation {
+  margin-bottom: 0;
+  background: #f8fafc;
+}
+
+.profile-calendar .react-calendar__tile {
+  padding: 12px 6px;
+}
+
+.profile-calendar .react-calendar__tile--active {
+  background: #1d4ed8;
+  color: #ffffff;
+}
+
 .visitor-print-page {
   min-height: 100vh;
   padding: 24px;
