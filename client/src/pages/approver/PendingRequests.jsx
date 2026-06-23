@@ -4,7 +4,7 @@ import LoadingState from "../../components/LoadingState";
 import EmptyState from "../../components/EmptyState";
 import TableShell from "../../components/TableShell";
 import PaginationControls from "../../components/PaginationControls";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { mapApiPass } from "../../utils/passMapper";
@@ -14,6 +14,8 @@ function PendingRequests() {
   useState(false);
 
   const navigate = useNavigate();
+  const [searchParams] =
+    useSearchParams();
 
   const [requests, setRequests] =
     useState([]);
@@ -25,7 +27,10 @@ function PendingRequests() {
   const [dateFilter, setDateFilter] =
     useState("");
   const [statusFilter, setStatusFilter] =
-    useState("Pending");
+    useState(
+      searchParams.get("status") ||
+      "Pending"
+    );
   const [typeFilter, setTypeFilter] =
     useState("All");
   const [requesterFilter,
@@ -229,6 +234,9 @@ function PendingRequests() {
                 </option>
                 <option value="Rejected">
                   Rejected
+                </option>
+                <option value="Expired">
+                  Expired
                 </option>
               </select>
 

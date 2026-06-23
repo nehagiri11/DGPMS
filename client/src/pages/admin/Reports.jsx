@@ -141,6 +141,13 @@ useState("");
         "COMPLETED"
     );
 
+  const expiredPasses =
+    requests.filter(
+      (r) =>
+        r.status ===
+        "Expired"
+    );
+
   const filteredRequests =
     requests.filter(
       (request) => {
@@ -334,12 +341,26 @@ const exportExcelData = (
   fileName
 ) => {
 
+  const rows =
+    data.map((request) => ({
+      "Pass No": request.passNo,
+      Type: request.type,
+      Requester: request.requester,
+      Status: request.status,
+      "Gate Status": request.gateStatus || "-",
+      Date: request.date || "-",
+      "Arrival Date": request.arrivalDate || "-",
+      "Departure Date": request.departureDate || "-",
+      "Entry Time": request.entryTime || "-",
+      "Exit Time": request.exitTime || "-"
+    }));
+
   const workbook =
     XLSX.utils.book_new();
 
   const worksheet =
     XLSX.utils.json_to_sheet(
-      data
+      rows
     );
 
   XLSX.utils.book_append_sheet(
@@ -480,7 +501,7 @@ const exportExcel = async () => {
 
           {/* STATS */}
 
-          <div className="grid md:grid-cols-4 gap-6 mb-8">
+          <div className="grid md:grid-cols-2 xl:grid-cols-5 gap-6 mb-8">
 
             <div className="bg-white p-6 rounded-2xl shadow-lg">
 
@@ -577,6 +598,18 @@ const exportExcel = async () => {
               <p className="text-4xl font-bold text-red-600">
 
                 {completedPasses.length}
+
+              </p>
+
+            </div>
+
+            <div className="bg-white p-6 rounded-2xl shadow-lg">
+
+              <h3>Expired</h3>
+
+              <p className="text-4xl font-bold text-slate-600">
+
+                {expiredPasses.length}
 
               </p>
 
@@ -746,6 +779,10 @@ const exportExcel = async () => {
     <option value="Rejected">
       Rejected
     </option>
+
+    <option value="Expired">
+      Expired
+    </option>
   </select>
 
 </div>
@@ -798,17 +835,18 @@ const exportExcel = async () => {
 
  <button
   onClick={exportDateRangeReport}
-  disabled={
-    !fromDate ||
-    !toDate
-  }
-  className="
-    bg-blue-600
+  className={`
     text-white
     px-5
     py-3
     rounded-lg
-  "
+    ${
+      !fromDate ||
+      !toDate
+        ? "bg-blue-500 hover:bg-blue-600"
+        : "bg-blue-600 hover:bg-blue-700"
+    }
+  `}
 >
     Export Date Range Report
   </button>

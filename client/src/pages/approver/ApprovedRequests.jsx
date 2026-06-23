@@ -223,6 +223,9 @@ function ApprovedRequests() {
                 <option value="Rejected">
                   Rejected
                 </option>
+                <option value="Expired">
+                  Expired
+                </option>
               </select>
 
               <select

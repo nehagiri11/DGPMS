@@ -178,6 +178,12 @@ const rejectedPasses =
       r.status === "Rejected"
   );
 
+const expiredPasses =
+  requests.filter(
+    (r) =>
+      r.status === "Expired"
+  );
+
 const approvalRate =
   requests.length > 0
     ? (
@@ -220,6 +226,11 @@ const barData = [
     count:
       rejectedPasses.length,
   },
+  {
+    name: "Expired",
+    count:
+      expiredPasses.length,
+  },
 ];
 
 const selectedUsers =
@@ -242,6 +253,8 @@ const selectedPasses =
     ? insidePasses
     : selectedView === "COMPLETED"
     ? completedPasses
+    : selectedView === "EXPIRED"
+    ? expiredPasses
     : [];
   
 
@@ -427,7 +440,7 @@ const selectedPasses =
 
           </div>
 
-          <div className="grid md:grid-cols-4 gap-6 mt-6">
+          <div className="grid md:grid-cols-2 xl:grid-cols-5 gap-6 mt-6">
 
             <div
               onClick={() =>
@@ -522,6 +535,30 @@ const selectedPasses =
 
               <p className="text-4xl font-bold text-red-600 mt-2">
                 {completedPasses.length}
+              </p>
+            </div>
+
+            <div
+              onClick={() =>
+                setSelectedView(
+                  "EXPIRED"
+                )
+              }
+              className="
+                bg-white
+                p-6
+                rounded-2xl
+                shadow-lg
+                cursor-pointer
+                hover:shadow-xl
+              "
+            >
+              <h3 className="text-slate-500">
+                Expired Passes
+              </h3>
+
+              <p className="text-4xl font-bold text-slate-600 mt-2">
+                {expiredPasses.length}
               </p>
             </div>
 
@@ -881,7 +918,8 @@ const selectedPasses =
                 "ALL_PASSES",
                 "PENDING",
                 "INSIDE",
-                "COMPLETED"
+                "COMPLETED",
+                "EXPIRED"
               ].includes(
                 selectedView
               ) && (

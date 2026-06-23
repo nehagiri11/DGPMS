@@ -69,6 +69,11 @@ function Dashboard() {
       (r) => r.status === "Rejected"
     ).length;
 
+  const expiredRequests =
+    requests.filter(
+      (r) => r.status === "Expired"
+    ).length;
+
   const totalRequests =
     requests.length;
 
@@ -111,7 +116,7 @@ function Dashboard() {
 
           {/* KPI Cards */}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6 mb-8">
 
             <div
               onClick={() =>
@@ -174,6 +179,23 @@ function Dashboard() {
 
               <h2 className="text-4xl font-bold text-blue-600 mt-2">
                 {totalRequests}
+              </h2>
+
+            </div>
+
+            <div
+              onClick={() =>
+                navigate("/approver/pending?status=Expired")
+              }
+              className="bg-white rounded-3xl shadow-lg p-6 border-l-4 border-slate-500 cursor-pointer hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+            >
+
+              <p className="text-gray-500">
+                Expired
+              </p>
+
+              <h2 className="text-4xl font-bold text-slate-600 mt-2">
+                {expiredRequests}
               </h2>
 
             </div>

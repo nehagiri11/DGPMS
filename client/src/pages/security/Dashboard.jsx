@@ -8,8 +8,7 @@ import { useToast } from "../../components/ToastProvider";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import {
-  Html5QrcodeScanner,
-  Html5QrcodeScanType,
+  Html5Qrcode,
 } from "html5-qrcode";
 import { mapApiPass } from "../../utils/passMapper";
 import {
@@ -249,21 +248,29 @@ function SecurityDashboard() {
   if (!scannerVisible) return;
 
   const scanner =
-    new Html5QrcodeScanner(
-      "reader",
-      {
-        fps: 10,
-        qrbox: 250,
-
-        supportedScanTypes: [
-          Html5QrcodeScanType
-            .SCAN_TYPE_CAMERA,
-        ],
-      },
-      false
+    new Html5Qrcode(
+      "reader"
     );
 
-  scanner.render(
+  const stopScanner = () =>
+    scanner.stop()
+      .then(() => scanner.clear())
+      .catch(() => {});
+
+  scanner.start(
+    {
+      facingMode: {
+        ideal: "environment"
+      }
+    },
+    {
+      fps: 10,
+      qrbox: {
+        width: 250,
+        height: 250
+      },
+      aspectRatio: 1
+    },
 
     async (decodedText) => {
 
@@ -304,7 +311,7 @@ if (
    "This visitor pass has expired."
 );
 
-scanner.clear();
+ stopScanner();
 
 setScannerVisible(false);
 
@@ -326,7 +333,7 @@ if (
  "This pass is no longer valid."
 );
 
-scanner.clear();
+stopScanner();
 
 setScannerVisible(false);
 
@@ -345,7 +352,7 @@ if (
   "This pass has already been checked out."
 );
 
-scanner.clear();
+stopScanner();
 
 setScannerVisible(false);
 
@@ -380,7 +387,7 @@ return;
             "Entry failed"
           );
 
-          scanner.clear();
+          stopScanner();
 
           setScannerVisible(false);
 
@@ -423,7 +430,7 @@ showToast?.(
             "Exit failed"
           );
 
-          scanner.clear();
+          stopScanner();
 
           setScannerVisible(false);
 
@@ -439,7 +446,7 @@ showToast?.(
 
       }
 
-      scanner.clear();
+      stopScanner();
 
       setScannerVisible(
         false
@@ -451,12 +458,17 @@ showToast?.(
 
     () => {}
 
-  );
+  ).catch((error) => {
+    setScanError(
+      error?.message ||
+      "Unable to start camera scanner."
+    );
+    setScannerVisible(false);
+  });
 
   return () => {
 
-    scanner.clear()
-      .catch(() => {});
+    stopScanner();
 
   };
 
@@ -495,53 +507,12 @@ showToast?.(
             <LoadingState message="Loading gate passes..." />
           )}
 
-          {scanError && (
-
-  <div
-    className="
-      bg-red-50
-      border-l-8
-      border-red-600
-      text-red-700
-      p-5
-      rounded-xl
-      shadow-lg
-      mb-6
-    "
-  >
-
-    <h3 className="font-bold text-lg">
-      Verification Failed
-    </h3>
-
-    <p className="mt-1">
-      {scanError}
-    </p>
-
-    <button
-      onClick={() =>
-        setScanError("")
-      }
-      className="
-        mt-4
-        bg-red-600
-        text-white
-        px-4
-        py-2
-        rounded-lg
-      "
-    >
-      Close
-    </button>
-
-  </div>
-
-)}
   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
 
   <button
     onClick={() => {
 
+      setScanError("");
       setScanMode("ENTRY");
       setScannerVisible(true);
 
@@ -579,6 +550,7 @@ showToast?.(
   <button
     onClick={() => {
 
+      setScanError("");
       setScanMode("EXIT");
       setScannerVisible(true);
 
@@ -642,6 +614,49 @@ showToast?.(
 />
 
 </div>
+
+)}
+
+{scanError && (
+
+  <div
+    className="
+      bg-red-50
+      border-l-8
+      border-red-600
+      text-red-700
+      p-5
+      rounded-xl
+      shadow-sm
+      mb-8
+    "
+  >
+
+    <h3 className="font-bold text-lg">
+      Verification Failed
+    </h3>
+
+    <p className="mt-1">
+      {scanError}
+    </p>
+
+    <button
+      onClick={() =>
+        setScanError("")
+      }
+      className="
+        mt-4
+        bg-red-600
+        text-white
+        px-4
+        py-2
+        rounded-lg
+      "
+    >
+      Close
+    </button>
+
+  </div>
 
 )}
 
