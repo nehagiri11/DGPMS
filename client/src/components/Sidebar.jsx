@@ -2,6 +2,11 @@ import {
   Link,
   useNavigate,
 } from "react-router-dom";
+import {
+  FiChevronRight,
+  FiLogOut,
+  FiUser,
+} from "react-icons/fi";
 
 function Sidebar({
   role,
@@ -34,7 +39,6 @@ function Sidebar({
       title: "Notifications",
       path: "/employee/notifications",
     },
-    ,
   ];
 
   const approverMenu = [
@@ -125,6 +129,24 @@ function Sidebar({
     localStorage.getItem("user")
   );
 
+const displayName =
+  user?.full_name ||
+  user?.name ||
+  user?.email ||
+  "User";
+
+const displayInitial =
+  displayName
+    ?.charAt(0)
+    ?.toUpperCase() || "U";
+
+const roleLabel =
+  role === "REQUESTER" || role === "EMPLOYEE"
+    ? "Requester"
+    : role?.toLowerCase()?.replace(/^\w/, (letter) =>
+        letter.toUpperCase()
+      );
+
 const getProfilePath = () => {
 
   if (role === "APPROVER")
@@ -169,15 +191,9 @@ const handleLogout = () => {
     default:
       menuItems = employeeMenu;
   }
-
+  
   menuItems =
-    [
-      ...menuItems.filter(Boolean),
-      {
-        title: "Profile",
-        path: getProfilePath()
-      }
-    ];
+    menuItems.filter(Boolean);
   
 
   return (
@@ -240,7 +256,7 @@ const handleLogout = () => {
         ))}
 
       </ul>
-      <div className="mt-auto border-t border-slate-700">
+      <div className="mt-auto border-t border-slate-700 bg-slate-950/30">
 
   <Link
     to={getProfilePath()}
@@ -249,22 +265,26 @@ const handleLogout = () => {
     }
     className="
       block
-      p-4
-      hover:bg-slate-800
+      p-5
+      hover:bg-slate-800/80
       transition
       border-b
       border-slate-700
+      group
     "
+    title="Open profile"
   >
 
     <div className="flex items-center gap-3">
 
       <div
         className="
-          h-12
-          w-12
+          h-13
+          w-13
           rounded-full
-          bg-blue-600
+          bg-gradient-to-br
+          from-blue-500
+          to-blue-700
           flex
           items-center
           justify-center
@@ -272,26 +292,33 @@ const handleLogout = () => {
           font-bold
           text-lg
           shrink-0
+          ring-2
+          ring-blue-300/20
+          shadow-lg
+          shadow-blue-950/30
         "
       >
-        {
-          user?.full_name
-            ?.charAt(0)
-            ?.toUpperCase() || "U"
-        }
+        {displayInitial}
       </div>
 
-      <div className="overflow-hidden">
+      <div className="min-w-0 flex-1 overflow-hidden">
 
-        <p className="font-semibold truncate">
-          {user?.full_name || "User"}
+        <p className="text-sm text-slate-400">
+          Signed in as
         </p>
 
-        <p className="text-xs text-slate-300 truncate">
-          {role}
+        <p className="font-semibold truncate text-white">
+          {displayName}
+        </p>
+
+        <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-slate-800 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-blue-200">
+          <FiUser className="text-xs" />
+          {roleLabel}
         </p>
 
       </div>
+
+      <FiChevronRight className="text-slate-500 transition group-hover:translate-x-1 group-hover:text-white" />
 
     </div>
 
@@ -303,15 +330,20 @@ const handleLogout = () => {
       onClick={handleLogout}
       className="
         w-full
-        bg-red-600
+        bg-red-600/95
         hover:bg-red-700
         text-white
         py-3
         rounded-lg
         font-semibold
         transition
+        inline-flex
+        items-center
+        justify-center
+        gap-2
       "
     >
+      <FiLogOut />
       Logout
     </button>
 

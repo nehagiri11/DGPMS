@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import {
   Html5Qrcode,
+  Html5QrcodeScannerState,
 } from "html5-qrcode";
 import { mapApiPass } from "../../utils/passMapper";
 import {
@@ -252,10 +253,25 @@ function SecurityDashboard() {
       "reader"
     );
 
-  const stopScanner = () =>
-    scanner.stop()
-      .then(() => scanner.clear())
-      .catch(() => {});
+  const stopScanner = () => {
+    try {
+      if (
+        scanner.getState?.() ===
+        Html5QrcodeScannerState.SCANNING
+      ) {
+        return scanner
+          .stop()
+          .then(() => scanner.clear())
+          .catch(() => {});
+      }
+
+      scanner.clear();
+    } catch {
+      return Promise.resolve();
+    }
+
+    return Promise.resolve();
+  };
 
   scanner.start(
     {
@@ -357,6 +373,56 @@ stopScanner();
 setScannerVisible(false);
 
 return;
+
+}
+
+if (
+  scanMode === "ENTRY" &&
+  !(
+    request.gateStatus === "NOT_USED" ||
+    (
+      request.type === "Visitor" &&
+      request.gateStatus === "CHECKED_OUT"
+    )
+  )
+) {
+
+  setScanError(
+    request.gateStatus === "INSIDE"
+      ? "This pass is already scanned in."
+      : request.gateStatus === "CHECKED_OUT"
+      ? request.type === "Visitor"
+        ? "This visitor pass can be scanned in again only after the scanner refreshes."
+        : "This pass is already scanned out."
+      : "This pass is already completed."
+  );
+
+  stopScanner();
+
+  setScannerVisible(false);
+
+  return;
+
+}
+
+if (
+  scanMode === "EXIT" &&
+  request.gateStatus !== "INSIDE"
+) {
+
+  setScanError(
+    request.gateStatus === "NOT_USED"
+      ? "This pass has not been scanned in yet."
+      : request.gateStatus === "CHECKED_OUT"
+      ? "This pass is already scanned out."
+      : "This pass is already completed."
+  );
+
+  stopScanner();
+
+  setScannerVisible(false);
+
+  return;
 
 }
 

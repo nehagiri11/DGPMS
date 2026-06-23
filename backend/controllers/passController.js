@@ -2351,6 +2351,38 @@ async (req, res) => {
 
     }
 
+    if (
+      pass.gateStatus === "CHECKED_OUT" &&
+      pass.type?.toUpperCase() !== "VISITOR"
+    ) {
+
+      return res.status(400).json({
+
+        success: false,
+
+        message:
+          "Pass already checked out"
+
+      });
+
+    }
+
+    if (
+      pass.gateStatus ===
+      "COMPLETED"
+    ) {
+
+      return res.status(400).json({
+
+        success: false,
+
+        message:
+          "Pass already completed"
+
+      });
+
+    }
+
     const validityError =
       getPassValidityError(
         passes[0]
@@ -2369,21 +2401,18 @@ async (req, res) => {
 
     }
 
-   if (
-  pass.type?.toUpperCase() !== "VISITOR" &&
-  pass.gateStatus === "COMPLETED"
-) {
-  
-    return res.status(400).json({
-      success: false,
-    message: "Pass already used"
-  });
+    const allowedEntryGateStatuses =
+      pass.type?.toUpperCase() === "VISITOR"
+        ? [
+            "NOT_USED",
+            "CHECKED_OUT"
+          ]
+        : [
+            "NOT_USED"
+          ];
 
-}
-
-
-
-    await db.query(
+    const [entryResult] =
+      await db.query(
 
       `
       UPDATE gate_passes
@@ -2395,12 +2424,31 @@ async (req, res) => {
       entry_time = NOW()
 
       WHERE pass_id = ?
+        AND gate_status IN (?)
 
       `,
 
-      [id]
+      [
+        id,
+        allowedEntryGateStatuses
+      ]
 
     );
+
+    if (
+      entryResult.affectedRows === 0
+    ) {
+
+      return res.status(409).json({
+
+        success: false,
+
+        message:
+          "Pass was already scanned. Please refresh and check the current gate status."
+
+      });
+
+    }
 
     await insertEntryExitLog(
       id,
@@ -2494,15 +2542,30 @@ async (req, res) => {
   formatPass(
     passes[0]
   );
+
   if (
-  pass.gateStatus === "CHECKED_OUT"
-)
-{
-  return res.status(400).json({
-    success: false,
-    message: "Visitor already checked out"
-  });
-}
+    pass.gateStatus ===
+    "CHECKED_OUT"
+  ) {
+
+    return res.status(400).json({
+      success: false,
+      message: "Pass already checked out"
+    });
+
+  }
+
+  if (
+    pass.gateStatus ===
+    "COMPLETED"
+  ) {
+
+    return res.status(400).json({
+      success: false,
+      message: "Pass already completed"
+    });
+
+  }
 
     if (
       pass.gateStatus !==
@@ -2543,7 +2606,8 @@ async (req, res) => {
     ? "CHECKED_OUT"
     : "COMPLETED";
 
-      await db.query(
+      const [exitResult] =
+        await db.query(
 
         `
         UPDATE gate_passes
@@ -2555,6 +2619,7 @@ async (req, res) => {
         exit_time = NOW()
 
         WHERE pass_id = ?
+          AND gate_status = 'INSIDE'
 
         `,
 
@@ -2564,6 +2629,21 @@ async (req, res) => {
         ]
 
       );
+
+      if (
+        exitResult.affectedRows === 0
+      ) {
+
+        return res.status(409).json({
+
+          success: false,
+
+          message:
+            "Pass was already scanned. Please refresh and check the current gate status."
+
+        });
+
+      }
 
       await insertEntryExitLog(
         id,
