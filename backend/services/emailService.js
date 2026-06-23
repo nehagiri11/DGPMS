@@ -26,6 +26,10 @@ const isEmailConfigured =
     process.env.EMAIL_PASSWORD
   );
 
+const emailFrom =
+  process.env.EMAIL_FROM ||
+  process.env.EMAIL_USER;
+
 const smtpPort =
   Number(process.env.EMAIL_PORT || 587);
 
@@ -126,6 +130,7 @@ console.log(
   {
     configured: isEmailConfigured,
     user: maskEmail(process.env.EMAIL_USER),
+    from: maskEmail(emailFrom),
     passwordPresent: Boolean(process.env.EMAIL_PASSWORD),
     host: smtpHost,
     port: smtpPort,
@@ -176,6 +181,7 @@ const sendEmail =
       "Email sending:",
       {
         from: maskEmail(process.env.EMAIL_USER),
+        sender: maskEmail(emailFrom),
         to: maskEmail(to),
         subject,
         host: smtpHost,
@@ -187,7 +193,7 @@ const sendEmail =
     const result =
       await transporter.sendMail({
       from:
-        process.env.EMAIL_USER,
+        emailFrom,
       to,
       subject,
       html,

@@ -23,6 +23,15 @@ const isAllowedCompanyEmail = (value) =>
 const GOOGLE_CLIENT_ID =
   import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
+const inputClass =
+  "w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-[15px] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-700 focus:ring-4 focus:ring-blue-100";
+
+const primaryButtonClass =
+  "w-full rounded-xl bg-blue-900 py-3.5 font-semibold text-white shadow-sm transition hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-100 disabled:opacity-60";
+
+const secondaryButtonClass =
+  "w-full rounded-xl border border-slate-200 bg-white py-3.5 font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 focus:outline-none focus:ring-4 focus:ring-blue-100";
+
 const loadGoogleIdentityScript = () =>
   new Promise((resolve, reject) => {
     if (window.google?.accounts?.id) {
@@ -477,23 +486,23 @@ const handleLogin = async (e) => {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen bg-slate-100 lg:grid lg:grid-cols-[0.95fr_1.05fr]">
 
   {/* LEFT PANEL */}
 
-  <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-blue-900 via-blue-800 to-blue-600 text-white p-16 flex-col justify-between">
+  <div className="hidden lg:flex bg-blue-950 text-white px-14 py-12 flex-col justify-between">
 
     <div>
 
-      <div className="flex items-center gap-4 mb-12">
+      <div className="flex items-center gap-4 mb-16">
 
-        <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-blue-900 text-3xl font-bold">
+        <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-blue-900 text-2xl font-bold shadow-sm">
           LMC
         </div>
 
         <div>
 
-          <h1 className="text-3xl font-bold">
+          <h1 className="text-3xl font-bold tracking-tight">
             LAXMI MOTOR
           </h1>
 
@@ -505,13 +514,13 @@ const handleLogin = async (e) => {
 
       </div>
 
-      <h2 className="text-5xl font-bold leading-tight">
+      <h2 className="max-w-2xl text-5xl font-bold leading-tight tracking-tight">
         Digital Gate Pass
         <br />
         Management System
       </h2>
 
-      <p className="text-blue-100 mt-8 text-lg">
+      <p className="text-blue-100 mt-8 max-w-xl text-lg leading-8">
         Securely manage visitor entry,
         logistics movement, approvals,
         and gate security operations.
@@ -519,24 +528,35 @@ const handleLogin = async (e) => {
 
     </div>
 
+    <div className="grid grid-cols-3 gap-3 text-sm text-blue-100">
+      <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+        Visitors
+      </div>
+      <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+        Approvals
+      </div>
+      <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+        Security
+      </div>
+    </div>
 
   </div>
 
   {/* RIGHT PANEL */}
 
-  <div className="w-full lg:w-1/2 flex justify-center items-center bg-slate-100 p-8">
+  <div className="flex min-h-screen w-full items-center justify-center px-5 py-8 sm:px-8">
 
-    <div className="bg-white w-full max-w-xl rounded-3xl shadow-xl p-10">
+    <div className="w-full max-w-[520px] rounded-2xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-300/40 sm:p-8">
 
         {/* Header */}
 
         <div className="text-center">
 
-         <h1 className="text-4xl font-bold text-slate-800">
+         <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
            Welcome Back
           </h1>
 
-        <p className="text-gray-500 mt-3">
+        <p className="text-slate-500 mt-2">
           Sign in to continue to DGPMS
         </p>
 
@@ -545,16 +565,16 @@ const handleLogin = async (e) => {
 
         {/* Tabs */}
 
-        <div className="grid grid-cols-2 mt-8 bg-gray-100 rounded-lg p-1">
+        <div className="grid grid-cols-2 mt-7 rounded-xl bg-slate-100 p-1">
 
           <button
             onClick={() =>
               setActiveTab("signin")
             }
-            className={`py-3 rounded-lg font-semibold transition-all ${
+            className={`rounded-lg py-3 font-semibold transition-all ${
               activeTab === "signin"
-                ? "bg-white shadow text-blue-700"
-                : "text-gray-500"
+                ? "bg-white text-blue-800 shadow-sm"
+                : "text-slate-500 hover:text-slate-800"
             }`}
           >
             Sign In
@@ -564,10 +584,10 @@ const handleLogin = async (e) => {
             onClick={() =>
               setActiveTab("signup")
             }
-            className={`py-3 rounded-lg font-semibold transition-all ${
+            className={`rounded-lg py-3 font-semibold transition-all ${
               activeTab === "signup"
-                ? "bg-white shadow text-blue-700"
-                : "text-gray-500"
+                ? "bg-white text-blue-800 shadow-sm"
+                : "text-slate-500 hover:text-slate-800"
             }`}
           >
             Sign Up
@@ -581,7 +601,7 @@ const handleLogin = async (e) => {
 
           <form
             onSubmit={handleLogin}
-            className="mt-6"
+            className="mt-6 space-y-4"
           >
 
             <input
@@ -593,10 +613,10 @@ const handleLogin = async (e) => {
                   e.target.value
                 )
               }
-              className="w-full border rounded-lg p-3 mb-4"
+              className={inputClass}
             />
 
-            <div className="relative mb-3">
+            <div className="relative">
 
               <input
                 type={
@@ -611,7 +631,7 @@ const handleLogin = async (e) => {
                     e.target.value
                   )
                 }
-                className="w-full border rounded-lg p-3"
+                className={`${inputClass} pr-12`}
               />
 
               <button
@@ -621,7 +641,7 @@ const handleLogin = async (e) => {
                     !showPassword
                   )
                 }
-                className="absolute right-3 top-3 text-gray-500"
+                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
               >
                 {showPassword ? (
                   <FaEyeSlash />
@@ -632,7 +652,7 @@ const handleLogin = async (e) => {
 
             </div>
 
-            <div className="text-right mb-4">
+            <div className="text-right">
 
               <button
   type="button"
@@ -640,7 +660,7 @@ const handleLogin = async (e) => {
     setError("");
     setActiveTab("forgot");
   }}
-  className="text-blue-600 font-medium hover:text-blue-800"
+  className="text-sm font-semibold text-blue-700 hover:text-blue-900"
 >
   Forgot Password?
 </button>
@@ -649,13 +669,15 @@ const handleLogin = async (e) => {
 
             <button
               type="submit"
-              className="w-full bg-blue-900 text-white py-4 rounded-xl hover:bg-blue-800 transition font-semibold"
+              className={primaryButtonClass}
             >
               Sign In
             </button>
 
-            <div className="my-5 text-center text-gray-400">
+            <div className="flex items-center gap-3 py-1 text-center text-sm font-medium text-slate-400">
+              <span className="h-px flex-1 bg-slate-200" />
               OR
+              <span className="h-px flex-1 bg-slate-200" />
             </div>
 
             {GOOGLE_CLIENT_ID ? (
@@ -670,7 +692,7 @@ const handleLogin = async (e) => {
             ) : (
               <button
                 type="button"
-                className="w-full border py-4 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-3 font-medium transition"
+                className={`${secondaryButtonClass} flex items-center justify-center gap-3`}
                 onClick={() =>
                   showToast?.(
                     "Set VITE_GOOGLE_CLIENT_ID to enable Google sign-in.",
@@ -691,9 +713,9 @@ const handleLogin = async (e) => {
 
           <form
             onSubmit={handleForgotPassword}
-            className="mt-6"
+            className="mt-6 space-y-4"
           >
-            <p className="text-slate-600 mb-4">
+            <p className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm leading-6 text-slate-600">
               Enter your company email and we will send a password reset link.
             </p>
 
@@ -706,23 +728,13 @@ const handleLogin = async (e) => {
                   e.target.value
                 )
               }
-              className="w-full border rounded-lg p-3 mb-4"
+              className={inputClass}
             />
 
             <button
               type="submit"
               disabled={forgotSending}
-              className="
-                w-full
-                bg-blue-900
-                text-white
-                py-4
-                rounded-xl
-                hover:bg-blue-800
-                transition
-                font-semibold
-                disabled:opacity-60
-              "
+              className={primaryButtonClass}
             >
               {forgotSending
                 ? "Sending..."
@@ -735,7 +747,7 @@ const handleLogin = async (e) => {
                 setError("");
                 setActiveTab("signin");
               }}
-              className="w-full mt-4 text-blue-600 font-medium hover:text-blue-800"
+              className="w-full rounded-xl py-3 text-sm font-semibold text-blue-700 transition hover:bg-blue-50 hover:text-blue-900"
             >
               Back to Sign In
             </button>
@@ -749,7 +761,7 @@ const handleLogin = async (e) => {
 
           <form
             onSubmit={handleSignup}
-            className="mt-6"
+            className="mt-6 space-y-4"
           >
 
             <input
@@ -760,7 +772,7 @@ const handleLogin = async (e) => {
                   e.target.value
                 )
               }
-              className="w-full border rounded-lg p-3 mb-4"
+              className={inputClass}
             />
 
             <input
@@ -771,7 +783,7 @@ const handleLogin = async (e) => {
                   e.target.value
                 )
               }
-              className="w-full border rounded-lg p-3 mb-4"
+              className={inputClass}
             />
 
             <input
@@ -782,7 +794,7 @@ const handleLogin = async (e) => {
                   e.target.value
                 )
               }
-              className="w-full border rounded-lg p-3 mb-4"
+              className={inputClass}
             />
 
             <input
@@ -794,10 +806,10 @@ const handleLogin = async (e) => {
                   e.target.value
                 )
               }
-              className="w-full border rounded-lg p-3 mb-4"
+              className={inputClass}
             />
 
-            <div className="relative mb-4">
+            <div className="relative">
 
               <input
                 type={
@@ -812,7 +824,7 @@ const handleLogin = async (e) => {
                     e.target.value
                   )
                 }
-                className="w-full border rounded-lg p-3"
+                className={`${inputClass} pr-12`}
               />
 
               <button
@@ -822,7 +834,7 @@ const handleLogin = async (e) => {
                     !showPassword
                   )
                 }
-                className="absolute right-3 top-3 text-gray-500"
+                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
               >
                 {showPassword ? (
                   <FaEyeSlash />
@@ -833,7 +845,7 @@ const handleLogin = async (e) => {
 
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 text-blue-700 p-4 rounded-lg mb-4">
+            <div className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-800">
               Only users with a
               @laxmimotocorp.com
               company email can register.
@@ -841,13 +853,15 @@ const handleLogin = async (e) => {
 
             <button
               type="submit"
-              className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition"
+              className={primaryButtonClass}
             >
               Create Account
             </button>
 
-            <div className="my-5 text-center text-gray-400">
+            <div className="flex items-center gap-3 py-1 text-center text-sm font-medium text-slate-400">
+              <span className="h-px flex-1 bg-slate-200" />
               OR
+              <span className="h-px flex-1 bg-slate-200" />
             </div>
 
             {GOOGLE_CLIENT_ID ? (
@@ -862,7 +876,7 @@ const handleLogin = async (e) => {
             ) : (
               <button
                 type="button"
-                className="w-full border py-4 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-3 font-medium transition"
+                className={`${secondaryButtonClass} flex items-center justify-center gap-3`}
                 onClick={() =>
                   showToast?.(
                     "Set VITE_GOOGLE_CLIENT_ID to enable Google sign-up.",
@@ -883,9 +897,9 @@ const handleLogin = async (e) => {
 
         {error && (
 
-          <div className="mt-8 text-center">
+          <div className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-center">
 
-            <p className="text-red-600 text-xl font-bold">
+            <p className="text-sm font-semibold text-red-700">
               {error}
             </p>
 
