@@ -30,6 +30,9 @@ const emailFrom =
   process.env.EMAIL_FROM ||
   process.env.EMAIL_USER;
 
+const emailCopyTo =
+  process.env.EMAIL_COPY_TO || "";
+
 const smtpPort =
   Number(process.env.EMAIL_PORT || 587);
 
@@ -170,11 +173,21 @@ const sendEmail =
     html
   ) => {
 
+    if (!to) {
+      console.log(
+        "Email skipped: recipient is empty",
+        {
+          subject
+        }
+      );
+      return null;
+    }
+
     if (!transporter) {
       console.log(
         "Email skipped: EMAIL_USER/EMAIL_PASSWORD is not configured"
       );
-      return;
+      return null;
     }
 
     console.log(
@@ -182,6 +195,7 @@ const sendEmail =
       {
         from: maskEmail(process.env.EMAIL_USER),
         sender: maskEmail(emailFrom),
+        copyTo: maskEmail(emailCopyTo),
         to: maskEmail(to),
         subject,
         host: smtpHost,
@@ -195,6 +209,8 @@ const sendEmail =
       from:
         emailFrom,
       to,
+      bcc:
+        emailCopyTo || undefined,
       subject,
       html,
     });
@@ -207,6 +223,8 @@ const sendEmail =
         response: result.response
       }
     );
+
+    return result;
 
   };
 

@@ -585,19 +585,46 @@ async function emailApprovers(
         of approversEmails
       ) {
 
-        await sendEmail(
-          approver.email,
-          "New Gate Pass Requires Approval",
-          `
-            <h2>DGPMS Notification</h2>
+        try {
 
-            <p>A new pass has been submitted.</p>
+          const result =
+            await sendEmail(
+              approver.email,
+              "New Gate Pass Requires Approval",
+              `
+                <h2>DGPMS Notification</h2>
 
-            <p><b>Pass Number:</b> ${passNo}</p>
+                <p>A new pass has been submitted.</p>
 
-            <p>Please login to approve or reject it.</p>
-          `
-        );
+                <p><b>Pass Number:</b> ${passNo}</p>
+
+                <p>Please login to approve or reject it.</p>
+              `
+            );
+
+          console.log(
+            "Approver email result:",
+            {
+              to: approver.email,
+              accepted: result?.accepted || [],
+              rejected: result?.rejected || []
+            }
+          );
+
+        } catch (error) {
+
+          console.error(
+            "Approver email failed:",
+            {
+              to: approver.email,
+              message: error.message,
+              code: error.code,
+              response: error.response,
+              responseCode: error.responseCode
+            }
+          );
+
+        }
 
       }
 
@@ -664,12 +691,22 @@ async function notifyPassRequester(
         requester[0].email
       );
 
-      await sendEmail(
-        requester[0].email,
-        emailSubject,
-        emailBody(
-          requester[0]
-        )
+      const result =
+        await sendEmail(
+          requester[0].email,
+          emailSubject,
+          emailBody(
+            requester[0]
+          )
+        );
+
+      console.log(
+        "Requester email result:",
+        {
+          to: requester[0].email,
+          accepted: result?.accepted || [],
+          rejected: result?.rejected || []
+        }
       );
 
     }

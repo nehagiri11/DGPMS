@@ -361,7 +361,7 @@
     height: 145.5mm !important;
     min-height: 145.5mm !important;
     margin: 0 !important;
-    padding: 4mm !important;
+    padding: 5mm 4mm 3mm !important;
     box-sizing: border-box !important;
     overflow: hidden !important;
   }
