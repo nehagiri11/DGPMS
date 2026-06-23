@@ -349,16 +349,17 @@
     padding: 0 !important;
     margin: 0 auto !important;
     display: grid !important;
-    grid-template-rows: 144mm 3mm 144mm !important;
+    grid-template-rows: 145.5mm 145.5mm !important;
     align-items: stretch !important;
+    position: relative !important;
     background: #ffffff !important;
   }
 
   .regular-ckd-print-container .regular-print-copy,
   .regular-ckd-print-container .ckd-print-copy {
     width: 194mm !important;
-    height: 144mm !important;
-    min-height: 144mm !important;
+    height: 145.5mm !important;
+    min-height: 145.5mm !important;
     margin: 0 !important;
     padding: 4mm !important;
     box-sizing: border-box !important;
@@ -366,9 +367,14 @@
   }
 
   .regular-ckd-print-container .cut-line {
-    align-self: center !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 0 !important;
+    right: 0 !important;
+    transform: translateY(-50%) !important;
     margin: 0 !important;
     height: 0 !important;
+    z-index: 5 !important;
   }
 
   .regular-ckd-print-container .cut-line span {
