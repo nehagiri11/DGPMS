@@ -1,23 +1,44 @@
 const mysql =
   require("mysql2");
 
+const getEnv = (name) =>
+  String(
+    process.env[name] || ""
+  ).trim();
+
+const dbHost =
+  getEnv("DB_HOST");
+
+if (
+  dbHost.includes("\n") ||
+  dbHost.includes("\r") ||
+  dbHost.includes("=")
+) {
+  throw new Error(
+    "Invalid DB_HOST. Set DB_HOST to only the database hostname, not the full .env block."
+  );
+}
+
 const pool =
   mysql.createPool({
 
     host:
-      process.env.DB_HOST,
+      dbHost,
 
     user:
-      process.env.DB_USER,
+      getEnv("DB_USER"),
 
     password:
-      process.env.DB_PASSWORD,
+      getEnv("DB_PASSWORD"),
 
     database:
-      process.env.DB_NAME,
+      getEnv("DB_NAME"),
     
     port:
-      process.env.DB_PORT,
+      Number(
+        getEnv("DB_PORT") ||
+        3306
+      ),
 
        ssl: {
     rejectUnauthorized: false,

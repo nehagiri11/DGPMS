@@ -340,7 +340,15 @@ exports.login = async (req, res) => {
 
   } catch (error) {
 
-    console.log("LOGIN ERROR:", error);
+    console.log(
+      "LOGIN ERROR:",
+      {
+        message: error.message,
+        code: error.code,
+        errno: error.errno,
+        syscall: error.syscall
+      }
+    );
 
     res.status(500).json({
 
