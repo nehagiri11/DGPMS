@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
+import NotificationCenterPage from "./NotificationCenterPage";
 
 function Notifications() {
+  return <NotificationCenterPage />;
 
   const [mobileOpen, setMobileOpen] =
     useState(false);
