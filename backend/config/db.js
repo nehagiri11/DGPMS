@@ -9,6 +9,18 @@ const getEnv = (name) =>
 const dbHost =
   getEnv("DB_HOST");
 
+const dbPort =
+  Number(
+    getEnv("DB_PORT") ||
+    3306
+  );
+
+const dbName =
+  getEnv("DB_NAME");
+
+const dbUser =
+  getEnv("DB_USER");
+
 if (
   dbHost.includes("\n") ||
   dbHost.includes("\r") ||
@@ -19,6 +31,19 @@ if (
   );
 }
 
+console.log(
+  "Database configuration:",
+  {
+    host: dbHost || "not-set",
+    port: dbPort,
+    database: dbName || "not-set",
+    user: dbUser || "not-set",
+    passwordPresent: Boolean(
+      getEnv("DB_PASSWORD")
+    )
+  }
+);
+
 const pool =
   mysql.createPool({
 
@@ -26,19 +51,16 @@ const pool =
       dbHost,
 
     user:
-      getEnv("DB_USER"),
+      dbUser,
 
     password:
       getEnv("DB_PASSWORD"),
 
     database:
-      getEnv("DB_NAME"),
+      dbName,
     
     port:
-      Number(
-        getEnv("DB_PORT") ||
-        3306
-      ),
+      dbPort,
 
        ssl: {
     rejectUnauthorized: false,

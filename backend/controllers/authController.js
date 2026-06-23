@@ -353,7 +353,12 @@ exports.login = async (req, res) => {
     res.status(500).json({
 
       success: false,
-      message: "Server Error"
+      message:
+        error.code === "ENOTFOUND" ||
+        error.code === "ECONNREFUSED" ||
+        error.code === "ETIMEDOUT"
+          ? "Database connection failed. Check backend DB env variables on Render."
+          : "Server Error"
 
     });
 
