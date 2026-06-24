@@ -438,10 +438,41 @@
   }
 
   .visitor-card-photo {
-  width: 20mm !important;
-  height: 24mm !important;
+  width: 18mm !important;
+  height: 22mm !important;
  } 
 
+ /* VISITOR BADGE TEXT */
+
+.visitor-card-company {
+  font-size: 4.8px !important;
+  line-height: 1.05 !important;
+  padding: 1mm !important;
+}
+
+.visitor-card-title {
+  font-size: 6px !important;
+  padding: 1.5mm 1mm !important;
+}
+
+.visitor-card-details p {
+  font-size: 5.2px !important;
+  line-height: 1.15 !important;
+  margin-bottom: 0.7mm !important;
+}
+
+.visitor-card-sign {
+  font-size: 5px !important;
+}
+.visitor-card-qr {
+  top: 1.5mm !important;
+  right: 1.5mm !important;
+}
+
+.visitor-card-qr canvas {
+  width: 12mm !important;
+  height: 12mm !important;
+}
 
   .visitor-record-sheet {
     width: 194mm !important;
