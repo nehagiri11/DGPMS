@@ -78,15 +78,20 @@ const [fieldErrors, setFieldErrors] =
   ]);
 
   const addItem = () => {
-    setItems([
-      ...items,
-      {
-        itemDescription: "",
-        quantity: "",
-        remarks: "",
-      },
-    ]);
-  };
+  if (items.length >= 5) {
+    alert("Maximum 5 items allowed");
+    return;
+  }
+
+  setItems([
+    ...items,
+    {
+      itemDescription: "",
+      quantity: "",
+      remarks: ""
+    }
+  ]);
+};
 
   const removeItem = (index) => {
     setItems(items.filter((_, i) => i !== index));
@@ -543,12 +548,18 @@ const [fieldErrors, setFieldErrors] =
             ))}
 
             <button
-              type="button"
-              onClick={addItem}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg"
-            >
-              + Add Item
-            </button>
+  type="button"
+  onClick={addItem}
+  disabled={items.length >= 5}
+  className="
+    px-3 py-2 rounded
+    bg-blue-600 text-white
+    disabled:bg-gray-400
+    disabled:cursor-not-allowed
+  "
+>
+  + Add Item
+</button>
 
             {/* Remarks */}
 

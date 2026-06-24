@@ -1465,6 +1465,16 @@ async (req, res) => {
       );
 
     }
+    if (
+  request.items &&
+  request.items.length > 5
+) {
+  return res.status(400).json({
+    success: false,
+    message:
+      "Maximum 5 items allowed per pass"
+  });
+}
 
     const passNo =
       await resolvePassNo(
@@ -1609,6 +1619,16 @@ async (req, res) => {
       );
 
     }
+    if (
+  request.items &&
+  request.items.length > 5
+) {
+  return res.status(400).json({
+    success: false,
+    message:
+      "Maximum 5 items allowed per pass"
+  });
+}
 
     const passNo =
       await resolvePassNo(
