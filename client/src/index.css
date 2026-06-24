@@ -186,7 +186,7 @@
     size: A4 portrait;
     margin: 6mm 3mm;
   }
-
+  
   html,
   body,
   #root {
@@ -285,6 +285,33 @@
   }
   .remarks-box {
   min-height: 13mm !important;
+}
+/* ==========================================
+   SCANNED PASS WATERMARK
+========================================== */
+
+.scanned-watermark {
+  position: absolute !important;
+  inset: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  pointer-events: none !important;
+
+  font-size: 48px !important;
+  font-weight: 700 !important;
+
+  color: #dc2626 !important;
+
+  opacity: 0.12 !important;
+
+  transform: rotate(-30deg) !important;
+
+  text-align: center !important;
+
+  z-index: 999 !important;
 }
 
  /* ==========================================

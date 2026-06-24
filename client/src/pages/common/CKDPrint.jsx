@@ -34,7 +34,7 @@ function CKDPrint({ request }) {
   );
 
   const renderCopy = (copyTitle, showSecurityFields) => (
-    <section className="copy-section ckd-print-copy border-2 border-black flex flex-col p-4">
+    <section className="copy-section ckd-print-copy border-2 border-black flex flex-col p-4 relative">
       <div className="relative border-b border-black pb-5">
         <div className="absolute right-2 -top-3 bg-white p-1">
           <QRCodeCanvas
@@ -180,7 +180,14 @@ function CKDPrint({ request }) {
   );
 
   return (
-    <div className="print-container regular-ckd-print-container p-4 bg-white">
+    <div className="relative print-container regular-ckd-print-container p-4 bg-white">
+    {request.gate_status !== "NOT_USED" && (
+  <div className="scanned-watermark">
+    SCANNED AT GATE
+    <br />
+    {request.entry_time}
+  </div>
+)}
       <button
         onClick={() => window.print()}
         className="
