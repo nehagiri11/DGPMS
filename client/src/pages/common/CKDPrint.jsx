@@ -34,7 +34,7 @@ function CKDPrint({ request }) {
   );
 
   const renderCopy = (copyTitle, showSecurityFields) => (
-    <section className="copy-section ckd-print-copy border-2 border-black flex flex-col">
+    <section className="copy-section ckd-print-copy border-2 border-black flex flex-col p-4">
       <div className="relative border-b border-black pb-5">
         <div className="absolute right-2 -top-3 bg-white p-1">
           <QRCodeCanvas
@@ -78,16 +78,16 @@ function CKDPrint({ request }) {
       <table className="w-full border-collapse border border-black mt-3 text-[11px]">
         <thead>
           <tr>
-            <th className="border border-black p-2">
+            <th className="border border-black p-4">
               S.N
             </th>
-            <th className="border border-black p-2">
+            <th className="border border-black p-4">
               ITEM/DESCRIPTION
             </th>
-            <th className="border border-black p-2">
+            <th className="border border-black p-4">
               QUANTITY
             </th>
-            <th className="border border-black p-2">
+            <th className="border border-black p-4">
               REMARKS
             </th>
           </tr>
@@ -98,13 +98,13 @@ function CKDPrint({ request }) {
               <td className="border border-black p-2 text-center">
                 {index + 1}
               </td>
-              <td className="border border-black p-2">
+              <td className="border border-black p-4">
                 {item.itemDescription}
               </td>
-              <td className="border border-black p-2">
+              <td className="border border-black p-4">
                 {item.quantity}
               </td>
-              <td className="border border-black p-2">
+              <td className="border border-black p-4">
                 {item.remarks}
               </td>
             </tr>
@@ -178,9 +178,10 @@ function CKDPrint({ request }) {
       </div>
     </section>
   );
+  
 
   return (
-    <div className="print-container regular-ckd-print-container bg-white">
+    <div className="print-container regular-ckd-print-container p-4 bg-white">
       <button
         onClick={() => window.print()}
         className="
