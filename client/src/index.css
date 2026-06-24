@@ -445,20 +445,24 @@
  /* VISITOR BADGE TEXT */
 
 .visitor-card-company {
-  font-size: 9px !important;
+  font-size: 8.5px !important;
   line-height: 1.05 !important;
   padding: 1mm !important;
 }
 
 .visitor-card-title {
-  font-size: 10px !important;
+  font-size: 11px !important;
   padding: 1.5mm 1mm !important;
+}
+.visitor-card-details {
+  padding-right: 13mm !important;
 }
 
 .visitor-card-details p {
-  font-size: 8px !important;
-  line-height: 1.10 !important;
+  font-size: 7.5px !important;
+  line-height: 1.1 !important;
   margin-bottom: 0.5mm !important;
+  white-space: nowrap !important;
 }
 
 .visitor-card-sign {
