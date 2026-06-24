@@ -475,7 +475,7 @@ if (
 ) {
 
   setScanError(
-  "This pass has already been checked out."
+  "This pass has already been completed."
 );
 
 stopScanner();
