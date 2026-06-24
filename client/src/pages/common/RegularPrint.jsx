@@ -197,7 +197,7 @@ function RegularPrint({ request }) {
 
       {renderCopy("SECURITY COPY - 1", true)}
 
-      <div className="cut-line">
+      <div className="regular-ckd-cut-line">
         <span className="absolute left-1/2 -translate-x-1/2 -top-3 bg-white px-3 text-xs font-semibold">
           Cut here
         </span>
