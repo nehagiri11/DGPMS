@@ -50,7 +50,7 @@
 .visitor-card-company {
   background: #2f5da8;
   color: #ffffff;
-  font-size: 9px;
+  font-size: 7px;
   font-weight: 800;
   line-height: 1.1;
   padding: 7px 4px 5px;
@@ -60,7 +60,7 @@
 .visitor-card-title {
   background: #ffffff;
   color: #111111;
-  font-size:11px;
+  font-size:9px;
   line-height: 1;
   padding: 10px 4px 8px;
   text-align: center;
@@ -104,7 +104,7 @@
 
 .visitor-card-details p {
   margin: 0 0 7px;
-  font-size: 8px;
+  font-size: 6.5px;
   line-height: 1.22;
 }
 
@@ -144,7 +144,7 @@
 }
 
 .visitor-card-sign {
-  font-size: 8px;
+  font-size: 6px;
 }
 
 .visitor-section-divider {
@@ -293,8 +293,8 @@
 
 .regular-ckd-print-container {
   width: 194mm !important;
-  height: 289mm !important;
-  max-height: 289mm !important;
+  height: 286mm !important;
+  max-height: 286mm !important;
   margin: 0 auto !important;
   padding: 0 !important;
 
@@ -303,7 +303,7 @@
 
   background: #fff !important;
   --regular-ckd-cut-height: 4mm;
-  --regular-ckd-copy-height: calc((289mm - var(--regular-ckd-cut-height)) / 2);
+  --regular-ckd-copy-height: calc((286mm - var(--regular-ckd-cut-height)) / 2);
   break-after: avoid !important;
   page-break-after: avoid !important;
 }
