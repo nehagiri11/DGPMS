@@ -209,7 +209,7 @@
   }
 
   .copy-section {
-    height: 139mm !important;
+    height: auto !important;
     margin: 0 !important;
     padding: 5mm !important;
     box-sizing: border-box !important;
@@ -293,8 +293,8 @@
 
 .regular-ckd-print-container {
   width: 194mm !important;
-  height: 286mm !important;
-  max-height: 286mm !important;
+  height: 280mm !important;
+  max-height: 280mm !important;
   margin: 0 auto !important;
   padding: 0 !important;
 
@@ -302,8 +302,8 @@
   flex-direction: column !important;
 
   background: #fff !important;
-  --regular-ckd-cut-height: 4mm;
-  --regular-ckd-copy-height: calc((286mm - var(--regular-ckd-cut-height)) / 2);
+  --regular-ckd-cut-height: 3mm;
+  --regular-ckd-copy-height: calc((280mm - var(--regular-ckd-cut-height)) / 2);
   break-after: avoid !important;
   page-break-after: avoid !important;
 }
@@ -320,8 +320,6 @@
 
   padding: 5mm 4mm 3mm !important;
   box-sizing: border-box !important;
-  margin-top: 0.5mm !important;
-  margin-bottom: 0.5mm !important;
 
   overflow: hidden !important;
 }
@@ -460,7 +458,6 @@
 
 .visitor-card-details p {
   font-size: 9px !important;
-
   line-height: 1.12 !important;
   margin-bottom: 1mm !important;
   white-space: nowrap !important;
@@ -486,13 +483,13 @@
 }
 
 .visitor-card-brandmark {
-  width: 18mm !important;
-  height: 6mm !important;
+  width: 24mm !important;
+  height: 8mm !important;
   margin-top: 2mm !important;
 }
 
 .visitor-card-sign {
-  font-size: 7px !important;
+  font-size: 8px !important;
   margin-bottom: -2mm !important;
 }
   .visitor-record-sheet {
