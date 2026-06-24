@@ -37,7 +37,7 @@ function RegularPrint({ request }) {
   const renderCopy = (copyTitle, showSecurityFields) => (
     <section className="copy-section regular-print-copy border-2 border-black flex flex-col p-4">
       <div className="relative border-b border-black pb-5">
-        <div className="absolute right-2 -top-1 bg-white p-1">
+        <div className="absolute right-2 -top-3 bg-white p-1">
           <QRCodeCanvas
             value={request.passNo}
             size={76}
