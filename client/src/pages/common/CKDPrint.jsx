@@ -183,9 +183,12 @@ function CKDPrint({ request }) {
     <div className="relative print-container regular-ckd-print-container p-4 bg-white">
     {request.gate_status !== "NOT_USED" && (
   <div className="scanned-watermark">
-    SCANNED AT GATE
-    <br />
-    {request.entry_time}
+    SCANNED OUT
+    {new Date(request.entry_time).toLocaleTimeString("en-US", {
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: true,
+})}
   </div>
 )}
       <button
