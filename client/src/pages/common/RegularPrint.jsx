@@ -119,7 +119,7 @@ function RegularPrint({ request }) {
 
 <div className="h-2"></div>
       {showSecurityFields ? (
-        <div className="grid grid-cols-3 gap-8 mt-2 items-end">
+        <div className="grid grid-cols-3 gap-8 mt-6 items-end">
           <div>
             <p className="text-gray-500">
               Prepared By
@@ -150,7 +150,7 @@ function RegularPrint({ request }) {
 </div>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-8 mt-3 items-end">
+        <div className="grid grid-cols-2 gap-8 mt-6 items-end">
           <div>
             <p className="text-gray-500">
               Prepared By
