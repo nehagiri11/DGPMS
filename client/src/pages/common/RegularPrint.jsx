@@ -35,9 +35,9 @@ function RegularPrint({ request }) {
 );
 
   const renderCopy = (copyTitle, showSecurityFields) => (
-    <section className="copy-section regular-print-copy border-2 border-black flex flex-col">
+    <section className="copy-section regular-print-copy border-2 border-black flex flex-col p-4">
       <div className="relative border-b border-black pb-5">
-        <div className="absolute right-2 -top-2 bg-white p-1">
+        <div className="absolute right-2 -top-1 bg-white p-1">
           <QRCodeCanvas
             value={request.passNo}
             size={76}
@@ -179,7 +179,7 @@ function RegularPrint({ request }) {
   );
 
   return (
-    <div className="print-container regular-ckd-print-container bg-white">
+    <div className="print-container regular-ckd-print-container p-4 bg-white">
       <button
         onClick={() => window.print()}
         className="
@@ -197,7 +197,7 @@ function RegularPrint({ request }) {
 
       {renderCopy("SECURITY COPY - 1", true)}
 
-      <div className="regular-ckd-cut-line">
+      <div className="cut-line">
         <span className="absolute left-1/2 -translate-x-1/2 -top-3 bg-white px-3 text-xs font-semibold">
           Cut here
         </span>
