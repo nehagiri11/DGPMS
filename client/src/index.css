@@ -287,99 +287,104 @@
   min-height: 13mm !important;
 }
 
-  .regular-print-copy,
-  .ckd-print-copy {
-    font-size: 9.5px !important;
-    line-height: 1.12 !important;
-  }
+ /* ==========================================
+   REGULAR + CKD PRINT LAYOUT
+========================================== */
 
-  .regular-print-copy > div:first-child,
-  .ckd-print-copy > div:first-child {
-    min-height: 24mm !important;
-    padding-bottom: 2mm !important;
-  }
+.regular-ckd-print-container {
+  width: 194mm !important;
+  height: 291mm !important;
+  margin: 0 auto !important;
 
-  .regular-print-copy > div:first-child > div:first-child,
-  .ckd-print-copy > div:first-child > div:first-child {
-    top: -3mm !important;
-    right: 2mm !important;
-  }
+  display: flex !important;
+  flex-direction: column !important;
 
-  .regular-print-copy > div:nth-child(2),
-  .ckd-print-copy > div:nth-child(2) {
-    padding-top: 2.4mm !important;
-    padding-bottom: 2.4mm !important;
-  }
+  background: #fff !important;
+}
 
-  .regular-print-copy table,
-  .ckd-print-copy table {
-    margin-top: 2mm !important;
-    font-size: 9px !important;
-  }
+.regular-print-copy,
+.ckd-print-copy {
+  width: 194mm !important;
 
-  .regular-print-copy th,
-  .regular-print-copy td,
-  .ckd-print-copy th,
-  .ckd-print-copy td {
-    padding: 1.25mm !important;
-    line-height: 1.08 !important;
-  }
+  height: 142mm !important;
+  min-height: 142mm !important;
 
-  .regular-print-copy .remarks-box,
-  .ckd-print-copy .remarks-box {
-    min-height: 8mm !important;
-    margin-top: 2mm !important;
-    padding: 1.5mm !important;
-    font-size: 9px !important;
-  }
+  border: 0.5mm solid #000 !important;
 
-  .regular-print-copy .print-person-name,
-  .ckd-print-copy .print-person-name {
-    font-size: 9.5px !important;
-  }
+  padding: 5mm !important;
+  box-sizing: border-box !important;
 
-  .regular-print-copy .generated-note,
-  .ckd-print-copy .generated-note {
-    font-size: 8px !important;
-  }
+  overflow: hidden !important;
+}
 
-  .regular-ckd-print-container {
-    width: 194mm !important;
-    height: 291mm !important;
-    padding: 0 !important;
-    margin: 0 auto !important;
-    display: grid !important;
-    grid-template-rows: 142.5mm 142.5mm !important;
-    align-items: stretch !important;
-    position: relative !important;
-    background: #ffffff !important;
-  }
+/* TOP COPY */
+.regular-ckd-print-container
+  .regular-print-copy:first-child,
+.regular-ckd-print-container
+  .ckd-print-copy:first-child {
+  margin-bottom: 3mm !important;
+}
 
-  .regular-ckd-print-container .regular-print-copy,
-  .regular-ckd-print-container .ckd-print-copy {
-    width: 194mm !important;
-    height: 142.5mm !important;
-    min-height: 142.5mm !important;
-    margin: 0 !important;
-    padding: 5mm 4mm 3mm !important;
-    box-sizing: border-box !important;
-    overflow: hidden !important;
-  }
+/* CUT LINE */
+.regular-ckd-print-container .cut-line {
+  position: relative !important;
 
-  .regular-ckd-print-container .cut-line {
-    position: absolute !important;
-    top: 51.5% !important;
-    left: 0 !important;
-    right: 0 !important;
-    transform: translateY(-50%) !important;
-    margin: 0 !important;
-    height: 0 !important;
-    z-index: 5 !important;
-  }
+  width: 100% !important;
 
-  .regular-ckd-print-container .cut-line span {
-    top: -2.1mm !important;
-  }
+  margin: 0 0 3mm 0 !important;
+
+  border-top: 1px dashed #000 !important;
+
+  height: 0 !important;
+}
+
+.regular-ckd-print-container .cut-line span {
+  position: absolute !important;
+
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+
+  top: -7px !important;
+
+  background: #fff !important;
+
+  padding: 0 8px !important;
+
+  font-size: 8px !important;
+}
+
+/* DETAILS SECTION */
+.regular-print-copy .grid,
+.ckd-print-copy .grid {
+  margin-top: 2mm !important;
+}
+
+/* TABLE */
+.regular-print-copy table,
+.ckd-print-copy table {
+  margin-top: 2mm !important;
+  font-size: 9px !important;
+}
+
+.regular-print-copy th,
+.regular-print-copy td,
+.ckd-print-copy th,
+.ckd-print-copy td {
+  padding: 1.5mm !important;
+}
+
+/* REMARKS */
+.regular-print-copy .remarks-box,
+.ckd-print-copy .remarks-box {
+  min-height: 8mm !important;
+  margin-top: 2mm !important;
+}
+
+/* FOOTER */
+.generated-note {
+  margin-top: auto !important;
+  padding-top: 2mm !important;
+}
 
   .visitor-print-page {
     width: 194mm !important;

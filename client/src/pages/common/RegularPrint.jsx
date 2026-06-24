@@ -197,7 +197,7 @@ function RegularPrint({ request }) {
 
       {renderCopy("SECURITY COPY - 1", true)}
 
-      <div className="cut-line border-t-2 border-dotted border-black my-6 relative">
+      <div className="cut-line ">
         <span className="absolute left-1/2 -translate-x-1/2 -top-3 bg-white px-3 text-xs font-semibold">
           Cut here
         </span>
