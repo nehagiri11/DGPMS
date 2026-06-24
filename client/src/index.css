@@ -460,14 +460,11 @@
 
 .visitor-card-details p {
   font-size: 8px !important;
-  line-height: 1.1 !important;
-  margin-bottom: 0.5mm !important;
+  line-height: 1.12 !important;
+  margin-bottom: 1mm !important;
   white-space: nowrap !important;
 }
 
-.visitor-card-sign {
-  font-size: 7px !important;
-}
 .visitor-card-qr {
   top: 2mm !important;
   right: 1.5mm !important;
@@ -479,21 +476,23 @@
 }
 .visitor-card-body {
   min-height: 35mm !important;
+   padding-bottom: 12mm !important;
 }
 .visitor-card-footer {
-  position: absolute;
-  left: 8px;
-  right: 8px;
-  bottom: 2px;
-
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
+  left: 1.5mm !important;
+  right: 1.5mm !important;
+  bottom: -4mm !important;
 }
+
 .visitor-card-brandmark {
-  transform: none !important;
+  width: 18mm !important;
+  height: 6mm !important;
+  margin-top: 2mm !important;
 }
 
+.visitor-card-sign {
+  font-size: 6px !important;
+}
   .visitor-record-sheet {
     width: 194mm !important;
     min-height: 291mm !important;
