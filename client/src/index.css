@@ -460,6 +460,7 @@
 
 .visitor-card-details p {
   font-size: 9px !important;
+
   line-height: 1.12 !important;
   margin-bottom: 1mm !important;
   white-space: nowrap !important;
@@ -491,7 +492,8 @@
 }
 
 .visitor-card-sign {
-  font-size: 6px !important;
+  font-size: 7px !important;
+  margin-bottom: -2mm !important;
 }
   .visitor-record-sheet {
     width: 194mm !important;
