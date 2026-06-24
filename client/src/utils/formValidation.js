@@ -40,20 +40,9 @@ export const isValidPhoneNumber = (
 
 };
 
-export const isPositiveQuantity = (
+export const hasQuantityValue = (
   value
-) => {
-
-  const quantity =
-    Number(value);
-
-  return (
-    requiredText(value) &&
-    Number.isFinite(quantity) &&
-    quantity > 0
-  );
-
-};
+) => requiredText(value);
 
 export const getItemValidationErrors = (
   items
@@ -101,13 +90,13 @@ export const getItemValidationErrors = (
       }
 
       if (
-        !isPositiveQuantity(
+        !hasQuantityValue(
           item.quantity
         )
       ) {
 
         errors.push(
-          `Item ${rowNumber}: quantity must be greater than 0.`
+          `Item ${rowNumber}: quantity is required.`
         );
 
       }

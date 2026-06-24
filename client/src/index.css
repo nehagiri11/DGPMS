@@ -95,17 +95,17 @@
 .visitor-card-body {
   position: relative;
   min-height: 202px;
-  padding: 9px 12px 12px;
+  padding: 10px 12px 12px;
 }
 
 .visitor-card-details {
-  padding-right: 88px;
+  padding-right: 92px;
 }
 
 .visitor-card-details p {
-  margin: 0 0 6px;
-  font-size: 13px;
-  line-height: 1.2;
+  margin: 0 0 7px;
+  font-size: 15px;
+  line-height: 1.22;
 }
 
 .visitor-card-details strong {
@@ -128,7 +128,7 @@
 .visitor-card-footer {
   position: absolute;
   right: 12px;
-  bottom: 9px;
+  bottom: 4px;
   left: 12px;
   display: flex;
   align-items: flex-end;
@@ -140,7 +140,7 @@
   width: 96px;
   height: 35px;
   object-fit: contain;
-  transform: translateY(8px);
+  transform: translateY(10px);
 }
 
 .visitor-card-sign {
@@ -184,7 +184,7 @@
 @media print {
   @page {
     size: A4 portrait;
-    margin: 2mm;
+    margin: 3mm 2mm;
   }
 
   html,
@@ -295,62 +295,62 @@
   width: 194mm !important;
   height: 291mm !important;
   margin: 0 auto !important;
+  padding: 0 !important;
 
   display: flex !important;
   flex-direction: column !important;
 
   background: #fff !important;
+  --regular-ckd-cut-height: 5mm;
+  --regular-ckd-copy-height: calc((291mm - var(--regular-ckd-cut-height)) / 2);
 }
 
 .regular-print-copy,
 .ckd-print-copy {
   width: 194mm !important;
 
-  height: 143mm !important;
-  min-height: 143mm !important;
+  height: var(--regular-ckd-copy-height) !important;
+  min-height: var(--regular-ckd-copy-height) !important;
+  flex: 0 0 var(--regular-ckd-copy-height) !important;
 
   border: 0.5mm solid #000 !important;
 
-  padding: 5mm !important;
+  padding: 5mm 4mm 3mm !important;
   box-sizing: border-box !important;
 
   overflow: hidden !important;
 }
 
-/* TOP COPY */
-.regular-ckd-print-container
-  .regular-print-copy:first-child,
-.regular-ckd-print-container
-  .ckd-print-copy:first-child {
-  margin-bottom: 3mm !important;
-}
-
 /* CUT LINE */
-.regular-ckd-print-container .cut-line {
+.regular-ckd-print-container .regular-ckd-cut-line {
   position: relative !important;
 
   width: 100% !important;
 
-  margin: 0 0 3mm 0 !important;
+  margin: 0 !important;
 
-  border-top: 1px dashed #000 !important;
+  border-top: 0.45mm dotted #000 !important;
 
-  height: 0 !important;
+  height: var(--regular-ckd-cut-height) !important;
+  flex: 0 0 var(--regular-ckd-cut-height) !important;
+  box-sizing: border-box !important;
 }
 
-.regular-ckd-print-container .cut-line span {
+.regular-ckd-print-container .regular-ckd-cut-line span {
   position: absolute !important;
 
   left: 50% !important;
   transform: translateX(-50%) !important;
 
-  top: -7px !important;
+  top: -2.1mm !important;
 
   background: #fff !important;
 
-  padding: 0 8px !important;
+  padding: 0 2.5mm !important;
 
   font-size: 8px !important;
+  line-height: 1 !important;
+  color: #000 !important;
 }
 
 /* DETAILS SECTION */
@@ -401,9 +401,11 @@
     flex-wrap: wrap !important;
     align-content: flex-start !important;
     gap: 5mm !important;
-    margin: 0 !important;
+    margin: 0 auto !important;
+    padding-top: 6mm !important;
     break-after: page;
     page-break-after: always;
+    box-sizing: border-box !important;
   }
 
   .visitor-pass-card {
@@ -437,17 +439,17 @@
 
   .visitor-card-body {
     min-height: 35mm !important;
-    padding: 1.6mm 2mm 2mm !important;
+    padding: 1.8mm 2mm 1.6mm !important;
   }
 
   .visitor-card-details {
-    padding-right: 16mm !important;
+    padding-right: 17mm !important;
   }
 
   .visitor-card-details p {
-    margin-bottom: 0.9mm !important;
-    font-size: 5.8px !important;
-    line-height: 1.12 !important;
+    margin-bottom: 1mm !important;
+    font-size: 6.6px !important;
+    line-height: 1.14 !important;
   }
 
   .visitor-card-dates {
@@ -467,14 +469,14 @@
 
   .visitor-card-footer {
     right: 2mm !important;
-    bottom: 1.8mm !important;
+    bottom: 0.8mm !important;
     left: 2mm !important;
   }
 
   .visitor-card-brandmark {
     width: 18mm !important;
     height: 6.5mm !important;
-    transform: translateY(2mm) !important;
+    transform: translateY(2.8mm) !important;
   }
 
   .visitor-card-sign {

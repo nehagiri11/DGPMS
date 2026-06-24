@@ -1,5 +1,8 @@
 import { QRCodeCanvas } from "qrcode.react";
 
+const visitorBadgeLogoSrc =
+  "/visitor-bagde-logo.jpeg";
+
 function VisitorPrint({ request }) {
   const visitors =
     request.visitors?.length > 0
@@ -102,8 +105,8 @@ function VisitorPrint({ request }) {
         <div className="visitor-card-footer">
           <img
             className="visitor-card-brandmark"
-            src="/visitor-badge-logo.svg"
-            alt="Hyundai and Laxmi Group"
+            src={visitorBadgeLogoSrc}
+            alt="Visitor badge logo"
           />
 
           <div className="visitor-card-sign">

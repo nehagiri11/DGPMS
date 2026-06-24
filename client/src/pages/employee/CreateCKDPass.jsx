@@ -472,9 +472,8 @@ try {
 />
 
                  <input
-  type="number"
-  min="1"
-  placeholder="Quantity"
+  type="text"
+  placeholder="Quantity / Unit (e.g. 10 pcs)"
   value={item.quantity}
   onChange={(e) => {
     const updated = [...items];

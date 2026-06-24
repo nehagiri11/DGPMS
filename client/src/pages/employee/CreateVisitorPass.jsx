@@ -207,10 +207,8 @@ const [fieldErrors, setFieldErrors] =
         nextFieldErrors[`visitor_${index}_company`] = "Company or organization is required.";
       }
 
-      if (!requiredText(visitor.email)) {
-        errors.push(`Visitor ${rowNumber}: email address is required.`);
-        nextFieldErrors[`visitor_${index}_email`] = "Email address is required.";
-      } else if (
+      if (
+        requiredText(visitor.email) &&
         !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
           visitor.email.trim()
         )
@@ -219,10 +217,8 @@ const [fieldErrors, setFieldErrors] =
         nextFieldErrors[`visitor_${index}_email`] = "Enter a valid email address.";
       }
 
-      if (!requiredText(visitor.contact)) {
-        errors.push(`Visitor ${rowNumber}: contact number is required.`);
-        nextFieldErrors[`visitor_${index}_contact`] = "Contact number is required.";
-      } else if (
+      if (
+        requiredText(visitor.contact) &&
         !isValidPhoneNumber(
           visitor.contact
         )
@@ -450,7 +446,7 @@ try {
                  <div>
                    <input
   type="email"
-  placeholder="Email Address"
+  placeholder="Email Address (optional)"
   value={visitor.email}
   onChange={(e) =>
     updateVisitor(
@@ -471,7 +467,7 @@ try {
                   <div>
                     <input
   type="tel"
-  placeholder="Contact Number"
+  placeholder="Contact Number (optional)"
   value={visitor.contact}
   onChange={(e) =>
     updateVisitor(

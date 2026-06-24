@@ -34,7 +34,7 @@ function CKDPrint({ request }) {
   );
 
   const renderCopy = (copyTitle, showSecurityFields) => (
-    <section className="copy-section ckd-print-copy border-2 border-black flex flex-col p-4 pt-8">
+    <section className="copy-section ckd-print-copy border-2 border-black flex flex-col">
       <div className="relative border-b border-black pb-5">
         <div className="absolute right-2 -top-2 bg-white p-1">
           <QRCodeCanvas
@@ -180,7 +180,7 @@ function CKDPrint({ request }) {
   );
 
   return (
-    <div className="print-container regular-ckd-print-container p-4 pt-10 bg-white">
+    <div className="print-container regular-ckd-print-container bg-white">
       <button
         onClick={() => window.print()}
         className="
@@ -198,7 +198,7 @@ function CKDPrint({ request }) {
 
       {renderCopy("SECURITY COPY - 1", true)}
 
-      <div className="cut-line border-t-2 border-dotted border-black my-10 relative">
+      <div className="regular-ckd-cut-line">
         <span className="absolute left-1/2 -translate-x-1/2 -top-3 bg-white px-3 text-xs font-semibold">
           Cut here
         </span>

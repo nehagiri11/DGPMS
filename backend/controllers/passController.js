@@ -378,16 +378,9 @@ function isValidPhoneNumber(value) {
 
 }
 
-function isPositiveQuantity(value) {
+function hasQuantityValue(value) {
 
-  const quantity =
-    Number(value);
-
-  return (
-    requiredText(value) &&
-    Number.isFinite(quantity) &&
-    quantity > 0
-  );
+  return requiredText(value);
 
 }
 
@@ -464,13 +457,13 @@ function getItemValidationErrors(
       }
 
       if (
-        !isPositiveQuantity(
+        !hasQuantityValue(
           item.quantity
         )
       ) {
 
         errors.push(
-          `Item ${rowNumber}: quantity must be greater than 0`
+          `Item ${rowNumber}: quantity is required`
         );
 
       }
@@ -831,9 +824,8 @@ function validateVisitorPass(body) {
           errors.push(`Visitor ${rowNumber}: company is required`);
         }
 
-        if (!requiredText(visitor.email)) {
-          errors.push(`Visitor ${rowNumber}: email is required`);
-        } else if (
+        if (
+          requiredText(visitor.email) &&
           !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
             visitor.email.trim()
           )
@@ -841,9 +833,8 @@ function validateVisitorPass(body) {
           errors.push(`Visitor ${rowNumber}: valid email is required`);
         }
 
-        if (!requiredText(visitor.contact)) {
-          errors.push(`Visitor ${rowNumber}: contact number is required`);
-        } else if (
+        if (
+          requiredText(visitor.contact) &&
           !isValidPhoneNumber(
             visitor.contact
           )
@@ -2849,6 +2840,20 @@ async (req, res) => {
   formatPass(
     passes[0]
   );
+
+    if (
+      !canReadPass(
+        req.user,
+        pass
+      )
+    ) {
+
+      return res.status(403).json({
+        success: false,
+        message: "Access denied"
+      });
+
+    }
 
     if (
       pass.type ===
