@@ -305,7 +305,7 @@ function VisitorPrint({ request }) {
           "visitor-record-pass"
         )}
 
-        <div className="visitor-record-cut-line cut-line border-t-2 border-dotted border-black my-4 relative">
+        <div className="visitor-record-cut-line">
           <span className="absolute left-1/2 -translate-x-1/2 -top-3 bg-white px-3 text-xs font-semibold">
             Cut here
           </span>
