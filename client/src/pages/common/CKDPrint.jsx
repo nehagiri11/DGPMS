@@ -34,7 +34,7 @@ function CKDPrint({ request }) {
   );
 
   const renderCopy = (copyTitle, showSecurityFields) => (
-    <section className="copy-section ckd-print-copy border-2 border-black flex flex-col p-4">
+    <section className="copy-section ckd-print-copy border-2 border-black flex flex-col p-4 pt-8">
       <div className="relative border-b border-black pb-5">
         <div className="absolute right-2 -top-2 bg-white p-1">
           <QRCodeCanvas

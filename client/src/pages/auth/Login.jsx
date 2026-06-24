@@ -3,7 +3,10 @@ import {
   useRef,
   useState
 } from "react";
-import { useNavigate } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate
+} from "react-router-dom";
 import axios from "axios";
 import { useToast } from "../../components/ToastProvider";
 
@@ -74,6 +77,7 @@ const loadGoogleIdentityScript = () =>
 function Login() {
   
   const navigate = useNavigate();
+  const location = useLocation();
   const showToast =
     useToast();
   const [activeTab, setActiveTab] =
@@ -118,6 +122,30 @@ function Login() {
   const [department, setDepartment] =
     useState("");
 
+const requestedRedirectPath =
+  new URLSearchParams(
+    location.search
+  ).get("redirect") ||
+  location.state?.from ||
+  "";
+
+const getSafeRedirectPath = () => {
+
+  if (
+    !requestedRedirectPath ||
+    !requestedRedirectPath.startsWith("/") ||
+    requestedRedirectPath.startsWith("//")
+  ) {
+    return "";
+  }
+
+  return requestedRedirectPath;
+
+};
+
+const safeRedirectPath =
+  getSafeRedirectPath();
+
 const handleAuthenticatedUser = (user, token) => {
 
   localStorage.setItem(
@@ -136,6 +164,16 @@ const handleAuthenticatedUser = (user, token) => {
   );
 
   setError("");
+
+  if (safeRedirectPath) {
+    navigate(
+      safeRedirectPath,
+      {
+        replace: true
+      }
+    );
+    return;
+  }
 
   if (
     user.role === "REQUESTER"
@@ -559,6 +597,12 @@ const handleLogin = async (e) => {
         <p className="text-slate-500 mt-2">
           Sign in to continue to DGPMS
         </p>
+
+        {safeRedirectPath && (
+          <p className="mx-auto mt-4 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-800">
+            Sign in with your registered email to verify your account and open this pass.
+          </p>
+        )}
 
       
         </div>

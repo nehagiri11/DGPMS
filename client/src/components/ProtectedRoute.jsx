@@ -1,4 +1,7 @@
-import { Navigate } from "react-router-dom";
+import {
+  Navigate,
+  useLocation
+} from "react-router-dom";
 
 const dashboardByRole = {
   ADMIN: "/admin/dashboard",
@@ -34,6 +37,9 @@ function ProtectedRoute({
   allowedRoles = []
 }) {
 
+  const location =
+    useLocation();
+
   const token =
     localStorage.getItem("token");
 
@@ -46,6 +52,10 @@ function ProtectedRoute({
       <Navigate
         to="/"
         replace
+        state={{
+          from:
+            `${location.pathname}${location.search}${location.hash}`
+        }}
       />
     );
 

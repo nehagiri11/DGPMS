@@ -515,6 +515,35 @@ async function runSideEffect(
 
 }
 
+function getFrontendUrl() {
+
+  return String(
+    process.env.FRONTEND_URL ||
+    process.env.CLIENT_URL ||
+    "https://dgpms.vercel.app"
+  ).replace(/\/$/, "");
+
+}
+
+function getPassLink(
+  passNo,
+  audience = "employee"
+) {
+
+  const encodedPassNo =
+    encodeURIComponent(passNo);
+
+  const passPath =
+    audience === "approver"
+      ? `/approver/request-details/${encodedPassNo}`
+      : audience === "admin"
+      ? `/admin/pass-details/${encodedPassNo}`
+      : `/employee/request-details/${encodedPassNo}`;
+
+  return `${getFrontendUrl()}/?redirect=${encodeURIComponent(passPath)}`;
+
+}
+
 async function notifyApprovers(
   title,
   message,
@@ -580,6 +609,12 @@ async function emailApprovers(
         approversEmails.length
       );
 
+      const passLink =
+        getPassLink(
+          passNo,
+          "approver"
+        );
+
       for (
         const approver
         of approversEmails
@@ -599,6 +634,16 @@ async function emailApprovers(
                 <p><b>Pass Number:</b> ${passNo}</p>
 
                 <p>Please login to approve or reject it.</p>
+
+                <p>
+                  <a href="${passLink}" style="display:inline-block;background:#1d4ed8;color:#ffffff;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:700;">
+                    Open Pass
+                  </a>
+                </p>
+
+                <p>If the button does not work, copy this link:<br />
+                  <a href="${passLink}">${passLink}</a>
+                </p>
               `
             );
 
@@ -653,11 +698,15 @@ async function notifyPassRequester(
             u.user_id,
             u.email,
             u.full_name,
+            r.role_name,
             gp.pass_no
           FROM gate_passes gp
           JOIN users u
             ON gp.requester_id =
                u.user_id
+          JOIN roles r
+            ON u.role_id =
+               r.role_id
           WHERE gp.pass_id = ?
           `,
           [passId]
@@ -692,11 +741,19 @@ async function notifyPassRequester(
       );
 
       const result =
-        await sendEmail(
+      await sendEmail(
           requester[0].email,
           emailSubject,
           emailBody(
-            requester[0]
+            requester[0],
+            getPassLink(
+              requester[0].pass_no,
+              requester[0].role_name === "APPROVER"
+                ? "approver"
+                : requester[0].role_name === "ADMIN"
+                ? "admin"
+                : "employee"
+            )
           )
         );
 
@@ -2144,7 +2201,7 @@ async (req, res) => {
         `${number} has been approved`,
       "PASS_APPROVED",
       "Gate Pass Approved",
-      (requester) => `
+      (requester, passLink) => `
         <h2>DGPMS Notification</h2>
 
         <p>Hello ${requester.full_name},</p>
@@ -2153,6 +2210,16 @@ async (req, res) => {
 
         <p><b>Pass Number:</b>
         ${requester.pass_no}</p>
+
+        <p>
+          <a href="${passLink}" style="display:inline-block;background:#16a34a;color:#ffffff;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:700;">
+            Open Approved Pass
+          </a>
+        </p>
+
+        <p>If the button does not work, copy this link:<br />
+          <a href="${passLink}">${passLink}</a>
+        </p>
       `
     );
 
@@ -2241,7 +2308,7 @@ async (req, res) => {
         `${number} has been rejected`,
       "PASS_REJECTED",
       "Gate Pass Rejected",
-      (requester) => `
+      (requester, passLink) => `
         <h2>DGPMS Notification</h2>
 
         <p>Hello ${requester.full_name},</p>
@@ -2253,6 +2320,16 @@ async (req, res) => {
 
         <p><b>Remarks:</b>
         ${remarks || "No remarks"}</p>
+
+        <p>
+          <a href="${passLink}" style="display:inline-block;background:#dc2626;color:#ffffff;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:700;">
+            Open Rejected Pass
+          </a>
+        </p>
+
+        <p>If the button does not work, copy this link:<br />
+          <a href="${passLink}">${passLink}</a>
+        </p>
       `
     );
 
