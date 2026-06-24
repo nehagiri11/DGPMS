@@ -438,40 +438,49 @@
   }
 
   .visitor-card-photo {
-  width: 18mm !important;
-  height: 22mm !important;
+  width: 22mm !important;
+  height: 28mm !important;
  } 
 
  /* VISITOR BADGE TEXT */
 
 .visitor-card-company {
-  font-size: 4.8px !important;
+  font-size: 8px !important;
   line-height: 1.05 !important;
   padding: 1mm !important;
 }
 
 .visitor-card-title {
-  font-size: 6px !important;
+  font-size: 9px !important;
   padding: 1.5mm 1mm !important;
 }
 
 .visitor-card-details p {
-  font-size: 5.2px !important;
+  font-size: 10px !important;
   line-height: 1.15 !important;
   margin-bottom: 0.7mm !important;
 }
 
 .visitor-card-sign {
-  font-size: 5px !important;
+  font-size: 7px !important;
 }
 .visitor-card-qr {
-  top: 1.5mm !important;
+  top: 2mm !important;
   right: 1.5mm !important;
 }
 
 .visitor-card-qr canvas {
   width: 12mm !important;
   height: 12mm !important;
+}
+.visitor-card-body {
+  min-height: 35mm !important;
+}
+.visitor-card-footer {
+  bottom: 1.5mm !important;
+}
+.visitor-card-brandmark {
+  transform: none !important;
 }
 
   .visitor-record-sheet {
