@@ -459,7 +459,7 @@
 }
 
 .visitor-card-details p {
-  font-size: 7.5px !important;
+  font-size: 8px !important;
   line-height: 1.1 !important;
   margin-bottom: 0.5mm !important;
   white-space: nowrap !important;
@@ -481,7 +481,14 @@
   min-height: 35mm !important;
 }
 .visitor-card-footer {
-  bottom: 1mm !important;
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 2px;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
 }
 .visitor-card-brandmark {
   transform: none !important;
