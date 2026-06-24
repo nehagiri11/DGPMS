@@ -186,6 +186,29 @@ async (req, res) => {
 
     const { id } =
       req.params;
+    const [existingUsers] = await db.query(
+  `
+  SELECT
+    u.full_name,
+    u.email,
+    u.approved,
+    r.role_name
+  FROM users u
+  JOIN roles r
+    ON u.role_id = r.role_id
+  WHERE u.user_id = ?
+  `,
+  [id]
+);
+
+if (existingUsers.length === 0) {
+  return res.status(404).json({
+    success: false,
+    message: "User not found"
+  });
+}
+
+const oldUser = existingUsers[0];
 
     const {
       full_name,
@@ -236,11 +259,63 @@ async (req, res) => {
 
     );
 
-    await writeAuditLog(
-      req.user?.userId,
-      "USER_UPDATED",
-      `User ${id} updated`
-    );
+   const changes = [];
+
+if (oldUser.full_name !== full_name) {
+  changes.push(
+    `name changed from "${oldUser.full_name}" to "${full_name}"`
+  );
+}
+
+if (oldUser.email !== email) {
+  changes.push(
+    `email changed from "${oldUser.email}" to "${email}"`
+  );
+}
+
+const [roleResult] = await db.query(
+  `
+  SELECT role_name
+  FROM roles
+  WHERE role_id = ?
+  `,
+  [resolvedRoleId]
+);
+
+const newRole =
+  roleResult[0]?.role_name;
+
+if (
+  oldUser.role_name !== newRole
+) {
+  changes.push(
+    `role changed from ${oldUser.role_name} to ${newRole}`
+  );
+}
+
+if (
+  approved !== undefined &&
+  Number(oldUser.approved) !== Number(approved)
+) {
+  changes.push(
+    `status changed from ${
+      oldUser.approved ? "ACTIVE" : "INACTIVE"
+    } to ${
+      approved ? "ACTIVE" : "INACTIVE"
+    }`
+  );
+}
+
+const details =
+  changes.length > 0
+    ? `User "${oldUser.full_name}" updated: ${changes.join(", ")}`
+    : `User "${oldUser.full_name}" updated`;
+
+await writeAuditLog(
+  req.user?.userId,
+  "USER_UPDATED",
+  details
+);
 
     res.json({
 
