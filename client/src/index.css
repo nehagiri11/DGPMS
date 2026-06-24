@@ -50,7 +50,7 @@
 .visitor-card-company {
   background: #2f5da8;
   color: #ffffff;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 800;
   line-height: 1.1;
   padding: 7px 4px 5px;
@@ -60,7 +60,7 @@
 .visitor-card-title {
   background: #ffffff;
   color: #111111;
-  font-size: 18px;
+  font-size: 20px;
   line-height: 1;
   padding: 10px 4px 8px;
   text-align: center;
@@ -104,7 +104,7 @@
 
 .visitor-card-details p {
   margin: 0 0 7px;
-  font-size: 15px;
+  font-size: 18px;
   line-height: 1.22;
 }
 
@@ -190,8 +190,8 @@
   html,
   body,
   #root {
-    width: 210mm;
-    min-height: 297mm;
+    width: auto;
+    min-height: 0;
     background: #ffffff !important;
   }
 
@@ -294,6 +294,7 @@
 .regular-ckd-print-container {
   width: 194mm !important;
   height: 291mm !important;
+  max-height: 291mm !important;
   margin: 0 auto !important;
   padding: 0 !important;
 
@@ -303,6 +304,8 @@
   background: #fff !important;
   --regular-ckd-cut-height: 5mm;
   --regular-ckd-copy-height: calc((291mm - var(--regular-ckd-cut-height)) / 2);
+  break-after: avoid !important;
+  page-break-after: avoid !important;
 }
 
 .regular-print-copy,
@@ -329,20 +332,30 @@
 
   margin: 0 !important;
 
-  border-top: 0.45mm dotted #000 !important;
+  border: 0 !important;
 
   height: var(--regular-ckd-cut-height) !important;
   flex: 0 0 var(--regular-ckd-cut-height) !important;
   box-sizing: border-box !important;
 }
 
+.regular-ckd-print-container .regular-ckd-cut-line::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: 50% !important;
+  border-top: 0.45mm dotted #000 !important;
+  transform: translateY(-50%) !important;
+}
+
 .regular-ckd-print-container .regular-ckd-cut-line span {
   position: absolute !important;
 
   left: 50% !important;
-  transform: translateX(-50%) !important;
+  transform: translate(-50%, -50%) !important;
 
-  top: -2.1mm !important;
+  top: 50% !important;
 
   background: #fff !important;
 

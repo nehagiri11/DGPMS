@@ -1,7 +1,7 @@
 import { QRCodeCanvas } from "qrcode.react";
 
 const visitorBadgeLogoSrc =
-  "/visitor-bagde-logo.jpeg";
+  "/visitor-bagde-logo.png";
 
 function VisitorPrint({ request }) {
   const visitors =
