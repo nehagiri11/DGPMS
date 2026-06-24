@@ -293,8 +293,8 @@
 
 .regular-ckd-print-container {
   width: 194mm !important;
-  height: 280mm !important;
-  max-height: 280mm !important;
+  height: 285mm !important;
+  max-height: 285mm !important;
   margin: 0 auto !important;
   padding: 0 !important;
 
@@ -303,7 +303,7 @@
 
   background: #fff !important;
   --regular-ckd-cut-height: 3mm;
-  --regular-ckd-copy-height: calc((280mm - var(--regular-ckd-cut-height)) / 2);
+  --regular-ckd-copy-height: calc((285mm - var(--regular-ckd-cut-height)) / 2);
   break-after: avoid !important;
   page-break-after: avoid !important;
 }
