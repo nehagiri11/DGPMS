@@ -16,6 +16,10 @@ import {
 } from "react-icons/fa";
 
 import { FcGoogle } from "react-icons/fc";
+import {
+  executeRecaptcha
+} from "../../utils/recaptcha";
+
 
 const ALLOWED_EMAIL_DOMAIN =
   "@laxmimotocorp.com";
@@ -369,19 +373,23 @@ const handleLogin = async (e) => {
     return;
   }
 
-  try {
+ try {
 
-    const response =
-      await axios.post(
+  const captchaToken =
+    await executeRecaptcha("login");
 
-        "/api/auth/login",
+  const response =
+    await axios.post(
 
-        {
-          email: normalizedEmail,
-          password
-        }
+      "/api/auth/login",
 
-      );
+      {
+        email: normalizedEmail,
+        password,
+        captchaToken
+      }
+
+    );
 
     const {
       token,
@@ -422,14 +430,15 @@ const handleLogin = async (e) => {
 
 }
 
-    if (
-      !name.trim() ||
-      !employeeId.trim() ||
-      !normalizedEmail ||
-      !password
-    ) {
+   if (
+!name.trim() ||
+!employeeId.trim() ||
+!department.trim() ||
+!normalizedEmail ||
+!password
+) {
       setError(
-        "Full name, employee ID, email and password are required."
+        "Full name, employee ID, department, email and password are required."
       );
       return;
     }
@@ -445,18 +454,21 @@ const handleLogin = async (e) => {
       return;
     }
 
-    try {
+   try {
 
-      await axios.post(
-        "/api/auth/register",
-        {
-          full_name: name.trim(),
-          employee_code: employeeId.trim(),
-          email: normalizedEmail,
-          password
-        }
-      );
+  const captchaToken =
+    await executeRecaptcha("register");
 
+ await axios.post(
+"/api/auth/register",
+{
+full_name: name.trim(),
+employee_code: employeeId.trim(),
+email: normalizedEmail,
+password,
+captchaToken
+}
+);
       setError("");
       setActiveTab("signin");
       showToast?.(
@@ -501,16 +513,20 @@ const handleLogin = async (e) => {
       return;
     }
 
-    try {
+   try {
 
-      setForgotSending(true);
+  setForgotSending(true);
 
-      await axios.post(
-        "/api/auth/forgot-password",
-        {
-          email: normalizedEmail
-        }
-      );
+  const captchaToken =
+    await executeRecaptcha("forgot_password");
+
+  await axios.post(
+    "/api/auth/forgot-password",
+    {
+      email: normalizedEmail,
+      captchaToken
+    }
+  );
 
       setError("");
       showToast?.(
@@ -881,10 +897,7 @@ const handleLogin = async (e) => {
                 }
                 className={`${inputClass} pr-12`}
               />
-              <p className="mt-2 text-xs text-slate-500">
-  Password must contain at least 8 characters, including an uppercase letter,
-  lowercase letter, number and special character.
-</p>
+            
 
               <button
                 type="button"
@@ -903,6 +916,10 @@ const handleLogin = async (e) => {
               </button>
 
             </div>
+            <p className="mt-2 text-xs text-slate-500">
+  Password must contain at least 8 characters, including an uppercase letter,
+  lowercase letter, number and special character.
+</p>
 
             <div className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-800">
               Manual signup requires an

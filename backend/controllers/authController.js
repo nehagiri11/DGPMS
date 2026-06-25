@@ -12,11 +12,14 @@ const EMAIL_REGEX =
   /^[A-Za-z0-9._%+-]+@laxmimotocorp\.com$/i;
 
 const isAllowedCompanyEmail = (email) =>
-  String(email || "")
-    .trim()
-    .toLowerCase()
-    .endsWith( EMAIL_REGEX);
 
+  EMAIL_REGEX.test(
+
+    String(email || "")
+      .trim()
+      .toLowerCase()
+
+  );
 const getGoogleClientId = () =>
   String(
     process.env.GOOGLE_CLIENT_ID ||
@@ -104,6 +107,7 @@ exports.register = async (req, res) => {
     const {
       full_name,
       employee_code,
+      department,
       password
     } = req.body;
 
@@ -123,7 +127,8 @@ exports.register = async (req, res) => {
       String(
         full_name || ""
       ).trim();
-
+  const normalizedDepartment =
+  String(department || "").trim();
     const errors = [];
 
     if (!normalizedFullName) {
@@ -139,6 +144,9 @@ exports.register = async (req, res) => {
     } else if (!EMAIL_REGEX.test(normalizedEmail)) {
       errors.push("Only company email addresses are allowed");
     }
+    if (!normalizedDepartment) {
+  errors.push("Department is required");
+}
 
    if (!password) {
 
@@ -216,6 +224,7 @@ else if (!PASSWORD_REGEX.test(password)) {
       (
         employee_code,
         full_name,
+        department,
         email,
         password_hash,
         role_id,
@@ -227,6 +236,7 @@ else if (!PASSWORD_REGEX.test(password)) {
       [
         normalizedEmployeeCode,
         normalizedFullName,
+        normalizedDepartment,
         normalizedEmail,
         passwordHash,
         roles[0].role_id
@@ -273,7 +283,7 @@ exports.login = async (req, res) => {
 
     }
 
-    if (!EMAIL_REGEX.test(normalizedEmail)) {
+    if (!isAllowedCompanyEmail(email)) {
 
       return res.status(400).json({
 
@@ -579,6 +589,7 @@ exports.profile = async (
 u.user_id,
 u.employee_code,
 u.full_name,
+u.department,
 u.email,
 u.created_at,
 r.role_name
@@ -871,14 +882,18 @@ exports.resetPassword = async (
 
     }
 
-    if (password.length < 6) {
+    if (!PASSWORD_REGEX.test(password)) {
 
-      return res.status(400).json({
-        success: false,
-        message: "Password must be at least 6 characters"
-      });
+    return res.status(400).json({
 
-    }
+        success:false,
+
+        message:
+        "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number and one special character."
+
+    });
+
+}
 
     const tokenHash =
       crypto
