@@ -26,6 +26,8 @@ const isAllowedCompanyEmail = (value) =>
 const GOOGLE_CLIENT_ID =
   import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
+const PASSWORD_REGEX =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&^#()_\-+=]).{8,}$/;
 const inputClass =
   "w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-[15px] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-700 focus:ring-4 focus:ring-blue-100";
 
@@ -410,6 +412,15 @@ const handleLogin = async (e) => {
 
     const normalizedEmail =
       email.trim().toLowerCase();
+    if (!PASSWORD_REGEX.test(password)) {
+
+  setError(
+    "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number and one special character."
+  );
+
+  return;
+
+}
 
     if (
       !name.trim() ||
@@ -870,6 +881,10 @@ const handleLogin = async (e) => {
                 }
                 className={`${inputClass} pr-12`}
               />
+              <p className="mt-2 text-xs text-slate-500">
+  Password must contain at least 8 characters, including an uppercase letter,
+  lowercase letter, number and special character.
+</p>
 
               <button
                 type="button"

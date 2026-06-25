@@ -6,15 +6,16 @@ const https = require("https");
 const {
   sendEmail
 } = require("../services/emailService");
-
-const ALLOWED_EMAIL_DOMAIN =
-  "@laxmimotocorp.com";
+const PASSWORD_REGEX =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&^#()_\-+=])[A-Za-z\d@$!%*?&^#()_\-+=]{8,}$/;
+const EMAIL_REGEX =
+  /^[A-Za-z0-9._%+-]+@laxmimotocorp\.com$/i;
 
 const isAllowedCompanyEmail = (email) =>
   String(email || "")
     .trim()
     .toLowerCase()
-    .endsWith(ALLOWED_EMAIL_DOMAIN);
+    .endsWith( EMAIL_REGEX);
 
 const getGoogleClientId = () =>
   String(
@@ -135,15 +136,22 @@ exports.register = async (req, res) => {
 
     if (!normalizedEmail) {
       errors.push("Company email is required");
-    } else if (
-      !isAllowedCompanyEmail(normalizedEmail)
-    ) {
+    } else if (!EMAIL_REGEX.test(normalizedEmail)) {
       errors.push("Only company email addresses are allowed");
     }
 
-    if (!password || password.length < 6) {
-      errors.push("Password must be at least 6 characters");
-    }
+   if (!password) {
+
+  errors.push("Password is required");
+
+}
+else if (!PASSWORD_REGEX.test(password)) {
+
+  errors.push(
+    "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number and one special character."
+  );
+
+}
 
     if (errors.length > 0) {
 
@@ -265,7 +273,7 @@ exports.login = async (req, res) => {
 
     }
 
-    if (!isAllowedCompanyEmail(email)) {
+    if (!EMAIL_REGEX.test(normalizedEmail)) {
 
       return res.status(400).json({
 
@@ -641,16 +649,18 @@ exports.changePassword = async (
 
     }
 
-    if (
-      newPassword.length < 6
-    ) {
+    if (!PASSWORD_REGEX.test(newPassword)) {
 
-      return res.status(400).json({
-        success: false,
-        message: "New password must be at least 6 characters"
-      });
+  return res.status(400).json({
 
-    }
+    success: false,
+
+    message:
+      "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number and one special character."
+
+  });
+
+}
 
     const [users] =
       await db.query(
