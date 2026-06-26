@@ -53,7 +53,9 @@ const formatDate = (value) => {
   return date.toLocaleDateString();
 };
 
+
 function Profile() {
+ 
   const showToast =
     useToast();
 
@@ -62,6 +64,16 @@ function Profile() {
 
   const [profile, setProfile] =
     useState(null);
+  const [editing, setEditing] = useState(false);
+
+const [editData, setEditData] = useState({
+  full_name: "",
+  employee_code: "",
+  department: ""
+});
+
+const [savingProfile, setSavingProfile] =
+  useState(false);
 
   const [passes, setPasses] =
     useState([]);
@@ -120,9 +132,15 @@ function Profile() {
             )
           ]);
 
-        setProfile(
-          profileRes.data.user
-        );
+       const user = profileRes.data.user;
+
+setProfile(user);
+
+setEditData({
+  full_name: user.full_name || "",
+  employee_code: user.employee_code || "",
+  department: user.department || ""
+});
 
         setPasses(
           (passRes.data.passes || []).map(
@@ -140,6 +158,92 @@ function Profile() {
 
     loadData();
   }, []);
+const handleImageUpload =
+async (event)=>{
+
+const file = event.target.files[0];
+
+if(!file) return;
+
+if(!file.type.startsWith("image/")){
+
+showToast("Only images allowed","error");
+
+return;
+
+}
+
+if(file.size > 5*1024*1024){
+
+showToast("Image must be below 5MB","error");
+
+return;
+
+}
+
+
+const formData =
+new FormData();
+
+formData.append(
+"image",
+file
+);
+
+const token =
+localStorage.getItem("token");
+
+const response =
+await axios.put(
+
+"/api/auth/profile-image",
+
+formData,
+
+{
+
+headers:{
+
+Authorization:
+`Bearer ${token}`,
+
+"Content-Type":
+"multipart/form-data"
+
+}
+
+}
+);
+
+
+setProfile(
+response.data.user
+);
+setEditData({
+
+full_name:response.data.user.full_name,
+
+employee_code:response.data.user.employee_code,
+
+department:response.data.user.department
+
+});
+
+localStorage.setItem(
+
+"user",
+
+JSON.stringify(
+response.data.user
+)
+
+);
+localStorage.setItem(
+"loggedInUser",
+JSON.stringify(response.data.user)
+);
+
+};  
 
   const metrics =
     useMemo(() => {
@@ -268,6 +372,72 @@ function Profile() {
       setSavingPassword(false);
     }
   };
+  const handleUpdateProfile = async (e) => {
+
+  e.preventDefault();
+
+  try {
+
+    setSavingProfile(true);
+
+    const token =
+      localStorage.getItem("token");
+
+    const response =
+      await axios.put(
+        "/api/auth/profile",
+        editData,
+        {
+          headers: {
+            Authorization:
+              `Bearer ${token}`
+          }
+        }
+      );
+
+    setProfile(response.data.user);
+    setEditData({
+  full_name: response.data.user.full_name || "",
+  employee_code: response.data.user.employee_code || "",
+  department: response.data.user.department || ""
+});
+
+    localStorage.setItem(
+      "user",
+      JSON.stringify(response.data.user)
+    );
+
+    localStorage.setItem(
+      "loggedInUser",
+      JSON.stringify(response.data.user)
+    );
+
+    setEditing(false);
+
+    showToast?.(
+      "Profile updated successfully.",
+      "success"
+    );
+
+  } catch (error) {
+
+    showToast?.(
+
+      error.response?.data?.message ||
+
+      "Unable to update profile.",
+
+      "error"
+
+    );
+
+  } finally {
+
+    setSavingProfile(false);
+
+  }
+
+};
 
   return (
     <div className="flex">
@@ -302,16 +472,113 @@ function Profile() {
                 <div className="overflow-hidden rounded-3xl border border-blue-200 bg-white shadow-sm">
                   <div className="bg-blue-900 p-6 text-white">
                     <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20">
-                      <FiUser size={42} />
+                    <label className="relative cursor-pointer group block h-20 w-20">
+
+{
+profile?.profile_image ?
+
+<img
+src={`${import.meta.env.VITE_API_BASE_URL}/uploads/profile/${profile.profile_image}`}
+alt="Profile"
+className="h-20 w-20 rounded-2xl object-cover"
+/>
+
+:
+
+<div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white/10">
+    <FiUser size={42}/>
+</div>
+
+}
+<div className="absolute inset-0 rounded-2xl bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-semibold">
+  Change Photo
+</div>
+
+<input
+type="file"
+accept="image/*"
+hidden
+onChange={handleImageUpload}
+/>
+
+</label>
                     </div>
 
-                    <h2 className="mt-5 text-2xl font-bold">
-                      {profile?.full_name || "User"}
-                    </h2>
+                    <div className="flex gap-3">
+  <FiUser className="mt-1 text-white" />
+
+  <div className="w-full">
+
+    <p className="text-xs text-white font-semibold uppercase tracking-wide text-slate-500">
+      Full Name
+    </p>
+
+    {editing ? (
+
+      <input
+        className={inputClass}
+        value={editData.full_name}
+        onChange={(e)=>
+          setEditData({
+            ...editData,
+            full_name:e.target.value
+          })
+        }
+      />
+
+    ) : (
+
+      <p className="font-semibold">
+        {profile?.full_name}
+      </p>
+
+    )}
+
+  </div>
+
+</div>
+
 
                     <p className="mt-1 text-sm text-blue-100">
                       {profile?.role_name || role}
                     </p>
+                    <div className="mt-6">
+
+<button
+
+onClick={() => {
+
+if(editing){
+
+setEditData({
+
+full_name: profile.full_name || "",
+
+employee_code: profile.employee_code || "",
+
+department: profile.department || ""
+
+});
+
+}
+
+setEditing(!editing);
+
+}}
+className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-blue-900"
+>
+
+{editing ?
+
+"Cancel"
+
+:
+
+"Edit Profile"}
+
+</button>
+
+</div>
                   </div>
 
                   <div className="space-y-4 p-6">
@@ -321,35 +588,127 @@ function Profile() {
                         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                           Employee Code
                         </p>
-                        <p className="font-semibold text-slate-900">
-                          {profile?.employee_code || "-"}
-                        </p>
-                      </div>
-                    </div>
+                       <div>
 
-                    <div className="flex gap-3">
-                      <FiMail className="mt-1 text-blue-700" />
-                      <div className="min-w-0">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                          Email
-                        </p>
-                        <p className="break-all font-semibold text-slate-900">
-                          {profile?.email || "-"}
-                        </p>
-                      </div>
-                    </div>
+{editing ?
 
-                    <div className="flex gap-3">
-                      <FiCalendar className="mt-1 text-blue-700" />
-                      <div>
-                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                          Joined
-                        </p>
-                        <p className="font-semibold text-slate-900">
-                          {formatDate(profile?.created_at)}
-                        </p>
+<input
+className={inputClass}
+value={editData.employee_code}
+onChange={(e)=>
+setEditData({
+...editData,
+employee_code:e.target.value
+})
+}
+/>
+
+:
+
+<p className="font-semibold">
+
+{profile?.employee_code}
+
+</p>
+
+}
+
+</div>
+
                       </div>
                     </div>
+                    <div className="flex gap-3">
+  <FiShield className="mt-1 text-blue-700" />
+
+  <div className="w-full">
+
+    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+      Department
+    </p>
+
+    {editing ? (
+
+      <input
+        className={inputClass}
+        value={editData.department}
+        onChange={(e)=>
+          setEditData({
+            ...editData,
+            department:e.target.value
+          })
+        }
+      />
+
+    ) : (
+
+      <p className="font-semibold">
+        {profile?.department || "-"}
+      </p>
+
+    )}
+
+  </div>
+
+</div>
+<div className="flex gap-3">
+
+  <FiMail className="mt-1 text-blue-700" />
+
+  <div>
+
+    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+      Email
+    </p>
+
+    <p className="font-semibold">
+      {profile?.email}
+    </p>
+
+  </div>
+
+</div>
+<div className="flex gap-3">
+
+  <FiCalendar className="mt-1 text-blue-700" />
+
+  <div>
+
+    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+      Joined
+    </p>
+
+    <p className="font-semibold">
+      {formatDate(profile?.created_at)}
+    </p>
+
+  </div>
+
+</div>
+                    {editing && (
+
+<button
+
+type="button"
+
+onClick={handleUpdateProfile}
+
+disabled={savingProfile}
+
+className="mt-6 w-full rounded-xl bg-blue-900 py-3 font-semibold text-white"
+
+>
+
+{savingProfile ?
+
+"Saving..."
+
+:
+
+"Save Changes"}
+
+</button>
+
+)}
                   </div>
                 </div>
 

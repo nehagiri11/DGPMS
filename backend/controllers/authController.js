@@ -218,37 +218,91 @@ else if (!PASSWORD_REGEX.test(password)) {
         10
       );
 
+   const [result] = await db.query(
+  `
+  INSERT INTO users
+  (
+    employee_code,
+    full_name,
+    department,
+    email,
+    password_hash,
+    role_id,
+    approved,
+    email_verified
+  )
+  VALUES
+  (?, ?, ?, ?, ?, ?, 0, 0)
+  `,
+  [
+    normalizedEmployeeCode,
+    normalizedFullName,
+    normalizedDepartment,
+    normalizedEmail,
+    passwordHash,
+    roles[0].role_id
+  ]
+);
+const verificationToken =
+  crypto.randomBytes(32).toString("hex");
+
+const tokenHash =
+  crypto
+    .createHash("sha256")
+    .update(verificationToken)
+    .digest("hex");
+
     await db.query(
-      `
-      INSERT INTO users
-      (
-        employee_code,
-        full_name,
-        department,
-        email,
-        password_hash,
-        role_id,
-        approved
-      )
-      VALUES
-      (?, ?, ?, ?, ?, 0)
-      `,
-      [
-        normalizedEmployeeCode,
-        normalizedFullName,
-        normalizedDepartment,
-        normalizedEmail,
-        passwordHash,
-        roles[0].role_id
-      ]
-    );
+  `
+  INSERT INTO email_verification_tokens
+  (
+      user_id,
+      token_hash,
+      expires_at
+  )
+  VALUES
+  (
+      ?,
+      ?,
+      DATE_ADD(NOW(), INTERVAL 24 HOUR)
+  )
+  `,
+  [
+    result.insertId,
+    tokenHash
+  ]
+);
+const frontendUrl =
+  process.env.FRONTEND_URL ||
+  process.env.CLIENT_URL;
 
-    res.status(201).json({
-      success: true,
-      message: "Account created and waiting for admin approval"
-    });
+const verifyUrl =
+  `${frontendUrl}/verify-email/${verificationToken}`;
+await sendEmail(
+  normalizedEmail,
+  "Verify your DGPMS account",
+  `
+    <h2>Welcome to DGPMS</h2>
 
-  } catch (error) {
+    <p>Hello ${normalizedFullName},</p>
+
+    <p>Please verify your company email by clicking the link below.</p>
+
+    <p>
+      <a href="${verifyUrl}">
+        Verify Email
+      </a>
+    </p>
+
+    <p>This link expires in 24 hours.</p>
+  `
+);
+res.status(201).json({
+    success: true,
+    message:
+      "Account created. Please verify your email before admin approval."
+});
+} catch (error) {
 
     console.log(error);
 
@@ -333,6 +387,14 @@ exports.login = async (req, res) => {
       });
 
     }
+    if (!user.email_verified) {
+
+  return res.status(403).json({
+    success: false,
+    message: "Please verify your email before logging in."
+  });
+
+}
 
     const isMatch = await bcrypt.compare(
 
@@ -592,7 +654,10 @@ u.full_name,
 u.department,
 u.email,
 u.created_at,
-r.role_name
+r.role_name,
+u.email_verified,
+u.approved,
+u.profile_image
         FROM users u
         JOIN roles r
           ON u.role_id = r.role_id
@@ -963,6 +1028,211 @@ exports.resetPassword = async (
     res.status(500).json({
       success: false,
       message: "Unable to reset password"
+    });
+
+  }
+
+};
+
+exports.verifyEmail = async (req, res) => {
+
+  try {
+
+    const { token } = req.params;
+
+    if (!token) {
+
+      return res.status(400).json({
+        success: false,
+        message: "Verification token is missing."
+      });
+
+    }
+
+    const tokenHash = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+
+    const [tokens] = await db.query(
+      `
+      SELECT
+        verification_id,
+        user_id
+      FROM email_verification_tokens
+      WHERE token_hash = ?
+        AND used_at IS NULL
+        AND expires_at > NOW()
+      `,
+      [tokenHash]
+    );
+
+    if (tokens.length === 0) {
+
+      return res.status(400).json({
+        success: false,
+        message: "Verification link is invalid or expired."
+      });
+
+    }
+
+    await db.query(
+      `
+      UPDATE users
+      SET email_verified = 1
+      WHERE user_id = ?
+      `,
+      [tokens[0].user_id]
+    );
+
+    await db.query(
+      `
+      UPDATE email_verification_tokens
+      SET used_at = NOW()
+      WHERE verification_id = ?
+      `,
+      [tokens[0].verification_id]
+    );
+
+    res.json({
+      success: true,
+      message: "Email verified successfully."
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error"
+    });
+
+  }
+
+};
+exports.updateProfile = async (req, res) => {
+
+  try {
+
+    const {
+      full_name,
+      employee_code,
+      department
+    } = req.body;
+
+    const normalizedFullName =
+      String(full_name || "").trim();
+
+    const normalizedEmployeeCode =
+      String(employee_code || "").trim();
+
+    const normalizedDepartment =
+      String(department || "").trim();
+
+    const errors = [];
+
+    if (!normalizedFullName) {
+      errors.push("Full name is required");
+    }
+
+    if (!normalizedEmployeeCode) {
+      errors.push("Employee ID is required");
+    }
+
+    if (!normalizedDepartment) {
+      errors.push("Department is required");
+    }
+
+    if (errors.length > 0) {
+
+      return res.status(400).json({
+        success: false,
+        message: errors.join("; "),
+        errors
+      });
+
+    }
+
+    const [existing] = await db.query(
+      `
+      SELECT user_id
+      FROM users
+      WHERE employee_code = ?
+      AND user_id <> ?
+      `,
+      [
+        normalizedEmployeeCode,
+        req.user.userId
+      ]
+    );
+
+    if (existing.length > 0) {
+
+      return res.status(409).json({
+        success: false,
+        message: "Employee ID already exists."
+      });
+
+    }
+
+    await db.query(
+      `
+      UPDATE users
+      SET
+        full_name = ?,
+        employee_code = ?,
+        department = ?
+      WHERE user_id = ?
+      `,
+      [
+        normalizedFullName,
+        normalizedEmployeeCode,
+        normalizedDepartment,
+        req.user.userId
+      ]
+    );
+
+    const [users] = await db.query(
+      `
+      SELECT
+        u.user_id,
+        u.full_name,
+        u.employee_code,
+        u.department,
+        u.profile_image,
+        u.email,
+        u.email_verified,
+        u.approved,
+        r.role_name
+      FROM users u
+      JOIN roles r
+        ON u.role_id = r.role_id
+      WHERE u.user_id = ?
+      `,
+      [req.user.userId]
+    );
+
+    res.json({
+
+      success: true,
+
+      message: "Profile updated successfully.",
+
+      user: users[0]
+
+    });
+
+  } catch (error) {
+
+    console.log("UPDATE PROFILE ERROR:", error);
+
+    res.status(500).json({
+
+      success: false,
+
+      message: "Server Error"
+
     });
 
   }

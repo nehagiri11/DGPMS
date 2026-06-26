@@ -29,6 +29,7 @@ import ToastProvider from "./components/ToastProvider";
 import ApproverNotifications
 from "./pages/approver/NotificationCenterPage";
 import Profile from "./pages/common/Profile";
+import VerifyEmail from "./pages/auth/VerifyEmail";
 
 function App() {
   const protect = (
@@ -50,6 +51,10 @@ function App() {
         
 
         <Route path="/" element={<Login />} />
+        <Route
+  path="/verify-email/:token"
+  element={<VerifyEmail />}
+/>
 
         <Route
           path="/reset-password/:token"

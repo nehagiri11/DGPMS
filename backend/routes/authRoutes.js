@@ -28,14 +28,13 @@ const {
   "../services/emailService"
 );
 
-router.post(
-  "/register",
-  register
-);
+const verifyRecaptcha =
+require("../middleware/verifyRecaptcha");
 
 router.post(
-  "/login",
-  login
+  "/register",
+  verifyRecaptcha,
+  authController.register
 );
 
 router.post(
@@ -44,13 +43,26 @@ router.post(
 );
 
 router.post(
-  "/forgot-password",
-  forgotPassword
+"/login",
+verifyRecaptcha,
+authController.login
 );
 
 router.post(
-  "/reset-password",
-  resetPassword
+"/register",
+verifyRecaptcha,
+authController.register
+);
+
+router.post(
+"/forgot-password",
+verifyRecaptcha,
+authController.forgotPassword
+);
+router.post("/reset-password", verifyRecaptcha, authController.resetPassword);
+router.get(
+  "/verify-email/:token",
+  authController.verifyEmail
 );
 
 router.get("/test", (req, res) => {
@@ -64,6 +76,11 @@ router.get(
   "/profile",
   authMiddleware,
   profile
+);
+router.put(
+  "/profile",
+  authMiddleware,
+  authController.updateProfile
 );
 
 router.put(
