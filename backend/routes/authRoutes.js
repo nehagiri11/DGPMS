@@ -6,17 +6,7 @@ const router =
 express.Router();
 
 const authController = require("../controllers/authController");
-const {
-  register,
-  login,
-  googleAuth,
-  profile,
-  changePassword,
-  forgotPassword,
-  resetPassword
-} = require(
-  "../controllers/authController"
-);
+
 const authMiddleware =
 require(
   "../middleware/authMiddleware"
@@ -30,17 +20,20 @@ const {
 
 const verifyRecaptcha =
 require("../middleware/verifyRecaptcha");
+
 const uploadProfile =
 require("../middleware/uploadProfile");
+console.log(uploadProfile);
+console.log(typeof uploadProfile);
+
 router.post(
   "/register",
   verifyRecaptcha,
   authController.register
 );
-
 router.post(
   "/google",
-  googleAuth
+  authController.googleAuth
 );
 
 router.post(
@@ -49,11 +42,7 @@ verifyRecaptcha,
 authController.login
 );
 
-router.post(
-"/register",
-verifyRecaptcha,
-authController.register
-);
+
 
 router.post(
 "/forgot-password",
@@ -76,7 +65,7 @@ router.get("/test", (req, res) => {
 router.get(
   "/profile",
   authMiddleware,
-  profile
+  authController.profile
 );
 router.put(
   "/profile",
@@ -87,7 +76,7 @@ router.put(
 router.put(
   "/change-password",
   authMiddleware,
-  changePassword
+  authController.changePassword
 );
 router.put(
 

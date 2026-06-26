@@ -1238,3 +1238,87 @@ exports.updateProfile = async (req, res) => {
   }
 
 };
+exports.uploadProfileImage =
+async (req, res) => {
+
+try {
+
+if (!req.file) {
+
+return res.status(400).json({
+
+success:false,
+
+message:"Please choose an image."
+
+});
+
+}
+
+const image =
+req.file.filename;
+
+await db.query(
+
+`
+UPDATE users
+SET profile_image=?
+WHERE user_id=?
+`,
+
+[
+image,
+req.user.userId
+]
+
+);
+
+const [users] =
+await db.query(
+
+`
+SELECT
+user_id,
+full_name,
+employee_code,
+department,
+email,
+role_id,
+profile_image
+FROM users
+WHERE user_id=?
+`,
+
+[
+req.user.userId
+]
+
+);
+
+res.json({
+
+success:true,
+
+message:"Profile picture updated.",
+
+user:users[0]
+
+});
+
+}
+
+catch(error){
+
+console.log(error);
+
+res.status(500).json({
+
+success:false,
+
+message:"Unable to upload image."
+
+});
+
+}
+
+};
