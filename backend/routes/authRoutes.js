@@ -23,8 +23,6 @@ require("../middleware/verifyRecaptcha");
 
 const uploadProfile =
 require("../middleware/uploadProfile");
-console.log(uploadProfile);
-console.log(typeof uploadProfile);
 
 router.post(
   "/register",

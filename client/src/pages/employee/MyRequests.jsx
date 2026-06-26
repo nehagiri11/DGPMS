@@ -32,11 +32,6 @@ const [requests, setRequests] =
   useState([]);
 const [loading, setLoading] =
   useState(true);
-  useEffect(() => {
-
-  loadRequests();
-
-}, []);
 const loadRequests = async () => {
 
   try {
@@ -84,6 +79,12 @@ const loadRequests = async () => {
   }
 
 };
+
+  useEffect(() => {
+
+  loadRequests();
+
+}, []);
 
 
   const [searchParams] =

@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 const db = require("./config/db");
 
 const authRoutes =
@@ -37,6 +38,15 @@ app.use(
   express.json({
     limit: "10mb"
   })
+);
+app.use(
+  "/uploads",
+  express.static(
+    path.join(
+      __dirname,
+      "uploads"
+    )
+  )
 );
 console.log("MY BACKEND IS RUNNING");
 app.use(

@@ -459,11 +459,12 @@ const handleLogin = async (e) => {
   const captchaToken =
     await executeRecaptcha("register");
 
- await axios.post(
+await axios.post(
 "/api/auth/register",
 {
 full_name: name.trim(),
 employee_code: employeeId.trim(),
+department: department.trim(),
 email: normalizedEmail,
 password,
 captchaToken
@@ -472,7 +473,7 @@ captchaToken
       setError("");
       setActiveTab("signin");
       showToast?.(
-        "Account created successfully.\nWaiting for Admin approval.",
+        "Account created. Please verify your email before admin approval.",
         "success"
       );
 
@@ -922,13 +923,13 @@ captchaToken
 </p>
 
             <div className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-800">
-              Manual signup requires an
+              Manual signup requires a verification link sent to your
               {" "}
               <span className="font-semibold">
                 @laxmimotocorp.com
               </span>
               {" "}
-              email. Google signup can use any Google account, but admin approval is required before login.
+              email. Google signup is verified by Google and only needs admin approval before login.
             </div>
 
             <button
@@ -999,4 +1000,3 @@ captchaToken
 }
 
 export default Login;
-

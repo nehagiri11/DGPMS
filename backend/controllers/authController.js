@@ -76,6 +76,26 @@ const verifyGoogleCredential = async (credential) => {
   return fetchJson(url);
 };
 
+const hasPendingManualEmailVerification = async (user) => {
+  if (Number(user.email_verified) !== 0) {
+    return false;
+  }
+
+  const [tokens] =
+    await db.query(
+      `
+      SELECT verification_id
+      FROM email_verification_tokens
+      WHERE user_id = ?
+        AND used_at IS NULL
+      LIMIT 1
+      `,
+      [user.user_id]
+    );
+
+  return tokens.length > 0;
+};
+
 const createLoginResponse = (user) => {
   const token = jwt.sign(
     {
@@ -387,7 +407,7 @@ exports.login = async (req, res) => {
       });
 
     }
-    if (!user.email_verified) {
+    if (await hasPendingManualEmailVerification(user)) {
 
   return res.status(403).json({
     success: false,
@@ -590,10 +610,11 @@ exports.googleAuth = async (req, res) => {
         email,
         password_hash,
         role_id,
-        approved
+        approved,
+        email_verified
       )
       VALUES
-      (?, ?, ?, ?, ?, 0)
+      (?, ?, ?, ?, ?, 0, 1)
       `,
       [
         null,

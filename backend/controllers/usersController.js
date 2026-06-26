@@ -36,6 +36,25 @@ async function getRoleId(
 
 }
 
+async function getUserDisplayName(
+  userId
+) {
+
+  const [users] =
+    await db.query(
+      `
+      SELECT full_name
+      FROM users
+      WHERE user_id = ?
+      `,
+      [userId]
+    );
+
+  return users[0]?.full_name ||
+    `User ${userId}`;
+
+}
+
 exports.getUsers =
 async (req, res) => {
 
@@ -135,10 +154,11 @@ async (req, res) => {
         email,
         password_hash,
         role_id,
-        approved
+        approved,
+        email_verified
       )
       VALUES
-      (?, ?, ?, ?, ?, ?)
+      (?, ?, ?, ?, ?, ?, 1)
       `,
 
       [
@@ -350,6 +370,9 @@ async (req, res) => {
     const { id } =
       req.params;
 
+    const deletedUserName =
+      await getUserDisplayName(id);
+
     await db.query(
 
       `
@@ -364,7 +387,7 @@ async (req, res) => {
     await writeAuditLog(
       req.user?.userId,
       "USER_DELETED",
-      `User ${id} deleted`
+      `User "${deletedUserName}" deleted`
     );
 
     res.json({
@@ -400,6 +423,9 @@ async (req, res) => {
     const { id } =
       req.params;
 
+    const approvedUserName =
+      await getUserDisplayName(id);
+
     await db.query(
 
       `
@@ -415,7 +441,7 @@ async (req, res) => {
     await writeAuditLog(
       req.user?.userId,
       "USER_APPROVED",
-      `User ${id} approved`
+      `User "${approvedUserName}" approved`
     );
 
     res.json({

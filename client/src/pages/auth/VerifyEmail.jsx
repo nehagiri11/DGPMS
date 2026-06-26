@@ -75,7 +75,7 @@ function VerifyEmail() {
             </p>
 
             <Link
-              to="/login"
+              to="/"
               className="mt-6 inline-block bg-blue-900 text-white px-6 py-3 rounded-lg"
             >
               Go to Login
@@ -97,7 +97,7 @@ function VerifyEmail() {
             </p>
 
             <Link
-              to="/login"
+              to="/"
               className="mt-6 inline-block bg-blue-900 text-white px-6 py-3 rounded-lg"
             >
               Back to Login

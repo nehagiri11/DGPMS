@@ -134,11 +134,5 @@ export const updateUser = (
 
   saveUsers(updated);
 
-  localStorage.setItem(
-    "users",
-    JSON.stringify(updatedUsers)
-  );
-
-
 };
 

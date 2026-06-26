@@ -3,6 +3,33 @@ require("../config/db");
 
 async function formatAuditDetails(log) {
 
+  const userIdActionMatch =
+    String(log.details || "").match(
+      /^User\s+"?(\d+)"?\s+(updated|approved|deleted)(.*)$/i
+    );
+
+  if (userIdActionMatch) {
+    const [users] =
+      await db.query(
+        `
+        SELECT full_name
+        FROM users
+        WHERE user_id = ?
+        `,
+        [userIdActionMatch[1]]
+      );
+
+    if (users[0]?.full_name) {
+      return {
+        ...log,
+        details:
+          `User "${users[0].full_name}" ` +
+          `${userIdActionMatch[2].toLowerCase()}` +
+          `${userIdActionMatch[3] || ""}`
+      };
+    }
+  }
+
   const createdMatch =
     String(log.details || "").match(
       /^(Visitor pass|Regular pass|CKD pass)\s+(.+?)\s+created$/i
