@@ -5,6 +5,7 @@ require("express");
 const router =
 express.Router();
 
+const authController = require("../controllers/authController");
 const {
   register,
   login,
@@ -16,12 +17,11 @@ const {
 } = require(
   "../controllers/authController"
 );
-
-
 const authMiddleware =
 require(
   "../middleware/authMiddleware"
 );
+
 const {
   sendEmail,
 } = require(
@@ -30,7 +30,8 @@ const {
 
 const verifyRecaptcha =
 require("../middleware/verifyRecaptcha");
-
+const uploadProfile =
+require("../middleware/uploadProfile");
 router.post(
   "/register",
   verifyRecaptcha,
@@ -87,6 +88,17 @@ router.put(
   "/change-password",
   authMiddleware,
   changePassword
+);
+router.put(
+
+"/profile-image",
+
+authMiddleware,
+
+uploadProfile.single("image"),
+
+authController.uploadProfileImage
+
 );
 router.get(
   "/test-email",
