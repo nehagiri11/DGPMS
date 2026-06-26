@@ -34,3 +34,21 @@ CREATE TABLE IF NOT EXISTS email_verification_tokens (
     REFERENCES users (user_id)
     ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+SET @email_verification_used_at_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'email_verification_tokens'
+    AND COLUMN_NAME = 'used_at'
+);
+
+SET @add_email_verification_used_at_sql = IF(
+  @email_verification_used_at_exists = 0,
+  'ALTER TABLE email_verification_tokens ADD COLUMN used_at DATETIME DEFAULT NULL',
+  'SELECT 1'
+);
+
+PREPARE add_email_verification_used_at_stmt FROM @add_email_verification_used_at_sql;
+EXECUTE add_email_verification_used_at_stmt;
+DEALLOCATE PREPARE add_email_verification_used_at_stmt;

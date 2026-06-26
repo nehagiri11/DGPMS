@@ -1465,14 +1465,13 @@ async (req, res) => {
       );
 
     }
-    if (
-  request.items &&
-  request.items.length > 5
+   if (
+  items &&
+  items.length > 5
 ) {
   return res.status(400).json({
     success: false,
-    message:
-      "Maximum 5 items allowed per pass"
+    message: "Maximum 5 items allowed per pass"
   });
 }
 
@@ -1620,13 +1619,12 @@ async (req, res) => {
 
     }
     if (
-  request.items &&
-  request.items.length > 5
+  items &&
+  items.length > 5
 ) {
   return res.status(400).json({
     success: false,
-    message:
-      "Maximum 5 items allowed per pass"
+    message: "Maximum 5 items allowed per pass"
   });
 }
 
@@ -1766,7 +1764,12 @@ async (req, res) => {
     const conditions = [];
     const params = [];
 
-    if (req.user.role === "REQUESTER") {
+    if (
+      [
+        "REQUESTER",
+        "EMPLOYEE"
+      ].includes(req.user.role)
+    ) {
 
       conditions.push(
         "gp.requester_id = ?"
@@ -1928,10 +1931,6 @@ ON latest_log.log_id = (
   passes.map(
     formatPass
   );
-console.log(
-  "FORMATTED PASSES:",
-  JSON.stringify(formattedPasses, null, 2)
-);
 res.json({
   
   success: true,
@@ -2125,15 +2124,17 @@ async (req, res) => {
     const { id } =
       req.params;
 
-    const {
-      approved_by,
-      remarks
-    } = req.body;
+    const { remarks } = req.body;
 
     const [passes] =
       await db.query(
         `
-        SELECT status, created_at
+        SELECT
+          status,
+          created_at,
+          gate_status,
+          pass_type,
+          departure_date
         FROM gate_passes
         WHERE pass_id = ?
         `,
@@ -2164,7 +2165,20 @@ async (req, res) => {
 
     }
 
-    await db.query(
+    if (
+      passes[0].status !==
+      "PENDING"
+    ) {
+
+      return res.status(400).json({
+        success: false,
+        message: "Only pending passes can be approved"
+      });
+
+    }
+
+    const [approveResult] =
+      await db.query(
 
       `
       UPDATE gate_passes
@@ -2180,17 +2194,28 @@ async (req, res) => {
       approver_remarks = ?
 
       WHERE pass_id = ?
+        AND status = 'PENDING'
 
       `,
 
       [
-        approved_by ||
-          req.user?.userId,
+        req.user?.userId,
         remarks,
         id
       ]
 
     );
+
+    if (
+      approveResult.affectedRows === 0
+    ) {
+
+      return res.status(409).json({
+        success: false,
+        message: "Pass status changed. Please refresh and try again."
+      });
+
+    }
     const [passRows] =
       await db.query(
         `
@@ -2271,15 +2296,48 @@ async (req, res) => {
 
   try {
 
+    await refreshPassLifecycleState();
+
     const { id } =
       req.params;
 
-    const {
-      rejected_by,
-      remarks
-    } = req.body;
+    const { remarks } = req.body;
 
-    await db.query(
+    const [passes] =
+      await db.query(
+        `
+        SELECT status
+        FROM gate_passes
+        WHERE pass_id = ?
+        `,
+        [id]
+      );
+
+    if (
+      passes.length === 0
+    ) {
+
+      return res.status(404).json({
+        success: false,
+        message: "Pass not found"
+      });
+
+    }
+
+    if (
+      passes[0].status !==
+      "PENDING"
+    ) {
+
+      return res.status(400).json({
+        success: false,
+        message: "Only pending passes can be rejected"
+      });
+
+    }
+
+    const [rejectResult] =
+      await db.query(
 
       `
       UPDATE gate_passes
@@ -2289,15 +2347,27 @@ async (req, res) => {
       approved_date = NOW(),
       approver_remarks = ?
       WHERE pass_id = ?
+        AND status = 'PENDING'
       `,
 
       [
-        rejected_by,
+        req.user?.userId,
         remarks,
         id
       ]
 
     );
+
+    if (
+      rejectResult.affectedRows === 0
+    ) {
+
+      return res.status(409).json({
+        success: false,
+        message: "Pass status changed. Please refresh and try again."
+      });
+
+    }
     const [passRows] =
       await db.query(
         `

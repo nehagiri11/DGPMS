@@ -87,7 +87,7 @@ const hasPendingManualEmailVerification = async (user) => {
       SELECT verification_id
       FROM email_verification_tokens
       WHERE user_id = ?
-        AND used_at IS NULL
+        AND expires_at > NOW()
       LIMIT 1
       `,
       [user.user_id]
@@ -397,17 +397,7 @@ exports.login = async (req, res) => {
 
     const user = users[0];
 
-    if (!user.approved) {
-
-      return res.status(403).json({
-
-        success: false,
-        message: "Your account is waiting for admin approval"
-
-      });
-
-    }
-    if (await hasPendingManualEmailVerification(user)) {
+if (Number(user.email_verified) !== 1) {
 
   return res.status(403).json({
     success: false,
@@ -416,12 +406,19 @@ exports.login = async (req, res) => {
 
 }
 
-    const isMatch = await bcrypt.compare(
+if (!user.approved) {
 
-      password,
-      user.password_hash
+  return res.status(403).json({
+    success: false,
+    message: "Your account is waiting for admin approval."
+  });
 
-    );
+}
+
+const isMatch = await bcrypt.compare(
+  password,
+  user.password_hash
+);
 
     if (!isMatch) {
 
@@ -1082,7 +1079,6 @@ exports.verifyEmail = async (req, res) => {
         user_id
       FROM email_verification_tokens
       WHERE token_hash = ?
-        AND used_at IS NULL
         AND expires_at > NOW()
       `,
       [tokenHash]
@@ -1108,8 +1104,7 @@ exports.verifyEmail = async (req, res) => {
 
     await db.query(
       `
-      UPDATE email_verification_tokens
-      SET used_at = NOW()
+      DELETE FROM email_verification_tokens
       WHERE verification_id = ?
       `,
       [tokens[0].verification_id]
