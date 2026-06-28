@@ -76,26 +76,6 @@ const verifyGoogleCredential = async (credential) => {
   return fetchJson(url);
 };
 
-const hasPendingManualEmailVerification = async (user) => {
-  if (Number(user.email_verified) !== 0) {
-    return false;
-  }
-
-  const [tokens] =
-    await db.query(
-      `
-      SELECT verification_id
-      FROM email_verification_tokens
-      WHERE user_id = ?
-        AND expires_at > NOW()
-      LIMIT 1
-      `,
-      [user.user_id]
-    );
-
-  return tokens.length > 0;
-};
-
 const createLoginResponse = (user) => {
   const token = jwt.sign(
     {
@@ -294,10 +274,11 @@ const tokenHash =
 );
 const frontendUrl =
   process.env.FRONTEND_URL ||
-  process.env.CLIENT_URL;
+  process.env.CLIENT_URL ||
+  `${req.protocol}://${req.get("host")}`;
 
 const verifyUrl =
-  `${frontendUrl}/verify-email/${verificationToken}`;
+  `${frontendUrl.replace(/\/$/, "")}/verify-email/${verificationToken}`;
 await sendEmail(
   normalizedEmail,
   "Verify your DGPMS account",
@@ -397,6 +378,22 @@ exports.login = async (req, res) => {
 
     const user = users[0];
 
+const isMatch = await bcrypt.compare(
+  password,
+  user.password_hash
+);
+
+    if (!isMatch) {
+
+      return res.status(401).json({
+
+        success: false,
+        message: "Invalid email or password"
+
+      });
+
+    }
+
 if (Number(user.email_verified) !== 1) {
 
   return res.status(403).json({
@@ -414,22 +411,6 @@ if (!user.approved) {
   });
 
 }
-
-const isMatch = await bcrypt.compare(
-  password,
-  user.password_hash
-);
-
-    if (!isMatch) {
-
-      return res.status(401).json({
-
-        success: false,
-        message: "Invalid email or password"
-
-      });
-
-    }
 
     res.json(
       createLoginResponse(user)
@@ -548,6 +529,15 @@ exports.googleAuth = async (req, res) => {
     if (users.length > 0) {
 
       const user = users[0];
+
+      if (Number(user.email_verified) !== 1) {
+
+        return res.status(403).json({
+          success: false,
+          message: "Please verify your email before logging in."
+        });
+
+      }
 
       if (!user.approved) {
 
@@ -1294,15 +1284,19 @@ await db.query(
 
 `
 SELECT
-user_id,
-full_name,
-employee_code,
-department,
-email,
-role_id,
-profile_image
-FROM users
-WHERE user_id=?
+u.user_id,
+u.full_name,
+u.employee_code,
+u.department,
+u.email,
+u.email_verified,
+u.approved,
+u.profile_image,
+r.role_name
+FROM users u
+JOIN roles r
+ON u.role_id = r.role_id
+WHERE u.user_id=?
 `,
 
 [

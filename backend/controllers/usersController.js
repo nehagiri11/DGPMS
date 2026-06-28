@@ -55,6 +55,14 @@ async function getUserDisplayName(
 
 }
 
+function normalizeEmail(email) {
+
+  return String(email || "")
+    .trim()
+    .toLowerCase();
+
+}
+
 exports.getUsers =
 async (req, res) => {
 
@@ -121,6 +129,25 @@ async (req, res) => {
       approved = 1
     } = req.body;
 
+    const normalizedName =
+      String(full_name || "").trim();
+
+    const normalizedEmail =
+      normalizeEmail(email);
+
+    if (
+      !normalizedName ||
+      !normalizedEmail ||
+      !password
+    ) {
+
+      return res.status(400).json({
+        success: false,
+        message: "Name, email and password are required"
+      });
+
+    }
+
     const resolvedRoleId =
       role_id ||
       await getRoleId(role);
@@ -163,8 +190,8 @@ async (req, res) => {
 
       [
         employee_code,
-        full_name,
-        email,
+        normalizedName,
+        normalizedEmail,
         hashedPassword,
         resolvedRoleId,
         approved ? 1 : 0
@@ -175,7 +202,7 @@ async (req, res) => {
     await writeAuditLog(
       req.user?.userId,
       "USER_CREATED",
-      `User ${full_name} created`
+      `User ${normalizedName} created`
     );
 
     res.json({
@@ -190,6 +217,17 @@ async (req, res) => {
   } catch (error) {
 
     console.log(error);
+
+    if (
+      error.code === "ER_DUP_ENTRY"
+    ) {
+
+      return res.status(409).json({
+        success: false,
+        message: "Email or employee code already exists"
+      });
+
+    }
 
     res.status(500).json({
       success: false,
@@ -238,6 +276,24 @@ const oldUser = existingUsers[0];
       approved
     } = req.body;
 
+    const normalizedName =
+      String(full_name || "").trim();
+
+    const normalizedEmail =
+      normalizeEmail(email);
+
+    if (
+      !normalizedName ||
+      !normalizedEmail
+    ) {
+
+      return res.status(400).json({
+        success: false,
+        message: "Name and email are required"
+      });
+
+    }
+
     const resolvedRoleId =
       role_id ||
       await getRoleId(role);
@@ -268,8 +324,8 @@ const oldUser = existingUsers[0];
       `,
 
       [
-        full_name,
-        email,
+        normalizedName,
+        normalizedEmail,
         resolvedRoleId,
         approved === undefined
           ? null
@@ -281,15 +337,15 @@ const oldUser = existingUsers[0];
 
    const changes = [];
 
-if (oldUser.full_name !== full_name) {
+if (oldUser.full_name !== normalizedName) {
   changes.push(
-    `name changed from "${oldUser.full_name}" to "${full_name}"`
+    `name changed from "${oldUser.full_name}" to "${normalizedName}"`
   );
 }
 
-if (oldUser.email !== email) {
+if (oldUser.email !== normalizedEmail) {
   changes.push(
-    `email changed from "${oldUser.email}" to "${email}"`
+    `email changed from "${oldUser.email}" to "${normalizedEmail}"`
   );
 }
 
@@ -350,6 +406,17 @@ await writeAuditLog(
 
     console.log(error);
 
+    if (
+      error.code === "ER_DUP_ENTRY"
+    ) {
+
+      return res.status(409).json({
+        success: false,
+        message: "Email already exists"
+      });
+
+    }
+
     res.status(500).json({
 
       success: false,
@@ -369,6 +436,27 @@ async (req, res) => {
 
     const { id } =
       req.params;
+
+    const [existingUsers] =
+      await db.query(
+        `
+        SELECT user_id
+        FROM users
+        WHERE user_id = ?
+        `,
+        [id]
+      );
+
+    if (
+      existingUsers.length === 0
+    ) {
+
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+
+    }
 
     const deletedUserName =
       await getUserDisplayName(id);
@@ -403,6 +491,17 @@ async (req, res) => {
 
     console.log(error);
 
+    if (
+      error.code === "ER_ROW_IS_REFERENCED_2"
+    ) {
+
+      return res.status(409).json({
+        success: false,
+        message: "User has related records and cannot be deleted. Deactivate the user instead."
+      });
+
+    }
+
     res.status(500).json({
 
       success: false,
@@ -422,6 +521,27 @@ async (req, res) => {
 
     const { id } =
       req.params;
+
+    const [existingUsers] =
+      await db.query(
+        `
+        SELECT user_id
+        FROM users
+        WHERE user_id = ?
+        `,
+        [id]
+      );
+
+    if (
+      existingUsers.length === 0
+    ) {
+
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+
+    }
 
     const approvedUserName =
       await getUserDisplayName(id);

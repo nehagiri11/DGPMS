@@ -171,6 +171,18 @@ async (req, res) => {
       details
     } = req.body;
 
+    if (
+      !user ||
+      !action
+    ) {
+
+      return res.status(400).json({
+        success: false,
+        message: "User and action are required"
+      });
+
+    }
+
     await db.query(
 
       `
